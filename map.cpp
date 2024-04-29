@@ -105,6 +105,8 @@ void Map::optimize_placement()
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     std::cout << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
 
+    std::cout << "Optimal antenna position : ";
+    accessible_tiles[max_index]->get_pos().show();
     calculate_data_rate(accessible_tiles[max_index]);
     show_map(display);
     display->add_tiles(0, tiles);
