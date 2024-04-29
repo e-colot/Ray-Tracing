@@ -1,0 +1,48 @@
+#include "rapidjson/document.h"
+#include "rapidjson/filewritestream.h"
+#include "rapidjson/writer.h"
+#include <fstream>
+#include <iostream>
+
+using namespace rapidjson;
+
+int main() {
+    // Create the JSON document
+    Document d;
+    d.SetArray();
+
+    // Create the first object
+    Value item1(kObjectType);
+    item1.AddMember("nom", "Ampoule LED", d.GetAllocator());
+    item1.AddMember("prix", 60, d.GetAllocator());
+    item1.AddMember("categorie", "Optiques", d.GetAllocator());
+
+    // Create the second object
+    Value item2(kObjectType);
+    item2.AddMember("nom", "Plaquettes de frein (x4)", d.GetAllocator());
+    item2.AddMember("prix", 40, d.GetAllocator());
+    item2.AddMember("categorie", "Freinage", d.GetAllocator());
+
+    // Add the objects to the document
+    d.PushBack(item1, d.GetAllocator());
+    d.PushBack(item2, d.GetAllocator());
+
+    // Open the output file using fopen_s
+    FILE* file;
+    errno_t err = fopen_s(&file, "example.json", "wb");
+    if (err != 0) {
+        std::cerr << "Failed to open file for writing." << std::std::endl;
+        return 1;
+    }
+
+    // Write the JSON data to the file
+    char buffer[65536]; // Buffer for writing
+    FileWriteStream os(file, buffer, sizeof(buffer));
+    Writer<FileWriteStream> writer(os);
+    d.Accept(writer);
+
+    // Close the file
+    fclose(file);
+
+    return 0;
+}
