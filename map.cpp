@@ -83,7 +83,7 @@ void Map::show_data_rate(Vector pos) {
 void Map::get_binary_rate() const {
     std::cout << "Binary rate : " << tx->get_binary_rate() << std::endl;
 }
-void Map::optimize_placement()
+void Map::optimize_placement(int nbr_ant)
 {
     if (display == nullptr) {
         std::cout << "No window given to show the data rate" << std::endl;
@@ -91,6 +91,7 @@ void Map::optimize_placement()
     }
     std::cout << "Starting optimization..." << std::endl;
     auto start_time = std::chrono::high_resolution_clock::now();
+
     setup_accessible_tiles();
     floatVect coverage;
     floatVect total_rate_GB;
@@ -101,15 +102,15 @@ void Map::optimize_placement()
             max_index = i;
         }
     }
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-    std::cout << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
-
     std::cout << "Optimal antenna position : ";
     accessible_tiles[max_index]->get_pos().show();
     calculate_data_rate(accessible_tiles[max_index]);
     show_map(display);
     display->add_tiles(0, tiles);
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+    std::cout << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
 }
 void Map::show_map(Graphics* display) const
 {
@@ -245,8 +246,6 @@ void Map::calculate_data_rate(floatVect* cov, floatVect* data)
     }
 }
 void Map::calculate_data_rate(Tile* tx_tile) {
-    std::cout << "Starting heavy computations" << std::endl;
-    auto start_time = std::chrono::high_resolution_clock::now();
     tx = tx_tile->get_antenna();
     for (Tile* t : tiles) {
         rx = t->get_antenna();
@@ -264,9 +263,6 @@ void Map::calculate_data_rate(Tile* tx_tile) {
     }
     tx = nullptr;
     rx = nullptr;
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-    std::cout << "Duration : " << duration.count()/1e6f << " seconds" << std::endl;
 }
 void Map::setup_tiles()
 {

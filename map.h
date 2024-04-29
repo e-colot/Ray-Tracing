@@ -7,6 +7,7 @@
 class Map;
 
 using cornerVect = std::vector<corner*>;
+using floatMatrix = std::vector<std::vector<float>>;
 
 class Map {
 
@@ -34,7 +35,7 @@ public:
     void show_rays();
     void show_data_rate(Vector antenna_pos);
     void get_binary_rate() const;
-    void optimize_placement();
+    void optimize_placement(int number_of_antennas);
 private:
     void show_map(Graphics* display) const;
     void add_wall(Wall* wall_to_add);
