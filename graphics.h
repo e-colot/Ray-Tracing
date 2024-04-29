@@ -66,7 +66,7 @@ public :
 	void add_corner(corner* corner_to_show);
 	void add_rays(RealAntenna* transmitter);
 	void add_text(const char text[], color col, const Vector& pos); // pos is here the center of the text label
-	void add_tiles(int position, tileVect tiles);
+	void add_tiles(tileVect tiles);
 private :
 	void add_line(const Vector& start, const Vector& end, color col);
 	void add_rect(const Vector& start, int length, int width, color col); // Start is here considered as the top of the rectangle with the width on the x axis
@@ -74,7 +74,6 @@ private :
 	void set_colormap_scale(float min, float max);
 	color colormap(float value, Uint8 alpha = 100) const;
 	void add_colormap_legend(const char txt1[] = "MAXIMUM", const char txt2[] = "", const char txt3[] = "", const char txt4[] = "MINIMUM");
-	void add_colormap_legend(float min, float max);
 	Vector to_pixel(const Vector& v) const;
 	int to_pixel(float f) const;
 	int to_pixel(int i) const;

@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     else {
         m = new Map(&g);
         // m->show_data_rate(Vector(11.4f, 4.4f));
-        m->optimize_placement(1);
+        m->optimize_placement(2);
     }
 
     g.start();

@@ -44,8 +44,9 @@ private:
     void setup_walls(bool lift);
     void virtualize_antenna(RealAntenna* antenna);
     void create_rays();
-    void calculate_data_rate(floatVect* coverage, floatVect* total_data_rate);
+    void calculate_data_rate();
     void calculate_data_rate(Tile* tx_tile);
+    void calculate_data_rate(tileVect* tx_tiles);
     void setup_tiles();
     Tile* find_closest_tile(const Vector& position) const;
     void setup_accessible_tiles();
