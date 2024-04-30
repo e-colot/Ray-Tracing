@@ -6,7 +6,8 @@
 
 // ---------- CONSTRUCTORS ----------
 
-Map::Map() : display(nullptr) {}
+Map::Map() : exo_4_1(new Material()), air(new Material()), concrete(new Material()), 
+    gyproc(new Material()), glass(new Material()), metal(new Material()), display(nullptr) {}
 Map::Map(Graphics* g) {
     setup_materials();
     setup_walls(false);
@@ -65,7 +66,7 @@ void Map::show_rays() {
     virtualize_antenna(rx);
     virtualize_antenna(tx);
     create_rays();
-    show_map(display);
+    show_map();
     display->add_rays(tx);
     for (Ray* r : tx->get_rays()) {
         r->show();
@@ -79,7 +80,18 @@ void Map::show_data_rate(const Vector& pos) {
     }
     Tile* this_tile = find_closest_tile(pos);
     calculate_data_rate(this_tile);
-    show_map(display);
+    show_map();
+    display->add_tiles(tiles);
+}
+void Map::show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos)
+{
+    if (display == nullptr) {
+        std::cout << "No window given to show the data rate" << std::endl;
+        return;
+    }
+    tileVect these_tiles = { find_closest_tile(antenna1_pos) , find_closest_tile(antenna2_pos) };
+    calculate_data_rate(&these_tiles);
+    show_map();
     display->add_tiles(tiles);
 }
 void Map::get_binary_rate() const {
@@ -121,7 +133,7 @@ void Map::optimize_placement(int antenna_number)
         accessible_tiles[max_index]->get_pos().show();
         std::cout << "Coverage : " << coverage[max_index] * 100.0 << "%" << std::endl;
         calculate_data_rate(accessible_tiles[max_index]);
-        show_map(display);
+        show_map();
         display->add_tiles(tiles);
     }
     else if (antenna_number == 2) {
@@ -169,7 +181,7 @@ void Map::optimize_placement(int antenna_number)
         accessible_tiles[j_antenna]->get_pos().show();
         tileVect final_antennas = { new Tile(accessible_tiles[i_antenna]) , new Tile(accessible_tiles[j_antenna]) };
         calculate_data_rate(&final_antennas);
-        show_map(display);
+        show_map();
         display->add_tiles(tiles);
         for (Tile* t : final_antennas) {
             delete t;
@@ -179,7 +191,7 @@ void Map::optimize_placement(int antenna_number)
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     std::cout << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
 }
-void Map::show_map(Graphics* display) const
+void Map::show_map() const
 {
     for (Wall* w : walls) {
         display->add_wall(w);
@@ -255,8 +267,8 @@ void Map::setup_walls(bool lift) {
     }
 }
 void Map::virtualize_antenna(RealAntenna* a) {
-    for (int i = 0; i < static_cast<int>(walls.size()); i++) {
-        a->virtualize(walls[i]);
+    for (Wall* w : walls) {
+        a->virtualize(w);
     }
 }
 void Map::create_rays() {
@@ -370,7 +382,9 @@ void Map::setup_accessible_tiles()
                 }
             }
             if (to_keep) {
-                accessible_tiles.push_back(new Tile(t));
+                Tile* new_tile = new Tile(t);
+                virtualize_antenna(new_tile->get_antenna());
+                accessible_tiles.push_back(new_tile);
             }
         }
     }

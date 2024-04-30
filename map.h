@@ -38,7 +38,7 @@ public:
     void get_binary_rate() const;
     void optimize_placement(int number_of_antenna);
 private:
-    void show_map(Graphics* display) const;
+    void show_map() const;
     void add_wall(Wall* wall_to_add);
     void add_corner(corner* corner_to_add);
     void setup_materials();
@@ -56,13 +56,13 @@ private:
     // ---------- ATTRIBUTES ----------
 
 private:
+    const Material* exo_4_1;
+    const Material* air;
+    const Material* concrete;
+    const Material* gyproc;
+    const Material* glass;
+    const Material* metal;
     Graphics* display;
-    Material* exo_4_1;
-    Material* air;
-    Material* concrete;
-    Material* gyproc;
-    Material* glass;
-    Material* metal;
     wallVect walls;
     cornerVect corners;
     tileVect tiles;

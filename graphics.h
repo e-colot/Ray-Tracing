@@ -33,9 +33,9 @@ struct colored_line {
 };
 struct corner {
 	Vector pos;
-	Material* mat;
+	const Material* mat;
 	corner() : pos(Vector()), mat(new Material()) {}
-	corner(Vector position, Material* material) : pos(position), mat(material) {}
+	corner(Vector position, const Material* material) : pos(position), mat(material) {}
 };
 struct txt {
 	SDL_Texture* texture;

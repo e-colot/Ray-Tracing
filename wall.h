@@ -7,7 +7,7 @@
 class Wall;
 
 using floatVect = std::vector <float>;
-using matVect = std::vector<Material*>;
+using matVect = std::vector<const Material*>;
 
 class Wall {
 
@@ -16,9 +16,9 @@ class Wall {
 public:
     Wall();
     Wall(const Vector& start_position, const Vector& direction, const floatVect& interval_values,
-        Material* material);
+        const Material* material);
     Wall(const Vector& start_position, const Vector& direction, const floatVect& interval_values,
-        matVect materials);
+        const matVect materials);
 
     // ---------- ACCESSORS ----------
 
@@ -27,8 +27,8 @@ public:
     Vector get_normal() const;
     Vector get_dir() const;
     floatVect get_intervals() const;
-    Material* get_material(float length) const;
-    Material* get_material(int section) const;
+    const Material* get_material(float length) const;
+    const Material* get_material(int section) const;
 
     // ---------- METHODS ----------
 

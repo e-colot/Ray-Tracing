@@ -8,7 +8,7 @@
 int main(int argc, char* argv[]) {
     
     bool ray = false;
-    bool optimize = true;
+    bool optimize = false;
     int optimize_order = 2;
 
     Graphics g = Graphics("Data Rate");
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
                 m->optimize_placement(optimize_order);
             }
             else {
-                m->show_data_rate(Vector(12.5f, 4.0f));
+                m->show_data_rate(Vector(12.0f, 4.5f), Vector(2.0f, 3.0f));
             }
         }
     }

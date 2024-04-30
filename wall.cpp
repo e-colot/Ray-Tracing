@@ -9,14 +9,14 @@ Wall::Wall() :
     material.push_back(new Material());
     normal = dir.perpendicular();
 }
-Wall::Wall(const Vector& start_pos, const Vector& direction, const floatVect& int_val, Material* mat)
+Wall::Wall(const Vector& start_pos, const Vector& direction, const floatVect& int_val, const Material* mat)
     : pos(start_pos), dir(direction), intervals(int_val) {
     material.push_back(mat);
     dir.normalize();
     normal = dir.perpendicular();
     normal.normalize();
 }
-Wall::Wall(const Vector& start_pos, const Vector& direction, const floatVect& int_val, matVect mat) 
+Wall::Wall(const Vector& start_pos, const Vector& direction, const floatVect& int_val, const matVect mat) 
     : pos(start_pos), dir(direction), intervals(int_val), material(mat) {
     dir.normalize();
     normal = dir.perpendicular();
@@ -37,7 +37,7 @@ Vector Wall::get_dir() const {
 floatVect Wall::get_intervals() const {
     return intervals;
 }
-Material* Wall::get_material(float length) const {
+const Material* Wall::get_material(float length) const {
     int section = 0;
     for (int i = 0; i < static_cast<int>(intervals.size()); i += 2) {
         if ((i + 1 != static_cast<int>(intervals.size())) && (length > intervals[i]) && (length < intervals[i + 1])) {
@@ -47,7 +47,7 @@ Material* Wall::get_material(float length) const {
     }
     return material[section];
 }
-Material* Wall::get_material(int section) const
+const Material* Wall::get_material(int section) const
 {
     return material[static_cast<int>(section/2)];
 }
