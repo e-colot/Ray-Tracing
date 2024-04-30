@@ -11,7 +11,7 @@ class Material {
 public:
     Material();
     Material(float relative_permittivity, float conductivity, float thickness);
-    Material(float relative_permittivity, float conductivity, color color, float thickness);
+    Material(float relative_permittivity, float conductivity, const color& color, float thickness);
 
     // ---------- ACCESSORS ----------
 
@@ -25,10 +25,10 @@ public:
     // ---------- ATTRIBUTES ----------
 
 private:
-    float eps;
-    float sigma;
-    Complex propagation_cst;        // gamma_m in syllabus
-    Complex impedance;              // Z_m in syllabus
-    color col;
-    float thickness;
+    const float eps;
+    const float sigma;
+    const color col;
+    const float thickness;
+    const Complex propagation_cst;        // gamma_m in syllabus
+    const Complex impedance;              // Z_m in syllabus
 };

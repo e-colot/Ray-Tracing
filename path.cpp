@@ -25,7 +25,7 @@ void Path::show() const {
     end.show(false);
     std::cout << ")" << std::endl;
 }
-float Path::intersect_wall(Wall* w) const {
+float Path::intersect_wall(const Wall* w) const {
     float res = NULL;
     if ((start - w->get_pos()).scalar_prod(w->get_normal()) * (end - w->get_pos()).scalar_prod(w->get_normal()) < 0.0f) {
         // if the wall is between the start and the end of the path
@@ -41,7 +41,7 @@ float Path::intersect_wall(Wall* w) const {
     }
     return res;
 }
-Complex Path::calc_reflection(Wall* w, float intersection) const {
+Complex Path::calc_reflection(const Wall* w, float intersection) const {
     float cos_i = abs((end - start).scalar_prod(w->get_normal())) / (end - start).get_norm();
     float sin_i = sqrt(1 - cos_i * cos_i);
     float sin_t = sin_i * sqrt(1 / w->get_material(intersection)->get_relative_permittivity());
@@ -50,7 +50,7 @@ Complex Path::calc_reflection(Wall* w, float intersection) const {
     return (((w->get_material(intersection)->get_impedance() * cos_i) - static_cast<float>(Z_0 * cos_t)) /
         ((w->get_material(intersection)->get_impedance() * cos_i) + static_cast<float>(Z_0 * cos_t)));
 }
-Complex Path::calc_transmission(Wall* w, float intersection) const {
+Complex Path::calc_transmission(const Wall* w, float intersection) const {
     float cos_i = abs((end - start).scalar_prod(w->get_normal())) / (end - start).get_norm();
     float sin_i = sqrt(1 - cos_i * cos_i);
     float sin_t = sin_i * sqrt(1 / w->get_material(intersection)->get_relative_permittivity());

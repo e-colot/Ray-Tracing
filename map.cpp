@@ -6,14 +6,14 @@
 
 // ---------- CONSTRUCTORS ----------
 
-Map::Map() {}
+Map::Map() : display(nullptr) {}
 Map::Map(Graphics* g) {
     setup_materials();
     setup_walls(false);
     setup_tiles();
     add_window(g);
 }
-Map::Map(const Vector& tx_pos, const Vector& rx_pos)  {
+Map::Map(const Vector& tx_pos, const Vector& rx_pos) : display(nullptr) {
     setup_materials();
     setup_walls(false);
     tx = new RealAntenna(tx_pos);
@@ -72,7 +72,7 @@ void Map::show_rays() {
         std::cout << std::endl;
     }
 }
-void Map::show_data_rate(Vector pos) {
+void Map::show_data_rate(const Vector& pos) {
     if (display == nullptr) {
         std::cout << "No window given to show the data rate" << std::endl;
         return;

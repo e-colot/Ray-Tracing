@@ -12,8 +12,8 @@ class Tile
 
 public :
 	Tile();
-	Tile(Vector center_of_tile);
-	Tile(Tile* origin);
+	Tile(const Vector& center_of_tile);
+	Tile(const Tile* origin);
 
 	// ---------- DESTRUCTORS ----------
 
@@ -23,7 +23,7 @@ public:
 	// ---------- ACCESSORS ----------
 
 public :
-	float get_rate(int position);
+	float get_rate(int position) const;
 	RealAntenna* get_antenna() const; 
 	Vector get_pos() const;
 
@@ -31,7 +31,7 @@ public :
 
 public :
 	void add_rate(float rate);
-	bool in_wall(Wall* wall) const;
+	bool in_wall(const Wall* wall) const;
 
 	// ---------- ATTRIBUTES ----------
 

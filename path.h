@@ -23,15 +23,15 @@ public:
 
 public:
     void show() const;
-    float intersect_wall(Wall* wall_to_intersect) const;
-    Complex calc_reflection(Wall* wall_to_reflect_into, float intersection) const;
+    float intersect_wall(const Wall* wall_to_intersect) const;
+    Complex calc_reflection(const Wall* wall_to_reflect_into, float intersection) const;
     Complex calc_attenuation(const wallVect& map) const;
 private:
-    Complex calc_transmission(Wall* wall_to_transmit_through, float intersection) const;
+    Complex calc_transmission(const Wall* wall_to_transmit_through, float intersection) const;
 
     // ---------- ATTRIBUTES ----------
 
 private:
-    Vector start;
-    Vector end;
+    const Vector start;
+    const Vector end;
 };

@@ -6,11 +6,11 @@
 // ----------- CONSTRUCTORS -----------
 
 Tile::Tile() {}
-Tile::Tile(Vector center_of_zone) {
+Tile::Tile(const Vector& center_of_zone) {
 	pos = center_of_zone;
 	antenna = new RealAntenna(pos);
 }
-Tile::Tile(Tile* origin) : Tile(origin->get_pos()) {}
+Tile::Tile(const Tile* origin) : Tile(origin->get_pos()) {}
 
 // ---------- DESTRUCTORS ----------
 
@@ -20,7 +20,7 @@ Tile::~Tile() {
 
 // ---------- ACCESSORS ----------
 
-float Tile::get_rate(int i) {
+float Tile::get_rate(int i) const {
 	return rates[i];
 }
 RealAntenna* Tile::get_antenna() const {
@@ -36,7 +36,7 @@ void Tile::add_rate(float rate_in)
 {
 	rates.push_back(rate_in);
 }
-bool Tile::in_wall(Wall* w) const
+bool Tile::in_wall(const Wall* w) const
 // Check if the tile is inside a wall or in a door
 {
 	float projection = (pos - w->get_pos()).scalar_prod(w->get_dir());
