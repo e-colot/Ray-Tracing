@@ -98,7 +98,6 @@ bool Ray::exist(Path* virtual_path) {
                         \|/
                          |    
                     Where the "X" are the antennas and the walls are vertical and horizontal
-                    Error due to the method of :
                     */
                     return false;
                 }

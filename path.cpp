@@ -30,6 +30,7 @@ float Path::intersect_wall(const Wall* w) const {
     if ((start - w->get_pos()).scalar_prod(w->get_normal()) * (end - w->get_pos()).scalar_prod(w->get_normal()) < 0.0f) {
         // if the wall is between the start and the end of the path
         float fraction = -((start - w->get_pos()).scalar_prod(w->get_normal())) / ((end - start).scalar_prod(w->get_normal()));
+        // fraction of the wall at which it is crossed by the path
         float height = ((start - w->get_pos()).scalar_prod(w->get_dir())) + (fraction * ((end - start).scalar_prod(w->get_dir())));
         for (int i = 0; i < static_cast<int>(w->get_intervals().size()); i += 2) {
             if ((i + 1 != static_cast<int>(w->get_intervals().size())) && (height >= w->get_intervals()[i]) && (height <= w->get_intervals()[i + 1])) {
@@ -38,6 +39,24 @@ float Path::intersect_wall(const Wall* w) const {
                 break;
             }
         }
+    }
+    // TODO : faire fonctionner cette merde (lignes 44 - 60)
+    else if (((start - w->get_pos()).squared_norm() == 0.0f) || ((end - w->get_pos()).squared_norm() == 0.0f)) {
+        // if the start of the wall is exactly at the start or at the end of the path
+        /*
+        ______________
+            /|\
+           / | \
+          X  |  X
+             |
+        Where the "X" are the antennas and the walls are vertical and horizontal
+        */
+        res = 0.0f;
+    }
+    else if (((start - (w->get_pos() + w->get_dir() * w->get_intervals().back())).squared_norm() == 0.0f) || ((start - (w->get_pos() + w->get_dir() * w->get_intervals().back())).squared_norm() == 0.0f)) {
+        // if the end of the wall is exactly at the start or at the end of the path
+        // (same situation)
+        res = w->get_intervals().back();
     }
     return res;
 }
@@ -74,6 +93,7 @@ Complex Path::calc_transmission(const Wall* w, float intersection) const {
     return T_perp;
 }
 Complex Path::calc_attenuation(const wallVect& walls) const {
+    // determine the attenuation due to all the walls that are crossed
     Complex attenuation = Complex(1, 0);
     for (Wall* w : walls) {
         float intersection = intersect_wall(w);
