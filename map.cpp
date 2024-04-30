@@ -78,12 +78,12 @@ void Map::show_data_rate(Vector pos) {
     Tile* this_tile = find_closest_tile(pos);
     calculate_data_rate(this_tile);
     show_map(display);
-    display->add_tiles(0, tiles);
+    display->add_tiles(tiles);
 }
 void Map::get_binary_rate() const {
     std::cout << "Binary rate : " << tx->get_binary_rate() << std::endl;
 }
-void Map::optimize_placement()
+void Map::optimize_placement(int antenna_number)
 {
     if (display == nullptr) {
         std::cout << "No window given to show the data rate" << std::endl;
@@ -92,24 +92,90 @@ void Map::optimize_placement()
     std::cout << "Starting optimization..." << std::endl;
     auto start_time = std::chrono::high_resolution_clock::now();
     setup_accessible_tiles();
-    floatVect coverage;
-    floatVect total_rate_GB;
-    calculate_data_rate(&coverage, &total_rate_GB);
-    int max_index = 0;
-    for (int i = 0; i < static_cast<int>(coverage.size()); i++) {
-        if ((coverage[i] > coverage[max_index]) || ((coverage[i] == coverage[max_index]) && (total_rate_GB[i] >= total_rate_GB[max_index]))) {
-            max_index = i;
+    calculate_data_rate();
+    if (antenna_number == 1) {
+        floatVect coverage;
+        floatVect total_rate_GB;
+        int max_index = 0;
+        // the following finds the coverage and the total data rate of each antenna
+        for (int i = 0; i < static_cast<int>(accessible_tiles.size()); i++) {
+            float cov = 0.0f;
+            float data = 0;
+            for (Tile* t : accessible_tiles) {
+                if (t->get_rate(i) != 0) {
+                    cov++;
+                    data += (static_cast<float>(t->get_rate(i)) / 1e9f);
+                }
+            }
+            total_rate_GB.push_back(data);
+            std::cout << cov << "   " << static_cast<float>(cov) / static_cast<float>(accessible_tiles.size()) << std::endl;
+            coverage.push_back(static_cast<float>(cov)/ static_cast<float>(accessible_tiles.size()));
+            if ((coverage[i] > coverage[max_index]) || ((coverage[i] == coverage[max_index]) && (total_rate_GB[i] >= total_rate_GB[max_index]))) {
+                max_index = i;
+            }
+        }
+
+        std::cout << "Optimal antenna position : ";
+        accessible_tiles[max_index]->get_pos().show();
+        std::cout << "Coverage : " << coverage[max_index] * 100.0 << "%" << std::endl;
+        calculate_data_rate(accessible_tiles[max_index]);
+        show_map(display);
+        display->add_tiles(tiles);
+    }
+    else if (antenna_number == 2) {
+        floatMatrix coverage;
+        floatMatrix total_rate_GB;
+        int i_antenna = 0;
+        int j_antenna = 0;
+
+        // the following finds the coverage and the total data rate of each pair of antenna
+        for (int i = 0; i < static_cast<int>(accessible_tiles.size()); i++) {
+            floatVect cover;
+            floatVect data_rate;
+            for (int j = 0; j < static_cast<int>(accessible_tiles.size()); j++) {
+                if (j < i) {
+                    cover.push_back(coverage[j][i]);
+                    data_rate.push_back(total_rate_GB[j][i]);
+                }
+                else {
+                    int cov = 0;
+                    int data = 0;
+                    for (Tile* t : accessible_tiles) {
+                        if (t->get_rate(i) != 0 || t->get_rate(j) != 0) {
+                            cov++;
+                            data += (static_cast<float>(MAX(t->get_rate(i), t->get_rate(j))) / 1e9f);
+                        }
+                    }
+                    cover.push_back(static_cast<float>(cov) / static_cast<float>(accessible_tiles.size()));
+                    data_rate.push_back(data);
+                }
+            }
+            coverage.push_back(cover);
+            total_rate_GB.push_back(data_rate);
+
+            for (int j = 0; j < static_cast<int>(accessible_tiles.size()); j++) {
+                if ((coverage[i][j] > coverage[i_antenna][j_antenna]) || ((coverage[i][j] == coverage[i_antenna][j_antenna]) && (total_rate_GB[i][j] >= total_rate_GB[i_antenna][j_antenna]))) {
+                    i_antenna = i;
+                    j_antenna = j;
+                }
+            }
+        }
+        std::cout << "Coverage : " << coverage[i_antenna][j_antenna] * 100.0 << "%" << std::endl;
+
+        std::cout << "Optimal positions for 2 antennas : " << std::endl;
+        accessible_tiles[i_antenna]->get_pos().show();
+        accessible_tiles[j_antenna]->get_pos().show();
+        tileVect final_antennas = { new Tile(accessible_tiles[i_antenna]) , new Tile(accessible_tiles[j_antenna]) };
+        calculate_data_rate(&final_antennas);
+        show_map(display);
+        display->add_tiles(tiles);
+        for (Tile* t : final_antennas) {
+            delete t;
         }
     }
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
     std::cout << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
-
-    std::cout << "Optimal antenna position : ";
-    accessible_tiles[max_index]->get_pos().show();
-    calculate_data_rate(accessible_tiles[max_index]);
-    show_map(display);
-    display->add_tiles(0, tiles);
 }
 void Map::show_map(Graphics* display) const
 {
@@ -205,68 +271,48 @@ void Map::create_rays() {
         }
     }
 }
-void Map::calculate_data_rate(floatVect* cov, floatVect* data)
+void Map::calculate_data_rate()
 {
     for (int i = 0; i < static_cast<int>(accessible_tiles.size()); i++) {
         tx = accessible_tiles[i]->get_antenna();
-        int tiles_covered = 0;
-        float total_data = 0;
         for (int j = 0; j < static_cast<int>(accessible_tiles.size()); j++) {
-            bool skip = false;
-            for (int k = 0; k < i; k++) {
-                if (accessible_tiles[k] == accessible_tiles[j]) {
-                    // if we already calculated the situation but int the other side : RX <=> TX
-                    accessible_tiles[j]->add_rate(accessible_tiles[k]->get_rate(j));
-                    skip = true;
-                }
+            if (j < i) {
+                // if we already calculated the situation but in the other side : RX <=> TX
+                accessible_tiles[j]->add_rate(accessible_tiles[i]->get_rate(j));
             }
-            if (!skip) {
+            else {
                 rx = accessible_tiles[j]->get_antenna();
-                if (rx == tx) {
-                    // if it's the same tile
-                    accessible_tiles[j]->add_rate(40e9f);
-                }
-                else {
-                    create_rays();
-                    float rate = tx->get_binary_rate();
-                    accessible_tiles[j]->add_rate(rate);
-                }
-            }
-            tx->reset();
-            total_data += static_cast<float>(accessible_tiles[j]->get_rate(i)/1e9);
-            if (accessible_tiles[j]->get_rate(i) != 0) {
-                tiles_covered++;
+                accessible_tiles[j]->add_rate(calc_rate());
             }
         }
-        cov->push_back(static_cast<float>(tiles_covered) / static_cast<float>(accessible_tiles.size()));
-        data->push_back(total_data);
         tx = nullptr;
         rx = nullptr;
     }
 }
 void Map::calculate_data_rate(Tile* tx_tile) {
-    std::cout << "Starting heavy computations" << std::endl;
-    auto start_time = std::chrono::high_resolution_clock::now();
     tx = tx_tile->get_antenna();
     for (Tile* t : tiles) {
         rx = t->get_antenna();
-        if ((rx->get_pos() - tx->get_pos()).squared_norm() < 1e-5f) {
-            // if it's the same tile
-            t->add_rate(40e9f);
-        }
-        else {
-            create_rays();
-            float rate = tx->get_binary_rate();
-            t->add_rate(rate);
-        }
-        tx->reset();
-        rx->reset();
+        t->add_rate(calc_rate());
     }
     tx = nullptr;
     rx = nullptr;
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-    std::cout << "Duration : " << duration.count()/1e6f << " seconds" << std::endl;
+}
+void Map::calculate_data_rate(tileVect* tx_tiles) {
+    floatVect data_rate_values;
+    for (Tile* tx_tile : *tx_tiles) {
+        tx = tx_tile->get_antenna();
+        for (Tile* t : tiles) {
+            rx = t->get_antenna();
+            data_rate_values.push_back(calc_rate());
+        }
+        tx = nullptr;
+        rx = nullptr;
+    }
+    int size = static_cast<int>(tiles.size());
+    for (int i = 0; i < size; i++) {
+        tiles[i]->add_rate(MAX(data_rate_values[i], data_rate_values[size + i]));
+    }
 }
 void Map::setup_tiles()
 {
@@ -327,4 +373,18 @@ void Map::setup_accessible_tiles()
         }
     }
 }
-/* Memory leak ? Depuis que j'ai remplacé les tiles par des new tiles avec un constructeur de copie, le code va 50 fois plus vite (42s -> 0.8s) */
+float Map::calc_rate()
+{
+    float output;
+    if (tx == rx) {
+        // if it is the same tile
+        output =  4e10f;
+    }
+    else {
+        create_rays();
+        output = tx->get_binary_rate();
+    }
+    tx->reset();
+    rx->reset();
+    return output;
+}

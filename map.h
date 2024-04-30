@@ -48,6 +48,7 @@ private:
     void setup_tiles();
     Tile* find_closest_tile(const Vector& position) const;
     void setup_accessible_tiles();
+    float calc_rate();
 
     // ---------- ATTRIBUTES ----------
 
