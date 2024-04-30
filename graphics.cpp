@@ -162,7 +162,7 @@ void Graphics::add_rays(RealAntenna* tx) {
 	}
 	add_colormap_legend();
 }
-void Graphics::add_text(const char text[], color c, const Vector& p)
+void Graphics::add_text(const char text[], const Vector& p, color c)
 {
 	SDL_Color txt_color = { c.r, c.g, c.b, c.a };
 	SDL_Surface* txt_surf = TTF_RenderText_Solid(font, text, txt_color);
@@ -202,10 +202,10 @@ void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const c
 		add_line(Vector(SCREEN_WIDTH - 80, 100 + 2 * i), Vector(SCREEN_WIDTH - 40, 100 + 2 * i), c);
 		add_line(Vector(SCREEN_WIDTH - 80, 101 + 2 * i), Vector(SCREEN_WIDTH - 40, 101 + 2 * i), c);
 	}
-	add_text(txt4, color({ 255, 255, 255, 255 }), Vector(SCREEN_WIDTH - 120, 610));
-	add_text(txt3, color({ 255, 255, 255, 255 }), Vector(SCREEN_WIDTH - 120, 440));
-	add_text(txt2, color({ 255, 255, 255, 255 }), Vector(SCREEN_WIDTH - 120, 270));
-	add_text(txt1, color({ 255, 255, 255, 255 }), Vector(SCREEN_WIDTH - 120, 100));
+	add_text(txt4, Vector(SCREEN_WIDTH - 120, 610), color({ 255, 255, 255, 255 }));
+	add_text(txt3, Vector(SCREEN_WIDTH - 120, 440), color({ 255, 255, 255, 255 }));
+	add_text(txt2, Vector(SCREEN_WIDTH - 120, 270), color({ 255, 255, 255, 255 }));
+	add_text(txt1, Vector(SCREEN_WIDTH - 120, 100), color({ 255, 255, 255, 255 }));
 }
 void Graphics::add_line(const Vector& start, const Vector& end, color col)
 {

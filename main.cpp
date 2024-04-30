@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
                 m->optimize_placement(optimize_order);
             }
             else {
-                m->show_data_rate(Vector(11.4f, 4.4f));
+                m->show_data_rate(Vector(12.5f, 4.0f));
             }
         }
     }

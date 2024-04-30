@@ -65,7 +65,7 @@ public :
 	void add_wall(Wall* wall_to_add);
 	void add_corner(corner* corner_to_show);
 	void add_rays(RealAntenna* transmitter);
-	void add_text(const char text[], color col, const Vector& pos); // pos is here the center of the text label
+	void add_text(const char text[], const Vector& pos, color col); // pos is here the center of the text label
 	void add_tiles(tileVect tiles);
 private :
 	void add_line(const Vector& start, const Vector& end, color col);
