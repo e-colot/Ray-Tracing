@@ -180,14 +180,32 @@ void Graphics::add_text(const char text[], const Vector& p, color c)
 		}
 	}
 }
-void Graphics::add_tiles(tileVect tiles)
+void Graphics::add_tiles(tileVect tiles, bool dBm)
 {
-	set_colormap_scale(0, 40e9f);
 	for (Tile* t : tiles) {
-		color c = colormap(t->get_rate(0), static_cast<Uint8>(75));
+		color c;
+		if (dBm) {
+			set_colormap_scale(62.47245, 106.0206f);
+			if (t->get_rate(0) == 0) {
+				c = colormap(62.47245, static_cast<Uint8>(75));
+				// set to the minimum value of the colormap
+			}
+			else {
+				c = colormap(10 * log10f(t->get_rate(0)), static_cast<Uint8>(75));
+			}
+		}
+		else {
+			set_colormap_scale(0, 40e9f);
+			c = colormap(t->get_rate(0), static_cast<Uint8>(75));
+		}
 		add_rect(to_pixel(t->get_pos() + Vector(0.0f, -TILE_SIZE / 2.0f)), to_pixel(TILE_SIZE), to_pixel(TILE_SIZE), c);
 	}
-	add_colormap_legend("40 GB/s", "30 GB/s", "10 GB/s", "0  GB/s");
+	if (dBm) {
+		add_colormap_legend("40 GB/s", "1.4 GB/s", "40 MB/s", "0  GB/s");
+	}
+	else {
+		add_colormap_legend("40 GB/s", "30 GB/s", "10 GB/s", "0  GB/s");
+	}
 }
 void Graphics::set_colormap_scale(float min, float max)
 {

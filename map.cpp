@@ -73,7 +73,7 @@ void Map::show_rays() {
         std::cout << std::endl;
     }
 }
-void Map::show_data_rate(const Vector& pos) {
+void Map::show_data_rate(const Vector& pos, bool dBm) {
     if (display == nullptr) {
         std::cout << "No window given to show the data rate" << std::endl;
         return;
@@ -81,9 +81,9 @@ void Map::show_data_rate(const Vector& pos) {
     Tile* this_tile = find_closest_tile(pos);
     calculate_data_rate(this_tile);
     show_map();
-    display->add_tiles(tiles);
+    display->add_tiles(tiles, dBm);
 }
-void Map::show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos)
+void Map::show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos, bool dBm)
 {
     if (display == nullptr) {
         std::cout << "No window given to show the data rate" << std::endl;
@@ -92,7 +92,7 @@ void Map::show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos)
     tileVect these_tiles = { find_closest_tile(antenna1_pos) , find_closest_tile(antenna2_pos) };
     calculate_data_rate(&these_tiles);
     show_map();
-    display->add_tiles(tiles);
+    display->add_tiles(tiles, dBm);
 }
 void Map::get_binary_rate() const {
     std::cout << "Binary rate : " << tx->get_binary_rate() << std::endl;
@@ -153,11 +153,11 @@ void Map::optimize_placement(int antenna_number)
                 }
                 else {
                     int cov = 0;
-                    int data = 0;
+                    float data = 0;
                     for (Tile* t : accessible_tiles) {
                         if (t->get_rate(i) != 0 || t->get_rate(j) != 0) {
                             cov++;
-                            data += (static_cast<float>(MAX(t->get_rate(i), t->get_rate(j))) / 1e9f);
+                            data += static_cast<float>(static_cast<float>(MAX(t->get_rate(i), t->get_rate(j))) / 1e9f);
                         }
                     }
                     cover.push_back(static_cast<float>(cov) / static_cast<float>(accessible_tiles.size()));
