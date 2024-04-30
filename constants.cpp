@@ -16,4 +16,3 @@ const int SCREEN_WIDTH = 1800;
 const int SCREEN_HEIGHT = 800;
 const int SCALE = ((EXERCISE) ? 8 : 90);
 const float TILE_SIZE = ((EXERCISE) ? 1.0f : 0.2f);
-const bool PHASE = false;

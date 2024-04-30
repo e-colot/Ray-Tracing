@@ -73,12 +73,7 @@ bool Ray::exist(Path* virtual_path) {
         float intersection = virtual_path->intersect_wall(tx->get_wall());
         if (intersection != NULL) {
             first_bounce = true;
-            if (PHASE) {
-                attenuation *= virtual_path->calc_reflection(tx->get_wall(), intersection);
-            }
-            else {
-                attenuation *= virtual_path->calc_reflection(tx->get_wall(), intersection).squared_norm();
-            }
+            attenuation *= virtual_path->calc_reflection(tx->get_wall(), intersection).squared_norm();
             add_reflect(tx->get_wall()->get_pos() + tx->get_wall()->get_dir() * intersection);
         }
         else {
@@ -108,12 +103,7 @@ bool Ray::exist(Path* virtual_path) {
                     return false;
                 }
             }
-            if (PHASE) {
-                attenuation *= virtual_path->calc_reflection(rx->get_wall(), intersection);
-            }
-            else {
-                attenuation *= virtual_path->calc_reflection(rx->get_wall(), intersection).squared_norm();
-            }
+            attenuation *= virtual_path->calc_reflection(rx->get_wall(), intersection).squared_norm();
         }
         else {
             return false;
@@ -125,12 +115,7 @@ bool Ray::exist(Path* virtual_path) {
 void Ray::create_path(const wallVect& walls) {
     for (int i = 0; i < static_cast<int>((reflects.size()) - 1); i++) {
         Path* new_path = new Path(reflects[i], reflects[i + 1]);
-        if (PHASE) {
-            attenuation *= new_path->calc_attenuation(walls);
-        }
-        else {
-            attenuation *= new_path->calc_attenuation(walls).squared_norm();
-        }
+        attenuation *= new_path->calc_attenuation(walls).squared_norm();
         add_path(new_path);
     }
 }

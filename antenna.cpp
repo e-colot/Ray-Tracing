@@ -82,21 +82,11 @@ void Antenna::create_ray(Antenna* rx, const wallVect& walls) {
         // implies that it needs to be deleted when we don't use it anymore
         if (new_ray_ptr != nullptr) {
             add_ray(new_ray);
-            if (PHASE) {
-                if (src->get_max_attenuation() < new_ray->get_attenuation().squared_norm()) {
-                    src->set_max_attenuation(new_ray->get_attenuation().squared_norm());
-                }
-                else if (src->get_min_attenuation() > new_ray->get_attenuation().squared_norm()) {
-                    src->set_min_attenuation(new_ray->get_attenuation().squared_norm());
-                }
+            if (src->get_max_attenuation() < new_ray->get_attenuation().get_real()) {
+                src->set_max_attenuation(new_ray->get_attenuation().get_real());
             }
-            else{
-                if (src->get_max_attenuation() < new_ray->get_attenuation().get_real()) {
-                    src->set_max_attenuation(new_ray->get_attenuation().get_real());
-                }
-                else if (src->get_min_attenuation() > new_ray->get_attenuation().get_real()) {
-                    src->set_min_attenuation(new_ray->get_attenuation().get_real());
-                }
+            else if (src->get_min_attenuation() > new_ray->get_attenuation().get_real()) {
+                src->set_min_attenuation(new_ray->get_attenuation().get_real());
             }
         }
         new_ray_ptr = nullptr;
@@ -116,12 +106,7 @@ float RealAntenna::get_binary_rate() const {
     // + 5.49 from syllabus with theta = 0
     // + 1.12 from syllabus
     float received_power_mw;
-    if (PHASE) {
-        received_power_mw = static_cast<float>(emission_factor.squared_norm() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
-    }
-    else {
-        received_power_mw = static_cast<float>(emission_factor.get_real() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
-    }
+    received_power_mw = static_cast<float>(emission_factor.get_real() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
     float received_power_dBm = 10 * log10f(received_power_mw);
     if (received_power_dBm > -40.0f) {
         return 40e9;

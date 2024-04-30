@@ -142,20 +142,10 @@ void Graphics::add_corner(corner* c) {
 	add_rect(to_pixel(c->pos + c->mat->get_thickness() * Vector(0.0f, -0.5f)), to_pixel(c->mat->get_thickness()), to_pixel(c->mat->get_thickness()), c->mat->get_color());
 }
 void Graphics::add_rays(RealAntenna* tx) {
-	if (PHASE) {
-		set_colormap_scale(sqrt(tx->get_min_attenuation()), sqrt(tx->get_max_attenuation()));
-	}
-	else {
-		set_colormap_scale(sqrt(tx->get_min_attenuation()), sqrt(tx->get_max_attenuation()));
-	}
+	set_colormap_scale(sqrt(tx->get_min_attenuation()), sqrt(tx->get_max_attenuation()));
 	for (Ray* r : tx->get_rays()) {
 		color c;
-		if (PHASE) {
-			c = colormap(sqrt(r->get_attenuation().squared_norm()));
-		}
-		else {
-			c = colormap(sqrt(r->get_attenuation().get_real()));
-		}
+		c = colormap(sqrt(r->get_attenuation().get_real()));
 		for (Path* p : r->get_path()) {
 			add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
 		}

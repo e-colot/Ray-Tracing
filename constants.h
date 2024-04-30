@@ -17,7 +17,6 @@ extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
 extern const int SCALE;
 extern const float TILE_SIZE;
-extern const bool PHASE; // true if we don't do the local zone approximation
 
 struct color {
 	// the line above allows to initialize a color without storing a list before creating the color
