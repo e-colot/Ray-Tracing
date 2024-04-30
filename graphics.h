@@ -74,7 +74,6 @@ private :
 	void set_colormap_scale(float min, float max);
 	color colormap(float value, Uint8 alpha = 100) const;
 	void add_colormap_legend(const char txt1[] = "MAXIMUM", const char txt2[] = "", const char txt3[] = "", const char txt4[] = "MINIMUM");
-	void add_colormap_legend(float min, float max);
 	Vector to_pixel(const Vector& v) const;
 	int to_pixel(float f) const;
 	int to_pixel(int i) const;
