@@ -2,6 +2,8 @@
 #include <iostream>
 #include <chrono>
 
+#define MAX(a, b) ((a > b) ? a : b)
+
 // ---------- CONSTRUCTORS ----------
 
 Map::Map() {}

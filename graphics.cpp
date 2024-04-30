@@ -180,11 +180,11 @@ void Graphics::add_text(const char text[], color c, const Vector& p)
 		}
 	}
 }
-void Graphics::add_tiles(int pos, tileVect tiles)
+void Graphics::add_tiles(tileVect tiles)
 {
 	set_colormap_scale(0, 40e9f);
 	for (Tile* t : tiles) {
-		color c = colormap(t->get_rate(pos), static_cast<Uint8>(75));
+		color c = colormap(t->get_rate(0), static_cast<Uint8>(75));
 		add_rect(to_pixel(t->get_pos() + Vector(0.0f, -TILE_SIZE / 2.0f)), to_pixel(TILE_SIZE), to_pixel(TILE_SIZE), c);
 	}
 	add_colormap_legend("40 GB/s", "30 GB/s", "10 GB/s", "0  GB/s");

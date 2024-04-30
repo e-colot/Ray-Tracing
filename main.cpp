@@ -8,7 +8,7 @@
 int main(int argc, char* argv[]) {
     
     bool ray = false;
-    bool optimize = false;
+    bool optimize = true;
     int optimize_order = 2;
 
     Graphics g = Graphics("Data Rate");
