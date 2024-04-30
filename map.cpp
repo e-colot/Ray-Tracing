@@ -376,7 +376,7 @@ void Map::setup_accessible_tiles()
             // if we are not in the kitchen or in the bathroom
             bool to_keep = true;
             for (Wall* w : walls) {
-                if (t->in_wall(w)) {
+                if (w->inside(t->get_pos())) {
                     to_keep = false;
                     break;
                 }

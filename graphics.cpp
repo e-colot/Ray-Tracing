@@ -185,9 +185,9 @@ void Graphics::add_tiles(tileVect tiles, bool dBm)
 	for (Tile* t : tiles) {
 		color c;
 		if (dBm) {
-			set_colormap_scale(62.47245, 106.0206f);
+			set_colormap_scale(62.47245f, 106.0206f);
 			if (t->get_rate(0) == 0) {
-				c = colormap(62.47245, static_cast<Uint8>(75));
+				c = colormap(62.47245f, static_cast<Uint8>(75));
 				// set to the minimum value of the colormap
 			}
 			else {

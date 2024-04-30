@@ -2,6 +2,8 @@
 #include <vector>
 #include <iostream>
 
+#define ABS(a) ((a>=0)? a : -a)
+
 // ---------- CONSTRUCTORS ----------
 
 Wall::Wall() :
@@ -56,4 +58,14 @@ const Material* Wall::get_material(int section) const
 
 Vector Wall::mirror(const Vector& initial) const {
     return initial - normal * 2 * ((initial - pos).scalar_prod(normal));
+}
+
+bool Wall::inside(const Vector& position) const
+{
+    float projection = (position - pos).scalar_prod(dir);
+    if (projection < 0 || projection > intervals.back()) {
+        return false;
+    }
+    Vector projected_point = pos + dir * projection;
+    return (ABS((position - projected_point).scalar_prod(normal)) <= 1e-3);
 }

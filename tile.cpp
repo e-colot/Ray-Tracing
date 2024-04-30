@@ -36,15 +36,3 @@ void Tile::add_rate(float rate_in)
 {
 	rates.push_back(rate_in);
 }
-bool Tile::in_wall(const Wall* w) const
-// Check if the tile is inside a wall or in a door
-{
-	float projection = (pos - w->get_pos()).scalar_prod(w->get_dir());
-	if (projection < 0 || projection > w->get_intervals().back()) {
-		return false;
-	}
-	Vector projected_point = w->get_pos() + w->get_dir() * projection;
-	return (ABS((pos - projected_point).scalar_prod(w->get_normal())) <= 0.1);
-	// 0.1 chosen here to avoid being to close to the wall
-}
-

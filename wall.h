@@ -34,6 +34,7 @@ public:
 
 public:
     Vector mirror(const Vector& position_to_reflect) const;
+    bool inside(const Vector& pos) const;
 
     // ---------- ATTRIBUTES ----------        
 

@@ -31,7 +31,6 @@ public :
 
 public :
 	void add_rate(float rate);
-	bool in_wall(const Wall* wall) const;
 
 	// ---------- ATTRIBUTES ----------
 
