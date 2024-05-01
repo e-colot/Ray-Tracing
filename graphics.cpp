@@ -150,19 +150,22 @@ void Graphics::add_rays(const RealAntenna* tx) {
 }
 void Graphics::add_text(const char text[], const Vector& p, const color& c)
 {
-	SDL_Color txt_color = { c.r, c.g, c.b, c.a };
-	SDL_Surface* txt_surf = TTF_RenderText_Solid(font, text, txt_color);
-	if (txt_surf == NULL) {
-		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
-	}
-	else {
-		SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, txt_surf);
-		if (textTexture == NULL) {
-			printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+	if (*text != '\0') {
+		// if text is not empty
+		SDL_Color txt_color = { c.r, c.g, c.b, c.a };
+		SDL_Surface* txt_surf = TTF_RenderText_Solid(font, text, txt_color);
+		if (txt_surf == NULL) {
+			printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
 		}
 		else {
-			SDL_Rect textRect = SDL_Rect({ static_cast<int>(p.get_x() - txt_surf->w / 2.0f), static_cast<int>(p.get_y() - txt_surf->h / 2.0f), txt_surf->w, txt_surf->h });
-			texts.push_back(new txt(textTexture, textRect));
+			SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, txt_surf);
+			if (textTexture == NULL) {
+				printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+			}
+			else {
+				SDL_Rect textRect = SDL_Rect({ static_cast<int>(p.get_x() - txt_surf->w / 2.0f), static_cast<int>(p.get_y() - txt_surf->h / 2.0f), txt_surf->w, txt_surf->h });
+				texts.push_back(new txt(textTexture, textRect));
+			}
 		}
 	}
 }
