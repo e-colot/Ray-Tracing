@@ -8,7 +8,9 @@ Material::Material() : eps(0.0f), sigma(0.0f), col(color()), thickness(0.0f), pr
 Material::Material(float perm, float conv, const color& color, float thick) :
     eps(perm* EPS_0), sigma(conv), col(color), thickness(thick),
     propagation_cst(Complex(PULS* sqrt((MU_0* eps) / 2)* sqrt(sqrt(1 + (sigma * sigma / (PULS * PULS * eps * eps))) - 1), PULS* sqrt((MU_0* eps) / 2)* sqrt(sqrt(1 + (sigma * sigma / (PULS * PULS * eps * eps))) + 1))),
-    impedance(((static_cast<float>(MU_0)) / (Complex(eps, -sigma / (PULS)))).cplx_sqrt()) {}
+    impedance(((static_cast<float>(MU_0)) / (Complex(eps, -sigma / (PULS)))).cplx_sqrt()) {
+    propagation_cst.show();
+}
 
 // ---------- ACCESSORS ----------
 

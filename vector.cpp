@@ -27,6 +27,11 @@ Vector Vector::operator/(int a) const {
     return Vector(x / a, y / a);
 }
 
+bool Vector::operator==(const Vector& other) const
+{
+    return ((*this - other).squared_norm() <= 1e-3f);
+}
+
 // ---------- ACCESSORS ----------
 
 float Vector::get_x() const {

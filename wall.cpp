@@ -8,18 +8,18 @@
 
 Wall::Wall() :
     pos(Vector()), dir(Vector()), intervals(floatVect{ 0.0f }) {
-    material.push_back(new Material());
+    materials.push_back(new Material());
     normal = dir.perpendicular();
 }
 Wall::Wall(const Vector& start_pos, const Vector& direction, const floatVect& int_val, const Material* mat)
     : pos(start_pos), dir(direction), intervals(int_val) {
-    material.push_back(mat);
+    materials.push_back(mat);
     dir.normalize();
     normal = dir.perpendicular();
     normal.normalize();
 }
 Wall::Wall(const Vector& start_pos, const Vector& direction, const floatVect& int_val, const matVect mat) 
-    : pos(start_pos), dir(direction), intervals(int_val), material(mat) {
+    : pos(start_pos), dir(direction), intervals(int_val), materials(mat) {
     dir.normalize();
     normal = dir.perpendicular();
     normal.normalize();
@@ -47,11 +47,11 @@ const Material* Wall::get_material(float length) const {
             break;
         }
     }
-    return material[section];
+    return materials[section];
 }
 const Material* Wall::get_material(int section) const
 {
-    return material[static_cast<int>(section/2)];
+    return materials[static_cast<int>(section/2)];
 }
 
 // ---------- METHODS ----------

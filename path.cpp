@@ -40,9 +40,9 @@ float Path::intersect_wall(const Wall* w) const {
             }
         }
     }
-    // TODO : faire fonctionner cette merde (lignes 44 - 60)
-    else if (((start - w->get_pos()).squared_norm() == 0.0f) || ((end - w->get_pos()).squared_norm() == 0.0f)) {
-        // if the start of the wall is exactly at the start or at the end of the path
+    // TODO : faire fonctionner cette merde (lignes 43 - 59)
+    else if (start == w->get_pos()) {
+        // if the start of the wall is exactly at the start of the path
         /*
         ______________
             /|\
@@ -53,8 +53,8 @@ float Path::intersect_wall(const Wall* w) const {
         */
         res = 0.0f;
     }
-    else if (((start - (w->get_pos() + w->get_dir() * w->get_intervals().back())).squared_norm() == 0.0f) || ((start - (w->get_pos() + w->get_dir() * w->get_intervals().back())).squared_norm() == 0.0f)) {
-        // if the end of the wall is exactly at the start or at the end of the path
+    else if (start == (w->get_pos() + w->get_dir() * w->get_intervals().back())) {
+        // if the end of the wall is exactly at the start of the path
         // (same situation)
         res = w->get_intervals().back();
     }
@@ -66,8 +66,10 @@ Complex Path::calc_reflection(const Wall* w, float intersection) const {
     float sin_t = sin_i * sqrt(1 / w->get_material(intersection)->get_relative_permittivity());
     float cos_t = sqrt(1 - sin_t * sin_t);
     // 8.39 from syllabus
-    return (((w->get_material(intersection)->get_impedance() * cos_i) - static_cast<float>(Z_0 * cos_t)) /
+    Complex gamma_perp = (((w->get_material(intersection)->get_impedance() * cos_i) - static_cast<float>(Z_0 * cos_t)) /
         ((w->get_material(intersection)->get_impedance() * cos_i) + static_cast<float>(Z_0 * cos_t)));
+    // SEFA : calculer gamma_m
+    return gamma_perp;
 }
 Complex Path::calc_transmission(const Wall* w, float intersection) const {
     float cos_i = abs((end - start).scalar_prod(w->get_normal())) / (end - start).get_norm();
@@ -81,6 +83,10 @@ Complex Path::calc_transmission(const Wall* w, float intersection) const {
     Complex T_perp = (((1 - (gamma_perp * gamma_perp)) * cplx_exp(-s * w->get_material(intersection)->get_propagation_cst())) /
         (1 - gamma_perp * gamma_perp * cplx_exp(-2 * w->get_material(intersection)->get_propagation_cst() * s +
             Complex(0.0f, BETA_AIR * 2 * s * sin_t * sin_i))));
+    //((1 - (gamma_perp * gamma_perp)) * cplx_exp(-s * w->get_material(intersection)->get_propagation_cst())).show();
+    //(1 - gamma_perp * gamma_perp * cplx_exp(-2 * w->get_material(intersection)->get_propagation_cst() * s +
+    //    Complex(0.0f, BETA_AIR * 2 * s * sin_t * sin_i))).show();
+    //T_perp.show();
     if (T_perp.get_real() != T_perp.get_real()) {
         // This condition is only true if T_perp.get_real() == NaN
         // Happens if the propagation constant is too big (for metal)

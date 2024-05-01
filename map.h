@@ -35,7 +35,6 @@ public:
     void show_rays();
     void show_data_rate(const Vector& antenna_pos, bool dBm = false);
     void show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos, bool dBm = false);
-    void get_binary_rate() const;
     void optimize_placement(int number_of_antenna);
 private:
     void show_map() const;

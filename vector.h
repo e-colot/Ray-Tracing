@@ -18,6 +18,7 @@ public:
     Vector operator-(const Vector& other) const;
     Vector operator/(float scalar) const;
     Vector operator/(int scalar) const;
+    bool operator==(const Vector& other) const;
 
     // ---------- ACCESSORS ----------
 

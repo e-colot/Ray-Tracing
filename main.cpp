@@ -6,8 +6,8 @@
 #include "graphics.h"
 
 int main(int argc, char* argv[]) {
-    
-    bool ray = false;
+
+    bool ray = true;
     bool optimize = false;
     int optimize_order = 2;
 
@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
 
     if (EXERCISE) {
         m = new Map(Vector(32, 70), Vector(47, 15), &g);
+        m->show_rays();
     }
     else {
         if (ray) {
@@ -29,7 +30,7 @@ int main(int argc, char* argv[]) {
                 m->optimize_placement(optimize_order);
             }
             else {
-                m->show_data_rate(Vector(12.0f, 4.5f), Vector(2.0f, 3.0f), true);
+                m->show_data_rate(Vector(12.0f, 5.0f), Vector(5.5f, 5.0f), true);
             }
         }
     }

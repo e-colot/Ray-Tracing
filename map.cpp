@@ -93,9 +93,6 @@ void Map::show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos,
     show_map();
     display->add_tiles(tiles, dBm);
 }
-void Map::get_binary_rate() const {
-    std::cout << "Binary rate : " << tx->get_binary_rate() << std::endl;
-}
 void Map::optimize_placement(int antenna_number)
 {
     if (display == nullptr) {
@@ -380,7 +377,8 @@ void Map::setup_accessible_tiles()
     accessible_tiles.clear();
     // deleting accessible_tiles
     for (Tile* t : tiles) {
-        if ((t->get_pos().get_x() < 4 || t->get_pos().get_x() > 11 || t->get_pos().get_y() > 4)) {
+        /*if ((t->get_pos().get_x() < 4 || t->get_pos().get_x() > 11 || t->get_pos().get_y() > 4)) {*/
+        if (true) {
             // if we are not in the kitchen or in the bathroom
             bool to_keep = true;
             for (Wall* w : walls) {

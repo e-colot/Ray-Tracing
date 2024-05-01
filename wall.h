@@ -43,6 +43,6 @@ private:
     Vector dir;
     Vector normal;
     floatVect intervals;
-    matVect material;
+    matVect materials;
 
 };
