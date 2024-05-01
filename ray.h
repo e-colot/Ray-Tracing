@@ -5,54 +5,48 @@
 #include "path.h"
 
 class Ray;
-class Antenna; // here to allow a ray to know that a class Antenna exists to have an instance of it as its attributes
+class Antenna; // Forward declaration to allow a ray to know that a class Antenna exists
 
 using vectorVect = std::vector<Vector>;
 using pathVect = std::vector<const Path*>;
 
 class Ray {
-
-    // ---------- CONSTRUCTORS ----------
-
-public:
-    Ray();
-    Ray(const Antenna* emitter, const Antenna* receiver, Ray** dbl_ptr_to_this, const wallVect& all_walls);
-
-    // ---------- DESTRUCTORS ----------
-
-public:
-    ~Ray();
-
-    // ---------- ACCESSORS ----------
-
-public:
-    const Vector get_start() const;
-    const Vector get_translation() const;
-    const Antenna* get_rx() const;
-    const Antenna* get_tx() const;
-    const vectorVect get_reflects() const;
-    const pathVect get_path() const;
-    double get_attenuation() const;
-
-    // ---------- METHODS ----------
-
-public:
-    void show() const;
+    // Attributes
 private:
-    void add_reflect(const Vector& reflect);
-    bool exist(Path* virtual_path);
-    void create_path(const wallVect& all_walls);
-    void add_path(Path* path);
+    vectorVect reflects; // Stores intermediate positions
+    const Antenna* tx; // Transmitting antenna
+    const Antenna* rx; // Receiving antenna
+    const Vector start; // Start point of the ray
+    const Vector translation; // Translation vector of the ray
+    pathVect path; // Paths of the ray
+    double attenuation; // Attenuation of the ray
 
-    // ---------- ATTRIBUTES ----------
+    // Constructors
+public:
+    Ray(); // Default constructor
+    Ray(const Antenna* emitter, const Antenna* receiver, Ray** dbl_ptr_to_this, const wallVect& all_walls); // Constructor with parameters
+
+    // Destructor
+public:
+    ~Ray(); // Destructor
+
+    // Accessors
+public:
+    const Vector get_start() const; // Returns the start point of the ray
+    const Vector get_translation() const; // Returns the translation vector of the ray
+    const Antenna* get_rx() const; // Returns the receiving antenna
+    const Antenna* get_tx() const; // Returns the transmitting antenna
+    const vectorVect get_reflects() const; // Returns the reflection vectors
+    const pathVect get_path() const; // Returns the paths of the ray
+    double get_attenuation() const; // Returns the attenuation of the ray
+
+    // Methods
+public:
+    void show() const; // Displays information about the ray
 
 private:
-    vectorVect reflects;
-    const Antenna* tx;
-    const Antenna* rx;
-    const Vector start;
-    const Vector translation;
-    pathVect path;
-    double attenuation;
-
+    void add_reflect(const Vector& reflect); // Adds a reflection position to the ray
+    bool exist(Path* virtual_path); // Checks if a virtual path could exist
+    void create_path(const wallVect& all_walls); // Creates a path for the ray
+    void add_path(Path* path); // Adds a path to the ray's path list
 };

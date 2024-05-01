@@ -4,7 +4,7 @@
 
 #define ABS(x) ((x>=0)? x : -x)
 
-// ---------- CONSTRUCTORS ----------
+// Constructors
 
 Graphics::Graphics() : Graphics("No name") {}
 Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset((EXERCISE) ? Vector(750, 50) : Vector(200, 25)) {
@@ -45,8 +45,9 @@ Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset
 	}
 }
 
-Graphics::~Graphics()
-{
+// Destructor
+
+Graphics::~Graphics() {
 	delete surface;
 	for (const colored_rect* r : rectangles) {
 		delete r;
@@ -59,7 +60,7 @@ Graphics::~Graphics()
 	}
 }
 
-// ---------- METHODS ----------
+// Methods
 
 void Graphics::start() {
 	bool quit = false;
@@ -148,8 +149,7 @@ void Graphics::add_rays(const RealAntenna* tx) {
 	}
 	add_colormap_legend();
 }
-void Graphics::add_text(const char text[], const Vector& p, const color& c)
-{
+void Graphics::add_text(const char text[], const Vector& p, const color& c) {
 	if (*text != '\0') {
 		// if text is not empty
 		SDL_Color txt_color = { c.r, c.g, c.b, c.a };
@@ -169,8 +169,7 @@ void Graphics::add_text(const char text[], const Vector& p, const color& c)
 		}
 	}
 }
-void Graphics::add_tiles(const tileVect& tiles, bool dBm)
-{
+void Graphics::add_tiles(const tileVect& tiles, bool dBm) {
 	for (Tile* t : tiles) {
 		color c;
 		if (dBm) {
@@ -180,7 +179,7 @@ void Graphics::add_tiles(const tileVect& tiles, bool dBm)
 				// set to the minimum value of the colormap
 			}
 			else {
-				c = colormap(10 * log10f(t->get_rate(0)), static_cast<Uint8>(75));
+				c = colormap(10 * log10(t->get_rate(0)), static_cast<Uint8>(75));
 			}
 		}
 		else {
@@ -196,13 +195,11 @@ void Graphics::add_tiles(const tileVect& tiles, bool dBm)
 		add_colormap_legend("40 GB/s", "30 GB/s", "10 GB/s", "0  GB/s");
 	}
 }
-void Graphics::set_colormap_scale(double min, double max)
-{
+void Graphics::set_colormap_scale(double min, double max) {
 	min_value = min;
 	max_value = max;
 }
-void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const char txt3[], const char txt4[])
-{
+void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const char txt3[], const char txt4[]) {
 	for (int i = 255; i >= 0; i--)
 	{
 		color c = colormap(min_value + ((255.0f - i)/255.0f) * (max_value - min_value), static_cast<Uint8>(255));
@@ -214,13 +211,11 @@ void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const c
 	add_text(txt2, Vector(SCREEN_WIDTH - 120, 270), color({ 255, 255, 255, 255 }));
 	add_text(txt1, Vector(SCREEN_WIDTH - 120, 100), color({ 255, 255, 255, 255 }));
 }
-void Graphics::add_line(const Vector& start, const Vector& end, const color& col)
-{
+void Graphics::add_line(const Vector& start, const Vector& end, const color& col) {
 	colored_line* line = new colored_line(start, end, col);
 	lines.push_back(line);
 }
-void Graphics::add_rect(const Vector& start, int length, int width, const color& col)
-{
+void Graphics::add_rect(const Vector& start, int length, int width, const color& col) {
 	colored_rect* rect = new colored_rect(start, length, width, col);
 	rectangles.push_back(rect);
 }
@@ -234,8 +229,7 @@ void Graphics::close() {
 	// Quit SDL subsystems
 	SDL_Quit();
 }
-const color Graphics::colormap(double value, Uint8 alpha) const
-{
+const color Graphics::colormap(double value, Uint8 alpha) const {
 	// color first determined in HSV for a better maping
 	double fraction = (value - min_value) / (max_value - min_value);
 	float h = static_cast<float>(160.0f * (1.0f - fraction)) / 255.0f; // Teinte Hue

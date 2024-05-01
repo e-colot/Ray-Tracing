@@ -2,7 +2,7 @@
 #include "math.h"
 #include <iostream>
 
-// ---------- CONSTRUCTORS ----------
+// Constructors
 
 Material::Material() : eps(0.0f), sigma(0.0f), col(color()), thickness(0.0f), propagation_cst(Complex()), impedance(Complex()) {}
 Material::Material(float perm, float conv, const color& color, float thick) :
@@ -10,7 +10,7 @@ Material::Material(float perm, float conv, const color& color, float thick) :
     propagation_cst(Complex(PULS/C * sqrt(perm/2) * sqrt(sqrt(1 + std::pow(sigma / (PULS * eps), 2.0)) - 1), PULS* sqrt((MU_0 * eps) / 2) * sqrt(sqrt(1 + std::pow(sigma / (PULS * eps), 2.0)) + 1))),
     impedance(((static_cast<float>(MU_0)) / (Complex(eps, -sigma / (PULS)))).cplx_sqrt()) {}
 
-// ---------- ACCESSORS ----------
+// Accessors
 
 float Material::get_relative_permittivity() const {
     return eps / EPS_0;
@@ -24,8 +24,6 @@ Complex Material::get_propagation_cst() const {
 color Material::get_color() const {
     return col;
 }
-
-float Material::get_thickness() const
-{
+float Material::get_thickness() const {
     return thickness;
 }

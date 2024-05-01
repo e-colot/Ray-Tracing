@@ -2,36 +2,31 @@
 
 #include "wall.h"
 
-class Path;
 using wallVect = std::vector<const Wall*>;
 
 class Path {
-
-    // ---------- CONSTRUCTORS ----------
-
-public:
-    Path();
-    Path(const Vector& start_point, const Vector& end_point);
-
-    // ---------- ACCESSORS ----------
-
-public:
-    Vector get_start() const;
-    Vector get_end() const;
-
-    // ---------- METHODS ----------
-
-public:
-    void show() const;
-    float intersect_wall(const Wall* wall_to_intersect) const;
-    Complex calc_reflection(const Wall* wall_to_reflect_into, float intersection) const;
-    double calc_attenuation(const wallVect& map) const;
+    // Attributes
 private:
-    Complex calc_transmission(const Wall* wall_to_transmit_through, float intersection) const;
+    const Vector start; // Start point of the path
+    const Vector end; // End point of the path
 
-    // ---------- ATTRIBUTES ----------
+    // Constructors
+public:
+    Path(); // Default constructor
+    Path(const Vector& start_point, const Vector& end_point); // Constructor with start and end points
+
+    // Accessors
+public:
+    Vector get_start() const; // Returns the start point of the path
+    Vector get_end() const; // Returns the end point of the path
+
+    // Methods
+public:
+    void show() const; // Displays information about the path
+    float intersect_wall(const Wall* wall_to_intersect) const; // Calculates intersection with a wall
+    Complex calc_reflection(const Wall* wall_to_reflect_into, float intersection) const; // Calculates reflection off a wall
+    double calc_attenuation(const wallVect& map) const; // Calculates attenuation along the path
 
 private:
-    const Vector start;
-    const Vector end;
+    Complex calc_transmission(const Wall* wall_to_transmit_through, float intersection) const; // Calculates transmission through a wall
 };

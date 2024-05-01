@@ -2,12 +2,12 @@
 #include "math.h"
 #include <iostream>
 
-// ---------- CONSTRUCTORS ----------
+// Constructors
 
 Path::Path() : start(Vector()), end(Vector()) {}
 Path::Path(const Vector& s, const Vector& e) : start(s), end(e) {}
 
-// ---------- ACCESSORS ----------
+// Accessors
 
 Vector Path::get_start() const {
     return start;
@@ -16,7 +16,7 @@ Vector Path::get_end() const {
     return end;
 }
 
-// ---------- METHODS ----------
+// Methods
 
 void Path::show() const {
     std::cout << "Path from (";

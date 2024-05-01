@@ -4,7 +4,7 @@
 
 #define SIGN(a) ((a>=0)? 1 : -1)
 
-// ---------- CONSTRUCTORS ----------
+// Constructors
 
 Complex::Complex() : re(0.0f), im(0.0f) {}
 Complex::Complex(float r) : re(r), im(0.0f) {}
@@ -13,7 +13,7 @@ Complex::Complex(float r, float i) : re(static_cast<double>(r)), im(static_cast<
 Complex::Complex(double r, double i) : re(r), im(i) {}
 Complex::Complex(int r, int i) : re(static_cast<double>(r)), im(static_cast<double>(i)) {}
 
-// ---------- OPERATORS ----------
+// Operators
 
 Complex Complex::operator+(const Complex& c) const {
     return Complex(re + c.get_real(), im + c.get_imag());
@@ -37,7 +37,7 @@ void Complex::operator+=(const Complex& c) {
     im = im + c.get_imag();
 }
 
-// ---------- ACCESSORS ----------
+// Accessors
 
 double Complex::get_real() const {
     return re;
@@ -46,7 +46,7 @@ double Complex::get_imag() const {
     return im;
 }
 
-// ---------- METHODS ----------
+// Methods
 
 Complex Complex::cplx_sqrt() const {
     if (im <= std::numeric_limits<float>::epsilon()) {
@@ -77,7 +77,7 @@ Complex Complex::conjugate() const {
     return Complex(re, -im);
 }
 
-// ---------- COMMUTATIVE OPERATORS ----------
+// Commutative operators
 
 Complex operator*(int a, const Complex& v) {
     return Complex(a, 0) * v;
@@ -105,13 +105,13 @@ Complex operator/(const Complex& v, int a) {
 }
 Complex operator/(float a, const Complex& v) {
     return Complex(a, 0.0f) / v;
-};
+}
 Complex operator/(const Complex& v, float a) {
     return Complex(v.get_real() / a, v.get_imag() / a);
 }
 Complex operator/(double a, const Complex& v) {
     return Complex(a, 0.0) / v;
-};
+}
 Complex operator/(const Complex& v, double a) {
     return Complex(v.get_real() / a, v.get_imag() / a);
 }
@@ -152,7 +152,7 @@ Complex operator-(const Complex& v, double a) {
     return  v - Complex(a, 0.0);
 }
 
-// ---------- OTHER ----------
+// Other
 
 Complex cplx_exp(const Complex& c) {
     return (exp(c.get_real()) * Complex(cos(c.get_imag()), sin(c.get_imag())));

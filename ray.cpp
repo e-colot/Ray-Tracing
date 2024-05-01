@@ -2,7 +2,7 @@
 #include "antenna.h"
 #include <iostream>
 
-// ---------- CONSTRUCTORS ----------
+// Constructors
 
 Ray::Ray() : reflects({ Vector() }), tx(nullptr), rx(nullptr), start(Vector()), translation(Vector()), path({ nullptr }), attenuation(1.0f) {}
 Ray::Ray(const Antenna* t, const Antenna* r, Ray** ptr, const wallVect& walls) : tx(t), rx(r), start(t->get_pos()), translation(r->get_pos() - t->get_pos()), attenuation(1.0f) {
@@ -19,8 +19,9 @@ Ray::Ray(const Antenna* t, const Antenna* r, Ray** ptr, const wallVect& walls) :
     virtual_path = nullptr;
 }
 
-Ray::~Ray()
-{
+// Destructor
+
+Ray::~Ray() {
     for (int i = 0; i < static_cast<int>(path.size()); i++) {
         delete path[i];
         path[i] = nullptr;
@@ -29,7 +30,7 @@ Ray::~Ray()
     rx = nullptr;
 }
 
-// ---------- ACCESSORS ----------
+// Accessors
 
 const Vector Ray::get_start() const {
     return start;
@@ -53,10 +54,9 @@ double Ray::get_attenuation() const {
     return attenuation;
 }
 
-// ---------- METHODS ----------
+// Methods
 
-void Ray::show() const
-{
+void Ray::show() const {
     for (const Path* p : path) {
         p->show();
     }

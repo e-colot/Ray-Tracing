@@ -4,7 +4,7 @@
 
 #define ABS(a) ((a>=0)? a : -a)
 
-// ---------- CONSTRUCTORS ----------
+// Constructors
 
 Wall::Wall() :
     pos(Vector()), dir(Vector()), normal(Vector()), intervals(floatVect{ 0.0f }), materials({ nullptr }) {}
@@ -21,7 +21,7 @@ Wall::Wall(const Vector& start_pos, const Vector& direction, const floatVect& in
     normal.normalize();
 }
 
-// ---------- ACCESSORS ----------
+// Accessors
 
 Vector Wall::get_pos() const {
     return pos;
@@ -45,19 +45,16 @@ const Material* Wall::get_material(float length) const {
     }
     return materials[section];
 }
-const Material* Wall::get_material(int section) const
-{
+const Material* Wall::get_material(int section) const {
     return materials[static_cast<int>(section/2)];
 }
 
-// ---------- METHODS ----------
+// Methods
 
 Vector Wall::mirror(const Vector& initial) const {
     return initial - normal * 2 * ((initial - pos).scalar_prod(normal));
 }
-
-bool Wall::inside(const Vector& position) const
-{
+bool Wall::inside(const Vector& position) const {
     float projection = (position - pos).scalar_prod(dir);
     if (projection < 0 || projection > intervals.back()) {
         return false;

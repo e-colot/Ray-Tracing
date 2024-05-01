@@ -4,13 +4,13 @@
 
 #define ABS(a) ((a>=0)? a : -a)
 
-// ---------- CONSTRUCTORS ----------
+// Constructors
 
 Vector::Vector() : x(0.0f), y(0.0f) {}
 Vector::Vector(int a, int b) : x(static_cast<float>(a)), y(static_cast<float>(b)) {}
 Vector::Vector(float a, float b) : x(a), y(b) {}
 
-// ---------- OPERATORS ----------
+// Operators
 
 Vector Vector::operator+(const Vector& v) const {
     return Vector(x + v.get_x(), y + v.get_y());
@@ -30,7 +30,7 @@ bool Vector::operator==(const Vector& other) const
     return ((*this - other).squared_norm() <= 1e-3f);
 }
 
-// ---------- ACCESSORS ----------
+// Accessors
 
 float Vector::get_x() const {
     return x;
@@ -42,7 +42,7 @@ float Vector::get_norm() const {
     return calc_norm();
 }
 
-// ---------- METHODS ----------
+// Methods
 
 void Vector::normalize() {
     float norm = calc_norm();
@@ -79,7 +79,7 @@ float Vector::calc_norm() const {
     }
 }
 
-// ---------- COMMUTATIVE OPERATORS ----------
+// Commutative operators
 
 Vector operator*(int a, const Vector& v) {
     return Vector(a * v.get_x(), a * v.get_y());

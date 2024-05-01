@@ -2,44 +2,38 @@
 
 #include "antenna.h"
 #include <map>
+#include <vector>
 
 class Tile;
 
 using doubleVect = std::vector<double>;
 
-class Tile
-{
+class Tile {
+    // Attributes
+private:
+    const Vector pos; // Position of the tile
+    doubleVect rates; // Rates associated with the tile
+    RealAntenna* antenna; // Antenna associated with the tile
 
-	// ---------- CONSTRUCTORS ----------
+    // Constructors
+public:
+    Tile(); // Default constructor
+    Tile(const Vector& center_of_tile); // Constructor with center position
+    Tile(const Tile* origin); // Copy constructor from another Tile
 
-public :
-	Tile();
-	Tile(const Vector& center_of_tile);
-	Tile(const Tile* origin);
+    // Destructor
+public:
+    ~Tile(); // Destructor
 
-	// ---------- DESTRUCTORS ----------
+    // Accessors
+public:
+    double get_rate(int position) const; // Returns the rate at a specific position within the tile
+    RealAntenna* get_antenna() const; // Returns the antenna associated with the tile
+    const Vector& get_pos() const; // Returns the position of the tile
 
-public: 
-	~Tile();
+    // Method
+public:
+    void add_rate(double rate); // Adds a rate to the tile
 
-	// ---------- ACCESSORS ----------
-
-public :
-	double get_rate(int position) const;
-	RealAntenna* get_antenna() const; 
-	const Vector get_pos() const;
-
-	// ---------- METHODS ----------
-
-public :
-	void add_rate(double rate);
-
-	// ---------- ATTRIBUTES ----------
-
-private :
-	const Vector pos;
-	doubleVect rates;
-	RealAntenna* antenna;
 
 };
-

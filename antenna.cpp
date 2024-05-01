@@ -2,29 +2,14 @@
 #include "math.h"
 #include <iostream>
 
-// ---------- CONSTRUCTORS ----------
+//                              <---------- ANTENNA ---------->
+
+// Constructors
 
 Antenna::Antenna() : pos(Vector()), src(nullptr), wall(nullptr) {}
 Antenna::Antenna(const Vector& position, RealAntenna* source, const Wall* w) : pos(position), src(source), wall(w) {}
 
-RealAntenna::RealAntenna() : RealAntenna(Vector()) {}
-RealAntenna::RealAntenna(const Vector& position) : Antenna(position, this, nullptr), emission_factor(0.0f), min_attenuation(0.0f), max_attenuation(0.0f) {}
-
-VirtualAntenna::VirtualAntenna() : Antenna() {}
-VirtualAntenna::VirtualAntenna(RealAntenna* realAntenna, const Wall* reflectedWall) : Antenna(reflectedWall->mirror(realAntenna->get_pos()), realAntenna, reflectedWall) {}
-
-// ---------- DESTRUCTORS ----------
-
-RealAntenna::~RealAntenna() {
-    for (int i = 0; i < static_cast<int>(virtual_network.size()); i++) {
-        delete virtual_network[i];
-    }
-    for (int i = 0; i < static_cast<int>(rays.size()); i++) {
-        delete rays[i];
-    }
-}
-
-// ---------- ACCESSORS ----------
+// Accessors
 
 const Vector Antenna::get_pos() const {
     return pos;
@@ -36,35 +21,7 @@ const Wall* Antenna::get_wall() const {
     return wall;
 }
 
-antennaVect RealAntenna::get_virtual_network() const {
-    return virtual_network;
-}
-const rayVect RealAntenna::get_rays() const {
-    return rays;
-}
-
-double RealAntenna::get_min_attenuation() const
-{
-    return min_attenuation;
-}
-
-double RealAntenna::get_max_attenuation() const
-{
-    return max_attenuation;
-}
-
-// ---------- MUTATORS ----------
-
-void RealAntenna::set_min_attenuation(double a)
-{
-    min_attenuation = a;
-}
-void RealAntenna::set_max_attenuation(double a)
-{
-    max_attenuation = a;
-}
-
-// ---------- METHODS ----------
+// Method
 
 void Antenna::create_ray(const Antenna* rx, const wallVect& walls) {
     if ((get_wall() != rx->get_wall()) or ((get_wall() == nullptr) && (rx->get_wall() == nullptr))) {
@@ -87,6 +44,58 @@ void Antenna::create_ray(const Antenna* rx, const wallVect& walls) {
         new_ray_ptr = nullptr;
     }
 }
+
+
+
+//                           <---------- REAL ANTENNA ---------->
+
+// Constructors
+
+RealAntenna::RealAntenna() : RealAntenna(Vector()) {}
+RealAntenna::RealAntenna(const Vector& position) : Antenna(position, this, nullptr), emission_factor(0.0f), min_attenuation(0.0f), max_attenuation(0.0f) {}
+
+// Destructor
+
+RealAntenna::~RealAntenna() {
+    for (int i = 0; i < static_cast<int>(virtual_network.size()); i++) {
+        delete virtual_network[i];
+    }
+    for (int i = 0; i < static_cast<int>(rays.size()); i++) {
+        delete rays[i];
+    }
+}
+
+// Accessors
+
+antennaVect RealAntenna::get_virtual_network() const {
+    return virtual_network;
+}
+const rayVect RealAntenna::get_rays() const {
+    return rays;
+}
+
+double RealAntenna::get_min_attenuation() const
+{
+    return min_attenuation;
+}
+
+double RealAntenna::get_max_attenuation() const
+{
+    return max_attenuation;
+}
+
+// Mutators
+
+void RealAntenna::set_min_attenuation(double a)
+{
+    min_attenuation = a;
+}
+void RealAntenna::set_max_attenuation(double a)
+{
+    max_attenuation = a;
+}
+
+// Methods
 
 void RealAntenna::virtualize(const Wall* w) {
     virtual_network.push_back(new VirtualAntenna(this, w));
@@ -123,6 +132,17 @@ void RealAntenna::reset()
     min_attenuation = 0.0f;
     max_attenuation = 0.0f;
 }
+
+
+
+//                          <---------- VIRTUAL ANTENNA ---------->
+
+// Constructors
+
+VirtualAntenna::VirtualAntenna() : Antenna() {}
+VirtualAntenna::VirtualAntenna(RealAntenna* realAntenna, const Wall* reflectedWall) : Antenna(reflectedWall->mirror(realAntenna->get_pos()), realAntenna, reflectedWall) {}
+
+// Method
 
 void VirtualAntenna::add_ray(const Ray* r) {
     src->add_ray(r);
