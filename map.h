@@ -50,7 +50,7 @@ private:
     void setup_tiles(float tile_size = TILE_SIZE);
     Tile* find_closest_tile(const Vector& position) const;
     void setup_accessible_tiles();
-    float calc_rate() const;
+    double calc_rate() const;
 
     // ---------- ATTRIBUTES ----------
 

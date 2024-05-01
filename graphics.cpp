@@ -193,7 +193,7 @@ void Graphics::add_tiles(const tileVect& tiles, bool dBm)
 		add_colormap_legend("40 GB/s", "30 GB/s", "10 GB/s", "0  GB/s");
 	}
 }
-void Graphics::set_colormap_scale(float min, float max)
+void Graphics::set_colormap_scale(double min, double max)
 {
 	min_value = min;
 	max_value = max;
@@ -231,11 +231,11 @@ void Graphics::close() {
 	// Quit SDL subsystems
 	SDL_Quit();
 }
-const color Graphics::colormap(float value, Uint8 alpha) const
+const color Graphics::colormap(double value, Uint8 alpha) const
 {
 	// color first determined in HSV for a better maping
-	float fraction = (value - min_value) / (max_value - min_value);
-	float h = (160.0f * (1.0f - fraction)) / 255.0f; // Teinte Hue
+	double fraction = (value - min_value) / (max_value - min_value);
+	float h = static_cast<float>(160.0f * (1.0f - fraction)) / 255.0f; // Teinte Hue
 	float s = 1.0f; // Saturation
 	float v = 1.0f; // Value
 

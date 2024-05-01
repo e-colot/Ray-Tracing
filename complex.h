@@ -13,6 +13,7 @@ public:
     Complex(float real);
     Complex(int real);
     Complex(float real, float imaginary);
+    Complex(double real, double imaginary);
     Complex(int real, int imaginary);
 
     // ---------- OPERATORS ----------
@@ -28,23 +29,23 @@ public:
     // ---------- ACCESSORS ----------
 
 public:
-    float get_real() const;
-    float get_imag() const;
+    double get_real() const;
+    double get_imag() const;
 
     // ---------- METHODS ----------
 
 public:
     Complex cplx_sqrt() const;
     void show() const;
-    float squared_norm() const;
+    double squared_norm() const;
 private:
     Complex conjugate() const;
 
     // ---------- ATTRIBUTES ----------
 
 private:
-    float re;
-    float im;
+    double re;
+    double im;
 
 };
 
@@ -54,18 +55,26 @@ Complex operator*(int scalar, const Complex& complex);
 Complex operator*(const Complex& complex, int scalar);
 Complex operator*(float scalar, const Complex& complex);
 Complex operator*(const Complex& complex, float scalar);
+Complex operator*(double scalar, const Complex& complex);
+Complex operator*(const Complex& complex, double scalar);
 Complex operator/(int scalar, const Complex& complex);
 Complex operator/(const Complex& complex, int scalar);
 Complex operator/(float scalar, const Complex& complex);
 Complex operator/(const Complex& complex, float scalar);
+Complex operator/(double scalar, const Complex& complex);
+Complex operator/(const Complex& complex, double scalar);
 Complex operator+(int scalar, const Complex& complex);
 Complex operator+(const Complex& complex, int scalar);
 Complex operator+(float scalar, const Complex& complex);
 Complex operator+(const Complex& complex, float scalar);
+Complex operator+(double scalar, const Complex& complex);
+Complex operator+(const Complex& complex, double scalar);
 Complex operator-(int scalar, const Complex& complex);
 Complex operator-(const Complex& complex, int scalar);
 Complex operator-(float scalar, const Complex& complex);
 Complex operator-(const Complex& complex, float scalar);
+Complex operator-(double scalar, const Complex& complex);
+Complex operator-(const Complex& complex, double scalar);
 
 // ---------- OTHER ----------
 

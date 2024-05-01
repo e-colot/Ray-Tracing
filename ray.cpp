@@ -49,7 +49,7 @@ const vectorVect Ray::get_reflects() const {
 const pathVect Ray::get_path() const {
     return path;
 }
-float Ray::get_attenuation() const {
+double Ray::get_attenuation() const {
     return attenuation;
 }
 

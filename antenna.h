@@ -68,20 +68,20 @@ public:
 public:
     antennaVect get_virtual_network() const;
     const rayVect get_rays() const;
-    float get_min_attenuation() const;
-    float get_max_attenuation() const;
+    double get_min_attenuation() const;
+    double get_max_attenuation() const;
 
     // ---------- MUTATORS ----------
 
 public :
-    void set_min_attenuation(float min_att);
-    void set_max_attenuation(float max_att);
+    void set_min_attenuation(double min_att);
+    void set_max_attenuation(double max_att);
 
     // ---------- METHODS ----------
 
 public:
     void virtualize(const Wall* wall_to_bounce);
-    float get_binary_rate() const;
+    double get_binary_rate() const;
     void reset(); // allows the antenna to start again calculating rays and the binary rate
 private:
     void add_ray(const Ray* ray_to_add) override;
@@ -91,9 +91,9 @@ private:
 private:
     antennaVect virtual_network;
     rayVect rays;
-    float emission_factor;
-    float min_attenuation;
-    float max_attenuation;
+    double emission_factor;
+    double min_attenuation;
+    double max_attenuation;
 
 };
 

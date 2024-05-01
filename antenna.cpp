@@ -43,23 +43,23 @@ const rayVect RealAntenna::get_rays() const {
     return rays;
 }
 
-float RealAntenna::get_min_attenuation() const
+double RealAntenna::get_min_attenuation() const
 {
     return min_attenuation;
 }
 
-float RealAntenna::get_max_attenuation() const
+double RealAntenna::get_max_attenuation() const
 {
     return max_attenuation;
 }
 
 // ---------- MUTATORS ----------
 
-void RealAntenna::set_min_attenuation(float a)
+void RealAntenna::set_min_attenuation(double a)
 {
     min_attenuation = a;
 }
-void RealAntenna::set_max_attenuation(float a)
+void RealAntenna::set_max_attenuation(double a)
 {
     max_attenuation = a;
 }
@@ -76,7 +76,7 @@ void Antenna::create_ray(const Antenna* rx, const wallVect& walls) {
         // implies that it needs to be deleted when we don't use it anymore
         if (new_ray_ptr != nullptr) {
             add_ray(new_ray);
-            float att = new_ray->get_attenuation();
+            double att = new_ray->get_attenuation();
             if (src->get_max_attenuation() < att) {
                 src->set_max_attenuation(att);
             }
@@ -95,21 +95,21 @@ void RealAntenna::add_ray(const Ray* r) {
     rays.push_back(r);
     emission_factor += r->get_attenuation();
 }
-float RealAntenna::get_binary_rate() const {
+double RealAntenna::get_binary_rate() const {
     // 4.5 from exercises syllabus
     // + 5.27 from syllabus
     // + 5.49 from syllabus with theta = 0
     // + 1.12 from syllabus
-    float received_power_mw;
-    received_power_mw = static_cast<float>(emission_factor * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
-    float received_power_dBm = 10 * log10f(received_power_mw);
+    double received_power_mw;
+    received_power_mw = static_cast<double>(emission_factor * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
+    double received_power_dBm = 10 * log10(received_power_mw);
     if (received_power_dBm > -40.0f) {
         return 40e9;
     }
     else if (received_power_dBm < -90.0f) {
         return 0.0f;
     }
-    float binary_rate_dB = static_cast<float>(76.9897 + ((received_power_dBm + 90) / 50 * (106.0206 - 76.9897)));
+    double binary_rate_dB = static_cast<double>(76.9897 + ((received_power_dBm + 90) / 50 * (106.0206 - 76.9897)));
     return (pow(10.0f, binary_rate_dB / 10));
 }
 

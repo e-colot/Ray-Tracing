@@ -65,8 +65,8 @@ private :
 	void add_line(const Vector& start, const Vector& end, const color& col);
 	void add_rect(const Vector& start, int length, int width, const color& col); // Start is here considered as the top of the rectangle with the width on the x axis
 	void close();
-	void set_colormap_scale(float min, float max);
-	const color colormap(float value, Uint8 alpha = 100) const;
+	void set_colormap_scale(double min, double max);
+	const color colormap(double value, Uint8 alpha = 100) const;
 	void add_colormap_legend(const char txt1[] = "MAXIMUM", const char txt2[] = "", const char txt3[] = "", const char txt4[] = "MINIMUM");
 	const Vector to_pixel(const Vector& v) const;
 	int to_pixel(float f) const;
@@ -82,7 +82,7 @@ private :
 	std::vector<const colored_rect*> rectangles;
 	std::vector<const colored_line*> lines;
 	std::vector<const txt*> texts;
-	float min_value;
-	float max_value;
+	double min_value;
+	double max_value;
 	const Vector offset; // displace the origin
 };

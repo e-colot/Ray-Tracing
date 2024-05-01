@@ -308,7 +308,7 @@ void Map::calculate_data_rate(Tile* tx_tile) {
     rx = nullptr;
 }
 void Map::calculate_data_rate(tileVect* tx_tiles) {
-    floatVect data_rate_values;
+    doubleVect data_rate_values;
     for (Tile* tx_tile : *tx_tiles) {
         tx = tx_tile->get_antenna();
         for (Tile* t : tiles) {
@@ -395,9 +395,9 @@ void Map::setup_accessible_tiles()
         }
     }
 }
-float Map::calc_rate() const
+double Map::calc_rate() const
 {
-    float output;
+    double output;
     if (tx == rx) {
         // if it is the same tile
         output =  4e10f;

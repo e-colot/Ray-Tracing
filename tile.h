@@ -5,6 +5,8 @@
 
 class Tile;
 
+using doubleVect = std::vector<double>;
+
 class Tile
 {
 
@@ -23,20 +25,20 @@ public:
 	// ---------- ACCESSORS ----------
 
 public :
-	float get_rate(int position) const;
+	double get_rate(int position) const;
 	RealAntenna* get_antenna() const; 
 	const Vector get_pos() const;
 
 	// ---------- METHODS ----------
 
 public :
-	void add_rate(float rate);
+	void add_rate(double rate);
 
 	// ---------- ATTRIBUTES ----------
 
 private :
 	const Vector pos;
-	floatVect rates;
+	doubleVect rates;
 	RealAntenna* antenna;
 
 };

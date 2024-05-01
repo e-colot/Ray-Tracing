@@ -19,7 +19,7 @@ Tile::~Tile() {
 
 // ---------- ACCESSORS ----------
 
-float Tile::get_rate(int i) const {
+double Tile::get_rate(int i) const {
 	return rates[i];
 }
 RealAntenna* Tile::get_antenna() const {
@@ -31,7 +31,7 @@ const Vector Tile::get_pos() const {
 
 // ---------- METHODS ----------
 
-void Tile::add_rate(float rate_in)
+void Tile::add_rate(double rate_in)
 {
 	rates.push_back(rate_in);
 }

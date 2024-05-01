@@ -8,9 +8,10 @@
 
 Complex::Complex() : re(0.0f), im(0.0f) {}
 Complex::Complex(float r) : re(r), im(0.0f) {}
-Complex::Complex(int r) : re(static_cast<float>(r)), im(0.0f) {}
-Complex::Complex(float r, float i) : re(r), im(i) {}
-Complex::Complex(int r, int i) : re(static_cast<float>(r)), im(static_cast<float>(i)) {}
+Complex::Complex(int r) : re(static_cast<double>(r)), im(0.0) {}
+Complex::Complex(float r, float i) : re(static_cast<double>(r)), im(static_cast<double>(i)) {}
+Complex::Complex(double r, double i) : re(r), im(i) {}
+Complex::Complex(int r, int i) : re(static_cast<double>(r)), im(static_cast<double>(i)) {}
 
 // ---------- OPERATORS ----------
 
@@ -27,7 +28,7 @@ Complex Complex::operator/(const Complex& c) const {
     return (*this * c.conjugate()) / c.squared_norm();
 }
 void Complex::operator*=(const Complex& c) {
-    float old_re = re;
+    double old_re = re;
     re = (re * c.get_real()) - (im * c.get_imag());
     im = (old_re * c.get_imag()) + (im * c.get_real());
 }
@@ -38,10 +39,10 @@ void Complex::operator+=(const Complex& c) {
 
 // ---------- ACCESSORS ----------
 
-float Complex::get_real() const {
+double Complex::get_real() const {
     return re;
 }
-float Complex::get_imag() const {
+double Complex::get_imag() const {
     return im;
 }
 
@@ -51,10 +52,10 @@ Complex Complex::cplx_sqrt() const {
     if (im <= std::numeric_limits<float>::epsilon()) {
         // checks if im == 0
         if (re >= 0) {
-            return Complex(sqrt(re), 0.0f);
+            return Complex(sqrt(re), 0.0);
         }
         else {
-            return Complex(0.0f, sqrt(-re));
+            return Complex(0.0, sqrt(-re));
         }
     }
     else {
@@ -69,7 +70,7 @@ void Complex::show() const {
         std::cout << re << " - j" << -im << std::endl;
     }
 }
-float Complex::squared_norm() const {
+double Complex::squared_norm() const {
     return (re * re + im * im);
 }
 Complex Complex::conjugate() const {
@@ -90,6 +91,12 @@ Complex operator*(float a, const Complex& v) {
 Complex operator*(const Complex& v, float a) {
     return Complex(a, 0.0f) * v;
 }
+Complex operator*(double a, const Complex& v) {
+    return Complex(a, 0.0) * v;
+}
+Complex operator*(const Complex& v, double a) {
+    return Complex(a, 0.0) * v;
+}
 Complex operator/(int a, const Complex& v) {
     return Complex(a, 0) / v;
 }
@@ -100,6 +107,12 @@ Complex operator/(float a, const Complex& v) {
     return Complex(a, 0.0f) / v;
 };
 Complex operator/(const Complex& v, float a) {
+    return Complex(v.get_real() / a, v.get_imag() / a);
+}
+Complex operator/(double a, const Complex& v) {
+    return Complex(a, 0.0) / v;
+};
+Complex operator/(const Complex& v, double a) {
     return Complex(v.get_real() / a, v.get_imag() / a);
 }
 Complex operator+(int a, const Complex& v) {
@@ -114,6 +127,12 @@ Complex operator+(float a, const Complex& v) {
 Complex operator+(const Complex& v, float a) {
     return Complex(a, 0.0f) + v;
 }
+Complex operator+(double a, const Complex& v) {
+    return Complex(a, 0.0) + v;
+}
+Complex operator+(const Complex& v, double a) {
+    return Complex(a, 0.0) + v;
+}
 Complex operator-(int a, const Complex& v) {
     return Complex(a, 0) - v;
 }
@@ -125,6 +144,12 @@ Complex operator-(float a, const Complex& v) {
 }
 Complex operator-(const Complex& v, float a) {
     return  v - Complex(a, 0.0f);
+}
+Complex operator-(double a, const Complex& v) {
+    return Complex(a, 0.0) - v;
+}
+Complex operator-(const Complex& v, double a) {
+    return  v - Complex(a, 0.0);
 }
 
 // ---------- OTHER ----------

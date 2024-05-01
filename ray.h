@@ -32,7 +32,7 @@ public:
     const Antenna* get_tx() const;
     const vectorVect get_reflects() const;
     const pathVect get_path() const;
-    float get_attenuation() const;
+    double get_attenuation() const;
 
     // ---------- METHODS ----------
 
@@ -53,6 +53,6 @@ private:
     const Vector start;
     const Vector translation;
     pathVect path;
-    float attenuation;
+    double attenuation;
 
 };
