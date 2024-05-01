@@ -10,7 +10,6 @@ class Material {
 
 public:
     Material();
-    Material(float relative_permittivity, float conductivity, float thickness);
     Material(float relative_permittivity, float conductivity, const color& color, float thickness);
 
     // ---------- ACCESSORS ----------

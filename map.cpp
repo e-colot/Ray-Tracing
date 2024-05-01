@@ -6,7 +6,7 @@
 
 // ---------- CONSTRUCTORS ----------
 
-Map::Map() : exo_4_1(new Material()), air(new Material()), concrete(new Material()), 
+Map::Map() : exo_4_1(new Material()), concrete(new Material()), 
     gyproc(new Material()), glass(new Material()), metal(new Material()), display(nullptr) {}
 Map::Map(Graphics* g) {
     setup_materials();
@@ -31,7 +31,6 @@ Map::~Map() {
     rx = nullptr;
     tx = nullptr;
     delete exo_4_1;
-    delete air;
     delete concrete;
     delete gyproc;
     delete glass;
@@ -209,7 +208,6 @@ void Map::add_corner(corner* c) {
 void Map::setup_materials() {
     exo_4_1 = new Material(4.8f, 0.018f, color({ 168, 168, 160, 255 }), 0.15f);
 
-    air = new Material(1.0f, 0.0f, 0.0f);
     concrete = new Material(6.4954f, 1.43f, color({69, 69, 61, 255}), 0.3f);
     gyproc = new Material(2.7f, 0.05346f, color({168, 168, 160, 255}), 0.1f);
     glass = new Material(6.3919f, 0.00107f, color({126, 235, 230, 200}), 0.05f);

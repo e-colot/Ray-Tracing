@@ -57,7 +57,6 @@ private:
 
 private:
     const Material* exo_4_1;
-    const Material* air;
     const Material* concrete;
     const Material* gyproc;
     const Material* glass;
