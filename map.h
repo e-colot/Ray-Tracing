@@ -48,7 +48,7 @@ private:
     void calculate_data_rate();
     void calculate_data_rate(Tile* tx_tile);
     void calculate_data_rate(tileVect* tx_tiles);
-    void setup_tiles();
+    void setup_tiles(float tile_size = TILE_SIZE);
     Tile* find_closest_tile(const Vector& position) const;
     void setup_accessible_tiles();
     float calc_rate();

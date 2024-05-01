@@ -6,7 +6,7 @@
 
 Antenna::Antenna() {}
 RealAntenna::RealAntenna() {}
-RealAntenna::RealAntenna(const Vector& position) : emission_factor(Complex(0.0f)), min_attenuation(0.0f), max_attenuation(0.0f) {
+RealAntenna::RealAntenna(const Vector& position) : emission_factor(0.0f), min_attenuation(0.0f), max_attenuation(0.0f) {
     src = this;
     wall = nullptr;
     pos = position;
@@ -82,11 +82,12 @@ void Antenna::create_ray(Antenna* rx, const wallVect& walls) {
         // implies that it needs to be deleted when we don't use it anymore
         if (new_ray_ptr != nullptr) {
             add_ray(new_ray);
-            if (src->get_max_attenuation() < new_ray->get_attenuation().get_real()) {
-                src->set_max_attenuation(new_ray->get_attenuation().get_real());
+            float att = new_ray->get_attenuation();
+            if (src->get_max_attenuation() < att) {
+                src->set_max_attenuation(att);
             }
-            else if (src->get_min_attenuation() > new_ray->get_attenuation().get_real()) {
-                src->set_min_attenuation(new_ray->get_attenuation().get_real());
+            else if (src->get_min_attenuation() > att) {
+                src->set_min_attenuation(att);
             }
         }
         new_ray_ptr = nullptr;
@@ -106,7 +107,7 @@ float RealAntenna::get_binary_rate() const {
     // + 5.49 from syllabus with theta = 0
     // + 1.12 from syllabus
     float received_power_mw;
-    received_power_mw = static_cast<float>(emission_factor.get_real() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
+    received_power_mw = static_cast<float>(emission_factor * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
     float received_power_dBm = 10 * log10f(received_power_mw);
     if (received_power_dBm > -40.0f) {
         return 40e9;
@@ -124,7 +125,7 @@ void RealAntenna::reset()
         delete r;
     }
     rays.clear();
-    emission_factor = Complex(0.0f);
+    emission_factor = 0.0f;
     min_attenuation = 0.0f;
     max_attenuation = 0.0f;
 }

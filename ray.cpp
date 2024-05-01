@@ -14,7 +14,7 @@ Ray::Ray(Antenna* t, Antenna* r, Ray** ptr, const wallVect& walls) : tx(t), rx(r
         // the following line adds the exponential and the decrease with distance terms of 4.5 from exercises syllabus
         // attenuation = cplx_exp(Complex(0.0f, -(BETA_AIR)*translation.get_norm())) / translation.get_norm();
         // it is however simplified because we don't take the phase into account 
-        attenuation = Complex(1 / (translation.squared_norm()));
+        attenuation = 1 / (translation.squared_norm());
         create_path(walls);
     }
     delete virtual_path;
@@ -51,7 +51,7 @@ vectorVect Ray::get_reflects() const {
 pathVect Ray::get_path() const {
     return path;
 }
-Complex Ray::get_attenuation() const {
+float Ray::get_attenuation() const {
     return attenuation;
 }
 
@@ -114,7 +114,7 @@ bool Ray::exist(Path* virtual_path) {
 void Ray::create_path(const wallVect& walls) {
     for (int i = 0; i < static_cast<int>((reflects.size()) - 1); i++) {
         Path* new_path = new Path(reflects[i], reflects[i + 1]);
-        attenuation *= new_path->calc_attenuation(walls).squared_norm();
+        attenuation *= new_path->calc_attenuation(walls);
         add_path(new_path);
     }
 }

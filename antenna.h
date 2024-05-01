@@ -90,7 +90,7 @@ private:
 private:
     antennaVect virtual_network;
     rayVect rays;
-    Complex emission_factor;
+    float emission_factor;
     float min_attenuation;
     float max_attenuation;
 

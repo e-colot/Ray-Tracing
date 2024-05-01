@@ -92,7 +92,7 @@ Complex Path::calc_transmission(const Wall* w, float intersection) const {
     }
     return T_perp;
 }
-Complex Path::calc_attenuation(const wallVect& walls) const {
+float Path::calc_attenuation(const wallVect& walls) const {
     // determine the attenuation due to all the walls that are crossed
     Complex attenuation = Complex(1, 0);
     for (Wall* w : walls) {
@@ -102,5 +102,5 @@ Complex Path::calc_attenuation(const wallVect& walls) const {
             attenuation *= calc_transmission(w, intersection);
         }
     }
-    return attenuation;
+    return attenuation.squared_norm();
 }

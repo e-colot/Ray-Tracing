@@ -326,8 +326,13 @@ void Map::calculate_data_rate(tileVect* tx_tiles) {
         tiles[i]->add_rate(MAX(data_rate_values[i], data_rate_values[size + i]));
     }
 }
-void Map::setup_tiles()
+void Map::setup_tiles(float tile_size)
 {
+    for (Tile* t : tiles) {
+        delete t;
+    }
+    tiles.clear();
+    // deleting tiles
     int size[2];
     if (EXERCISE) {
         size[0] = 60;
@@ -337,17 +342,17 @@ void Map::setup_tiles()
         size[0] = 15;
         size[1] = 8;
     }
-    for (int i = 0; i <= static_cast<int>(size[0]/TILE_SIZE); i++) {
-        for (int j = 0; j <= static_cast<int>(size[1]/TILE_SIZE); j++) {
+    for (int i = 0; i <= static_cast<int>(size[0]/ tile_size); i++) {
+        for (int j = 0; j <= static_cast<int>(size[1]/ tile_size); j++) {
             if (!EXERCISE) {
-                if (j > static_cast<int>(-4.0/3.0 * i + 24.0/TILE_SIZE)) {
+                if (j > static_cast<int>(-4.0/3.0 * i + 24.0/ tile_size)) {
                     continue;
                 }
-                if ((j > static_cast<int>(6 / TILE_SIZE)) and (i > static_cast<int>(4 / TILE_SIZE)) and (i < static_cast<int>(9 / TILE_SIZE))) {
+                if ((j > static_cast<int>(6 / tile_size)) and (i > static_cast<int>(4 / tile_size)) and (i < static_cast<int>(9 / tile_size))) {
                     continue;
                 }
             }
-            Tile* new_tile = new Tile(Vector(i * TILE_SIZE, j * TILE_SIZE));
+            Tile* new_tile = new Tile(Vector(i * tile_size, j * tile_size));
             virtualize_antenna(new_tile->get_antenna());
             tiles.push_back(new_tile);
         }
@@ -369,6 +374,11 @@ Tile* Map::find_closest_tile(const Vector& pos) const
 
 void Map::setup_accessible_tiles()
 {
+    for (Tile* t : accessible_tiles) {
+        delete t;
+    }
+    accessible_tiles.clear();
+    // deleting accessible_tiles
     for (Tile* t : tiles) {
         if ((t->get_pos().get_x() < 4 || t->get_pos().get_x() > 11 || t->get_pos().get_y() > 4)) {
             // if we are not in the kitchen or in the bathroom

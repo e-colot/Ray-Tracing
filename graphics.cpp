@@ -145,7 +145,7 @@ void Graphics::add_rays(RealAntenna* tx) {
 	set_colormap_scale(sqrt(tx->get_min_attenuation()), sqrt(tx->get_max_attenuation()));
 	for (Ray* r : tx->get_rays()) {
 		color c;
-		c = colormap(sqrt(r->get_attenuation().get_real()));
+		c = colormap(sqrt(r->get_attenuation()));
 		for (Path* p : r->get_path()) {
 			add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
 		}

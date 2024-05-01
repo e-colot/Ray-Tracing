@@ -25,7 +25,7 @@ public:
     void show() const;
     float intersect_wall(const Wall* wall_to_intersect) const;
     Complex calc_reflection(const Wall* wall_to_reflect_into, float intersection) const;
-    Complex calc_attenuation(const wallVect& map) const;
+    float calc_attenuation(const wallVect& map) const;
 private:
     Complex calc_transmission(const Wall* wall_to_transmit_through, float intersection) const;
 
