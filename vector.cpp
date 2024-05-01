@@ -7,10 +7,8 @@
 // ---------- CONSTRUCTORS ----------
 
 Vector::Vector() : x(0.0f), y(0.0f) {}
-Vector::Vector(int a, int b) : x(static_cast<float>(a)), y(static_cast<float>(b)) {
-}
-Vector::Vector(float a, float b) : x(a), y(b) {
-}
+Vector::Vector(int a, int b) : x(static_cast<float>(a)), y(static_cast<float>(b)) {}
+Vector::Vector(float a, float b) : x(a), y(b) {}
 
 // ---------- OPERATORS ----------
 
@@ -42,17 +40,6 @@ float Vector::get_y() const {
 }
 float Vector::get_norm() const {
     return calc_norm();
-}
-
-// ---------- MUTATORS ----------
-
-void Vector::set(float x_value, float y_value) {
-    x = x_value;
-    y = y_value;
-}
-void Vector::set(Vector v) {
-    x = v.scalar_prod(Vector(1, 0));
-    y = v.scalar_prod(Vector(0, 1));
 }
 
 // ---------- METHODS ----------

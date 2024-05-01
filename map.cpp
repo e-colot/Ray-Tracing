@@ -6,8 +6,8 @@
 
 // ---------- CONSTRUCTORS ----------
 
-Map::Map() : exo_4_1(new Material()), concrete(new Material()), 
-    gyproc(new Material()), glass(new Material()), metal(new Material()), display(nullptr) {}
+Map::Map() : exo_4_1(nullptr), concrete(nullptr), gyproc(nullptr), 
+    glass(nullptr), metal(nullptr), display(nullptr), rx(nullptr), tx(nullptr) {}
 Map::Map(Graphics* g) {
     setup_materials();
     setup_walls(false);
@@ -35,10 +35,10 @@ Map::~Map() {
     delete gyproc;
     delete glass;
     delete metal;
-    for (Wall* i : walls) {
+    for (const Wall* i : walls) {
         delete i;
     }
-    for (corner* i : corners) {
+    for (const corner* i : corners) {
         delete i;
     }
     for (Tile* t : tiles) {
@@ -57,7 +57,7 @@ void Map::add_window(Graphics* g) {
 
 // ---------- METHODS ----------
 
-void Map::show_rays() {
+void Map::show_rays() const {
     if (display == nullptr) {
         std::cout << "No window given to show the rays" << std::endl;
         return;
@@ -67,7 +67,7 @@ void Map::show_rays() {
     create_rays();
     show_map();
     display->add_rays(tx);
-    for (Ray* r : tx->get_rays()) {
+    for (const Ray* r : tx->get_rays()) {
         r->show();
         std::cout << std::endl;
     }
@@ -189,17 +189,17 @@ void Map::optimize_placement(int antenna_number)
 }
 void Map::show_map() const
 {
-    for (Wall* w : walls) {
+    for (const Wall* w : walls) {
         display->add_wall(w);
     }
-    for (corner* c : corners) {
+    for (const corner* c : corners) {
         display->add_corner(c);
     }
 }
-void Map::add_wall(Wall* w) {
+void Map::add_wall(const Wall* w) {
     walls.push_back(w);
 }
-void Map::add_corner(corner* c) {
+void Map::add_corner(const corner* c) {
     corners.push_back(c);
 }
 void Map::setup_materials() {
@@ -261,12 +261,12 @@ void Map::setup_walls(bool lift) {
         }
     }
 }
-void Map::virtualize_antenna(RealAntenna* a) {
-    for (Wall* w : walls) {
+void Map::virtualize_antenna(RealAntenna* a) const {
+    for (const Wall* w : walls) {
         a->virtualize(w);
     }
 }
-void Map::create_rays() {
+void Map::create_rays() const {
     // direct link
     tx->create_ray(rx, walls);
     // 1 reflexion
@@ -381,7 +381,7 @@ void Map::setup_accessible_tiles()
         if (true) {
             // if we are not in the kitchen or in the bathroom
             bool to_keep = true;
-            for (Wall* w : walls) {
+            for (const Wall* w : walls) {
                 if (w->inside(t->get_pos())) {
                     to_keep = false;
                     break;
@@ -395,7 +395,7 @@ void Map::setup_accessible_tiles()
         }
     }
 }
-float Map::calc_rate()
+float Map::calc_rate() const
 {
     float output;
     if (tx == rx) {

@@ -25,7 +25,7 @@ public:
 public :
 	float get_rate(int position) const;
 	RealAntenna* get_antenna() const; 
-	Vector get_pos() const;
+	const Vector get_pos() const;
 
 	// ---------- METHODS ----------
 
@@ -35,7 +35,7 @@ public :
 	// ---------- ATTRIBUTES ----------
 
 private :
-	Vector pos;
+	const Vector pos;
 	floatVect rates;
 	RealAntenna* antenna;
 

@@ -5,10 +5,10 @@
 #include "path.h"
 
 class Ray;
-class Antenna;
+class Antenna; // here to allow a ray to know that a class Antenna exists to have an instance of it as its attributes
 
 using vectorVect = std::vector<Vector>;
-using pathVect = std::vector<Path*>;
+using pathVect = std::vector<const Path*>;
 
 class Ray {
 
@@ -16,7 +16,7 @@ class Ray {
 
 public:
     Ray();
-    Ray(Antenna* emitter, Antenna* receiver, Ray** dbl_ptr_to_this, const wallVect& all_walls);
+    Ray(const Antenna* emitter, const Antenna* receiver, Ray** dbl_ptr_to_this, const wallVect& all_walls);
 
     // ---------- DESTRUCTORS ----------
 
@@ -26,12 +26,12 @@ public:
     // ---------- ACCESSORS ----------
 
 public:
-    Vector get_start() const;
-    Vector get_translation() const;
-    Antenna* get_rx() const;
-    Antenna* get_tx() const;
-    vectorVect get_reflects() const;
-    pathVect get_path() const;
+    const Vector get_start() const;
+    const Vector get_translation() const;
+    const Antenna* get_rx() const;
+    const Antenna* get_tx() const;
+    const vectorVect get_reflects() const;
+    const pathVect get_path() const;
     float get_attenuation() const;
 
     // ---------- METHODS ----------
@@ -48,10 +48,10 @@ private:
 
 private:
     vectorVect reflects;
-    Antenna* tx;
-    Antenna* rx;
-    Vector start;
-    Vector translation;
+    const Antenna* tx;
+    const Antenna* rx;
+    const Vector start;
+    const Vector translation;
     pathVect path;
     float attenuation;
 

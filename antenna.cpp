@@ -4,20 +4,14 @@
 
 // ---------- CONSTRUCTORS ----------
 
-Antenna::Antenna() {}
-RealAntenna::RealAntenna() {}
-RealAntenna::RealAntenna(const Vector& position) : emission_factor(0.0f), min_attenuation(0.0f), max_attenuation(0.0f) {
-    src = this;
-    wall = nullptr;
-    pos = position;
-}
+Antenna::Antenna() : pos(Vector()), src(nullptr), wall(nullptr) {}
+Antenna::Antenna(const Vector& position, RealAntenna* source, const Wall* w) : pos(position), src(source), wall(w) {}
 
-VirtualAntenna::VirtualAntenna() {}
-VirtualAntenna::VirtualAntenna(RealAntenna* realAntenna, Wall* reflectedWall) {
-    src = realAntenna;
-    wall = reflectedWall;
-    pos = wall->mirror(src->get_pos());
-}
+RealAntenna::RealAntenna() : RealAntenna(Vector()) {}
+RealAntenna::RealAntenna(const Vector& position) : Antenna(position, this, nullptr), emission_factor(0.0f), min_attenuation(0.0f), max_attenuation(0.0f) {}
+
+VirtualAntenna::VirtualAntenna() : Antenna() {}
+VirtualAntenna::VirtualAntenna(RealAntenna* realAntenna, const Wall* reflectedWall) : Antenna(reflectedWall->mirror(realAntenna->get_pos()), realAntenna, reflectedWall) {}
 
 // ---------- DESTRUCTORS ----------
 
@@ -32,20 +26,20 @@ RealAntenna::~RealAntenna() {
 
 // ---------- ACCESSORS ----------
 
-Vector Antenna::get_pos() const {
+const Vector Antenna::get_pos() const {
     return pos;
 }
 RealAntenna* Antenna::get_src() const {
     return src;
 }
-Wall* Antenna::get_wall() const {
+const Wall* Antenna::get_wall() const {
     return wall;
 }
 
 antennaVect RealAntenna::get_virtual_network() const {
     return virtual_network;
 }
-rayVect RealAntenna::get_rays() const {
+const rayVect RealAntenna::get_rays() const {
     return rays;
 }
 
@@ -72,7 +66,7 @@ void RealAntenna::set_max_attenuation(float a)
 
 // ---------- METHODS ----------
 
-void Antenna::create_ray(Antenna* rx, const wallVect& walls) {
+void Antenna::create_ray(const Antenna* rx, const wallVect& walls) {
     if ((get_wall() != rx->get_wall()) or ((get_wall() == nullptr) && (rx->get_wall() == nullptr))) {
         // making sure it's not two virtual antennas mirrored on the same wall
         // the condition after the or is true if the two antennas are RealAntennas -> direct link
@@ -94,10 +88,10 @@ void Antenna::create_ray(Antenna* rx, const wallVect& walls) {
     }
 }
 
-void RealAntenna::virtualize(Wall* w) {
+void RealAntenna::virtualize(const Wall* w) {
     virtual_network.push_back(new VirtualAntenna(this, w));
 }
-void RealAntenna::add_ray(Ray* r) {
+void RealAntenna::add_ray(const Ray* r) {
     rays.push_back(r);
     emission_factor += r->get_attenuation();
 }
@@ -121,7 +115,7 @@ float RealAntenna::get_binary_rate() const {
 
 void RealAntenna::reset()
 {
-    for (Ray* r : rays) {
+    for (const Ray* r : rays) {
         delete r;
     }
     rays.clear();
@@ -130,7 +124,7 @@ void RealAntenna::reset()
     max_attenuation = 0.0f;
 }
 
-void VirtualAntenna::add_ray(Ray* r) {
+void VirtualAntenna::add_ray(const Ray* r) {
     src->add_ray(r);
 }
 

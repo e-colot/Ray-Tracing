@@ -7,13 +7,9 @@
 // ---------- CONSTRUCTORS ----------
 
 Wall::Wall() :
-    pos(Vector()), dir(Vector()), intervals(floatVect{ 0.0f }) {
-    materials.push_back(new Material());
-    normal = dir.perpendicular();
-}
-Wall::Wall(const Vector& start_pos, const Vector& direction, const floatVect& int_val, const Material* mat)
-    : pos(start_pos), dir(direction), intervals(int_val) {
-    materials.push_back(mat);
+    pos(Vector()), dir(Vector()), normal(Vector()), intervals(floatVect{ 0.0f }), materials({ nullptr }) {}
+Wall::Wall(const Vector& start_pos, const Vector& direction, const floatVect& int_val, const Material* mat) : 
+    pos(start_pos), dir(direction), intervals(int_val), materials({ mat }) {
     dir.normalize();
     normal = dir.perpendicular();
     normal.normalize();

@@ -27,12 +27,6 @@ public:
     float get_y() const;
     float get_norm() const;
 
-    // ---------- MUTATORS ----------
-
-public:
-    void set(float x_value, float y_value);
-    void set(Vector other);
-
     // ---------- METHODS ----------
 
 public:

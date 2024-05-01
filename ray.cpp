@@ -4,11 +4,9 @@
 
 // ---------- CONSTRUCTORS ----------
 
-Ray::Ray() {}
-Ray::Ray(Antenna* t, Antenna* r, Ray** ptr, const wallVect& walls) : tx(t), rx(r) {
+Ray::Ray() : reflects({ Vector() }), tx(nullptr), rx(nullptr), start(Vector()), translation(Vector()), path({ nullptr }), attenuation(1.0f) {}
+Ray::Ray(const Antenna* t, const Antenna* r, Ray** ptr, const wallVect& walls) : tx(t), rx(r), start(t->get_pos()), translation(r->get_pos() - t->get_pos()), attenuation(1.0f) {
     Path* virtual_path = new Path(tx->get_pos(), rx->get_pos());
-    start = tx->get_pos();
-    translation = (rx->get_pos() - tx->get_pos());
     if (exist(virtual_path)) {
         *ptr = this;
         // the following line adds the exponential and the decrease with distance terms of 4.5 from exercises syllabus
@@ -33,22 +31,22 @@ Ray::~Ray()
 
 // ---------- ACCESSORS ----------
 
-Vector Ray::get_start() const {
+const Vector Ray::get_start() const {
     return start;
 }
-Vector Ray::get_translation() const {
+const Vector Ray::get_translation() const {
     return translation;
 }
-Antenna* Ray::get_rx() const {
+const Antenna* Ray::get_rx() const {
     return rx;
 }
-Antenna* Ray::get_tx() const {
+const Antenna* Ray::get_tx() const {
     return tx;
 }
-vectorVect Ray::get_reflects() const {
+const vectorVect Ray::get_reflects() const {
     return reflects;
 }
-pathVect Ray::get_path() const {
+const pathVect Ray::get_path() const {
     return path;
 }
 float Ray::get_attenuation() const {
@@ -59,7 +57,7 @@ float Ray::get_attenuation() const {
 
 void Ray::show() const
 {
-    for (Path* p : path) {
+    for (const Path* p : path) {
         p->show();
     }
 }

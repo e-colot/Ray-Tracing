@@ -6,7 +6,7 @@
 
 class Map;
 
-using cornerVect = std::vector<corner*>;
+using cornerVect = std::vector<const corner*>;
 using floatMatrix = std::vector<std::vector<float>>;
 
 class Map {
@@ -32,25 +32,25 @@ public:
     // ---------- METHODS ----------
 
 public:
-    void show_rays();
+    void show_rays() const;
     void show_data_rate(const Vector& antenna_pos, bool dBm = false);
     void show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos, bool dBm = false);
     void optimize_placement(int number_of_antenna);
 private:
     void show_map() const;
-    void add_wall(Wall* wall_to_add);
-    void add_corner(corner* corner_to_add);
+    void add_wall(const Wall* wall_to_add);
+    void add_corner(const corner* corner_to_add);
     void setup_materials();
     void setup_walls(bool lift);
-    void virtualize_antenna(RealAntenna* antenna);
-    void create_rays();
+    void virtualize_antenna(RealAntenna* antenna) const;
+    void create_rays() const;
     void calculate_data_rate();
     void calculate_data_rate(Tile* tx_tile);
     void calculate_data_rate(tileVect* tx_tiles);
     void setup_tiles(float tile_size = TILE_SIZE);
     Tile* find_closest_tile(const Vector& position) const;
     void setup_accessible_tiles();
-    float calc_rate();
+    float calc_rate() const;
 
     // ---------- ATTRIBUTES ----------
 

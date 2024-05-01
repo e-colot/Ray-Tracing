@@ -39,10 +39,10 @@ public:
     // ---------- ATTRIBUTES ----------        
 
 private:
-    Vector pos;
+    const Vector pos;
     Vector dir;
     Vector normal;
-    floatVect intervals;
-    matVect materials;
+    const floatVect intervals;
+    const matVect materials;
 
 };

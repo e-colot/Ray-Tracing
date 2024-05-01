@@ -7,13 +7,7 @@
 // ---------- CONSTRUCTORS ----------
 
 Graphics::Graphics() : Graphics("No name") {}
-Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f) {
-	if (EXERCISE) {
-		offset = Vector(750, 50);
-	}
-	else {
-		offset = Vector(200, 25);
-	}
+Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset((EXERCISE) ? Vector(750, 50) : Vector(200, 25)) {
 	window = NULL;
 	surface = NULL;
 	renderer = NULL;
@@ -51,21 +45,9 @@ Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f) {
 	}
 }
 
-// ---------- DESTRUCTORS ----------
-
-Graphics::~Graphics() {
-	//delete window;
-	//delete surface;
-	//delete renderer;
-	//delete font;
-	//for (txt t : texts) {
-	//	delete t.texture;
-	//}
-}
-
 // ---------- METHODS ----------
 
-void Graphics::start(){
+void Graphics::start() {
 	bool quit = false;
 
 	//Event handler
@@ -104,7 +86,7 @@ void Graphics::start(){
 	//Free resources and close SDL
 	close();
 }
-void Graphics::add_wall(Wall* w) {
+void Graphics::add_wall(const Wall* w) {
 	for (int i = 0; i < static_cast<int>(w->get_intervals().size()); i += 2) {
 		if (i + 1 != static_cast<int>(w->get_intervals().size())) {
 			Vector start;
@@ -138,21 +120,21 @@ void Graphics::add_wall(Wall* w) {
 		}
 	}
 }
-void Graphics::add_corner(corner* c) {
+void Graphics::add_corner(const corner* c) {
 	add_rect(to_pixel(c->pos + c->mat->get_thickness() * Vector(0.0f, -0.5f)), to_pixel(c->mat->get_thickness()), to_pixel(c->mat->get_thickness()), c->mat->get_color());
 }
-void Graphics::add_rays(RealAntenna* tx) {
+void Graphics::add_rays(const RealAntenna* tx) {
 	set_colormap_scale(tx->get_min_attenuation(), tx->get_max_attenuation());
-	for (Ray* r : tx->get_rays()) {
+	for (const Ray* r : tx->get_rays()) {
 		color c;
 		c = colormap(r->get_attenuation());
-		for (Path* p : r->get_path()) {
+		for (const Path* p : r->get_path()) {
 			add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
 		}
 	}
 	add_colormap_legend();
 }
-void Graphics::add_text(const char text[], const Vector& p, color c)
+void Graphics::add_text(const char text[], const Vector& p, const color& c)
 {
 	SDL_Color txt_color = { c.r, c.g, c.b, c.a };
 	SDL_Surface* txt_surf = TTF_RenderText_Solid(font, text, txt_color);
@@ -170,7 +152,7 @@ void Graphics::add_text(const char text[], const Vector& p, color c)
 		}
 	}
 }
-void Graphics::add_tiles(tileVect tiles, bool dBm)
+void Graphics::add_tiles(const tileVect& tiles, bool dBm)
 {
 	for (Tile* t : tiles) {
 		color c;
@@ -215,12 +197,12 @@ void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const c
 	add_text(txt2, Vector(SCREEN_WIDTH - 120, 270), color({ 255, 255, 255, 255 }));
 	add_text(txt1, Vector(SCREEN_WIDTH - 120, 100), color({ 255, 255, 255, 255 }));
 }
-void Graphics::add_line(const Vector& start, const Vector& end, color col)
+void Graphics::add_line(const Vector& start, const Vector& end, const color& col)
 {
 	colored_line line = colored_line(start, end, col);
 	lines.push_back(line);
 }
-void Graphics::add_rect(const Vector& start, int length, int width, color col)
+void Graphics::add_rect(const Vector& start, int length, int width, const color& col)
 {
 	colored_rect rect = colored_rect(start, length, width, col);
 	rectangles.push_back(rect);
@@ -235,7 +217,7 @@ void Graphics::close() {
 	// Quit SDL subsystems
 	SDL_Quit();
 }
-color Graphics::colormap(float value, Uint8 alpha) const
+const color Graphics::colormap(float value, Uint8 alpha) const
 {
 	// color first determined in HSV for a better maping
 	float fraction = (value - min_value) / (max_value - min_value);
@@ -261,7 +243,7 @@ color Graphics::colormap(float value, Uint8 alpha) const
 
 	return color{ static_cast<Uint8>(r * 255), static_cast<Uint8>(g * 255), static_cast<Uint8>(b * 255), alpha };
 }
-Vector Graphics::to_pixel(const Vector& v) const {
+const Vector Graphics::to_pixel(const Vector& v) const {
 	return offset + (SCALE * v);
 }
 int Graphics::to_pixel(float f) const {

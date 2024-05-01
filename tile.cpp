@@ -5,9 +5,8 @@
 
 // ----------- CONSTRUCTORS -----------
 
-Tile::Tile() {}
-Tile::Tile(const Vector& center_of_zone) {
-	pos = center_of_zone;
+Tile::Tile() : pos(Vector()), antenna(nullptr) {}
+Tile::Tile(const Vector& center_of_zone) : pos(center_of_zone) {
 	antenna = new RealAntenna(pos);
 }
 Tile::Tile(const Tile* origin) : Tile(origin->get_pos()) {}
@@ -26,7 +25,7 @@ float Tile::get_rate(int i) const {
 RealAntenna* Tile::get_antenna() const {
 	return antenna;
 }
-Vector Tile::get_pos() const {
+const Vector Tile::get_pos() const {
 	return pos;
 }
 

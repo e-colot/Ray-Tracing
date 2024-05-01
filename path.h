@@ -3,7 +3,7 @@
 #include "wall.h"
 
 class Path;
-using wallVect = std::vector<Wall*>;
+using wallVect = std::vector<const Wall*>;
 
 class Path {
 

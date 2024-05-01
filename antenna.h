@@ -8,7 +8,7 @@ class RealAntenna;
 class VirtualAntenna; 
 
 using antennaVect = std::vector<Antenna*>;
-using rayVect = std::vector<Ray*>;
+using rayVect = std::vector<const Ray*>;
 
 class Antenna {
 
@@ -16,6 +16,7 @@ class Antenna {
 
 public:
     Antenna();
+    Antenna(const Vector& position, RealAntenna* source, const Wall* w);
 
     // ---------- DESTRUCTORS ----------
 
@@ -25,23 +26,23 @@ public:
     // ---------- ACCESSORS ----------
 
 public:
-    Vector get_pos() const;
-    Wall* get_wall() const;
+    const Vector get_pos() const;
+    const Wall* get_wall() const;
     RealAntenna* get_src() const;
 
     // ---------- METHODS ----------
 
 public:
-    void create_ray(Antenna* receiver, const wallVect& all_walls);
+    void create_ray(const Antenna* receiver, const wallVect& all_walls);
 protected:
-    virtual void add_ray(Ray* ray_to_add) = 0;
+    virtual void add_ray(const Ray* ray_to_add) = 0;
 
     // ---------- ATTRIBUTES ----------
 
 protected:
-    Vector pos;
+    const Vector pos;
     RealAntenna* src;
-    Wall* wall;
+    const Wall* wall;
 
 };
 
@@ -66,7 +67,7 @@ public:
 
 public:
     antennaVect get_virtual_network() const;
-    rayVect get_rays() const;
+    const rayVect get_rays() const;
     float get_min_attenuation() const;
     float get_max_attenuation() const;
 
@@ -79,11 +80,11 @@ public :
     // ---------- METHODS ----------
 
 public:
-    void virtualize(Wall* wall_to_bounce);
+    void virtualize(const Wall* wall_to_bounce);
     float get_binary_rate() const;
     void reset(); // allows the antenna to start again calculating rays and the binary rate
 private:
-    void add_ray(Ray* ray_to_add) override;
+    void add_ray(const Ray* ray_to_add) override;
 
     // ---------- ATTRIBUTES ----------
 
@@ -105,7 +106,7 @@ class VirtualAntenna : public Antenna {
 
 public:
     VirtualAntenna();
-    VirtualAntenna(RealAntenna* realAntenna, Wall* reflectedWall);
+    VirtualAntenna(RealAntenna* realAntenna, const Wall* reflectedWall);
 
     // ---------- DESTRUCTORS ----------
 
@@ -115,6 +116,6 @@ public:
     // ---------- METHODS ----------
 
 private:
-    void add_ray(Ray* ray_to_add) override;
+    void add_ray(const Ray* ray_to_add) override;
 
 };

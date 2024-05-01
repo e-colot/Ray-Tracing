@@ -101,7 +101,7 @@ Complex Path::calc_transmission(const Wall* w, float intersection) const {
 float Path::calc_attenuation(const wallVect& walls) const {
     // determine the attenuation due to all the walls that are crossed
     Complex attenuation = Complex(1, 0);
-    for (Wall* w : walls) {
+    for (const Wall* w : walls) {
         float intersection = intersect_wall(w);
         if (intersection != NULL) {
             // si on intersecte le mur i
