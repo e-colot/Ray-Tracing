@@ -1,7 +1,7 @@
 #include "constants.h"
 #include <cmath> // For std::round
 
-const bool EXERCISE = true;
+const bool EXERCISE = false;
 const float MU_0 = 12.56637061e-7f;
 const float EPS_0 = 8.85418782e-12f;
 const long long FREQUENCY = static_cast<long long>((EXERCISE) ? 8683e5 : 60e9);

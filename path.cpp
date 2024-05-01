@@ -26,7 +26,7 @@ void Path::show() const {
     std::cout << ")" << std::endl;
 }
 float Path::intersect_wall(const Wall* w) const {
-    float res = NULL;
+    float res = -1.0f;
     if ((start - w->get_pos()).scalar_prod(w->get_normal()) * (end - w->get_pos()).scalar_prod(w->get_normal()) < 0.0f) {
         // if the wall is between the start and the end of the path
         float fraction = -((start - w->get_pos()).scalar_prod(w->get_normal())) / ((end - start).scalar_prod(w->get_normal()));
@@ -40,7 +40,6 @@ float Path::intersect_wall(const Wall* w) const {
             }
         }
     }
-    // TODO : faire fonctionner cette merde (lignes 43 - 59)
     else if (start == w->get_pos()) {
         // if the start of the wall is exactly at the start of the path
         /*
@@ -83,10 +82,6 @@ Complex Path::calc_transmission(const Wall* w, float intersection) const {
     Complex T_perp = (((1 - (gamma_perp * gamma_perp)) * cplx_exp(-s * w->get_material(intersection)->get_propagation_cst())) /
         (1 - gamma_perp * gamma_perp * cplx_exp(-2 * w->get_material(intersection)->get_propagation_cst() * s +
             Complex(0.0f, BETA_AIR * 2 * s * sin_t * sin_i))));
-    //((1 - (gamma_perp * gamma_perp)) * cplx_exp(-s * w->get_material(intersection)->get_propagation_cst())).show();
-    //(1 - gamma_perp * gamma_perp * cplx_exp(-2 * w->get_material(intersection)->get_propagation_cst() * s +
-    //    Complex(0.0f, BETA_AIR * 2 * s * sin_t * sin_i))).show();
-    //T_perp.show();
     if (T_perp.get_real() != T_perp.get_real()) {
         // This condition is only true if T_perp.get_real() == NaN
         // Happens if the propagation constant is too big (for metal)
@@ -102,8 +97,9 @@ double Path::calc_attenuation(const wallVect& walls) const {
     // determine the attenuation due to all the walls that are crossed
     Complex attenuation = Complex(1, 0);
     for (const Wall* w : walls) {
-        float intersection = intersect_wall(w);
-        if (intersection != NULL) {
+        float intersection = -1.0f;
+        intersection = intersect_wall(w);
+        if (intersection >= 0.0f) {
             // si on intersecte le mur i
             attenuation *= calc_transmission(w, intersection);
         }

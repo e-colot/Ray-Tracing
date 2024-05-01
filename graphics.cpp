@@ -196,8 +196,9 @@ void Graphics::add_tiles(const tileVect& tiles, bool dBm) {
 	}
 }
 void Graphics::set_colormap_scale(double min, double max) {
-	min_value = min;
-	max_value = max;
+	// small changes to make sure we stay in the interval even with the lost of precision from double to float
+	min_value = min-0.001;  
+	max_value = max+0.001;
 }
 void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const char txt3[], const char txt4[]) {
 	for (int i = 255; i >= 0; i--)

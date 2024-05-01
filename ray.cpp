@@ -69,7 +69,7 @@ bool Ray::exist(Path* virtual_path) {
     add_reflect(tx->get_src()->get_pos());
     if (tx->get_wall() != nullptr) {
         float intersection = virtual_path->intersect_wall(tx->get_wall());
-        if (intersection != NULL) {
+        if (intersection >= 0.0f) {
             first_bounce = true;
             attenuation *= virtual_path->calc_reflection(tx->get_wall(), intersection).squared_norm();
             add_reflect(tx->get_wall()->get_pos() + tx->get_wall()->get_dir() * intersection);
@@ -80,7 +80,7 @@ bool Ray::exist(Path* virtual_path) {
     }
     if (rx->get_wall() != nullptr) {
         float intersection = virtual_path->intersect_wall(rx->get_wall());
-        if (intersection != NULL) {
+        if (intersection >= 0.0f) {
             add_reflect(rx->get_wall()->get_pos() + rx->get_wall()->get_dir() * intersection);
             if (first_bounce) {
                 if ((tx->get_pos() - reflects[2]).squared_norm() < (tx->get_pos() - reflects[1]).squared_norm()) {
