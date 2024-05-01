@@ -45,6 +45,20 @@ Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset
 	}
 }
 
+Graphics::~Graphics()
+{
+	delete surface;
+	for (const colored_rect* r : rectangles) {
+		delete r;
+	}
+	for (const colored_line* l : lines) {
+		delete l;
+	}
+	for (const txt* t : texts) {
+		delete t;
+	}
+}
+
 // ---------- METHODS ----------
 
 void Graphics::start() {
@@ -68,15 +82,15 @@ void Graphics::start() {
 		SDL_RenderClear(renderer);
 
 		for (int i = static_cast<int>(rectangles.size())-1; i >= 0; i--) {
-			SDL_SetRenderDrawColor(renderer, rectangles[i].c.r, rectangles[i].c.g, rectangles[i].c.b, rectangles[i].c.a);
-			SDL_RenderFillRect(renderer, &rectangles[i].rect);
+			SDL_SetRenderDrawColor(renderer, rectangles[i]->c.r, rectangles[i]->c.g, rectangles[i]->c.b, rectangles[i]->c.a);
+			SDL_RenderFillRect(renderer, &rectangles[i]->rect);
 		}
 		for (int i = static_cast<int>(lines.size()) - 1; i >= 0; i--) {
-			SDL_SetRenderDrawColor(renderer, lines[i].c.r, lines[i].c.g, lines[i].c.b, lines[i].c.a);
-			SDL_RenderDrawLine(renderer, lines[i].x1, lines[i].y1, lines[i].x2, lines[i].y2);
+			SDL_SetRenderDrawColor(renderer, lines[i]->c.r, lines[i]->c.g, lines[i]->c.b, lines[i]->c.a);
+			SDL_RenderDrawLine(renderer, lines[i]->x1, lines[i]->y1, lines[i]->x2, lines[i]->y2);
 		}
 		for (int i = static_cast<int>(texts.size()) - 1; i >= 0; i--) {
-			SDL_RenderCopy(renderer, texts[i].texture, NULL, &(texts[i].rect));
+			SDL_RenderCopy(renderer, texts[i]->texture, NULL, &(texts[i]->rect));
 		}
 
 		//Update screen
@@ -148,7 +162,7 @@ void Graphics::add_text(const char text[], const Vector& p, const color& c)
 		}
 		else {
 			SDL_Rect textRect = SDL_Rect({ static_cast<int>(p.get_x() - txt_surf->w / 2.0f), static_cast<int>(p.get_y() - txt_surf->h / 2.0f), txt_surf->w, txt_surf->h });
-			texts.push_back(txt(textTexture, textRect));
+			texts.push_back(new txt(textTexture, textRect));
 		}
 	}
 }
@@ -199,12 +213,12 @@ void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const c
 }
 void Graphics::add_line(const Vector& start, const Vector& end, const color& col)
 {
-	colored_line line = colored_line(start, end, col);
+	colored_line* line = new colored_line(start, end, col);
 	lines.push_back(line);
 }
 void Graphics::add_rect(const Vector& start, int length, int width, const color& col)
 {
-	colored_rect rect = colored_rect(start, length, width, col);
+	colored_rect* rect = new colored_rect(start, length, width, col);
 	rectangles.push_back(rect);
 }
 void Graphics::close() {

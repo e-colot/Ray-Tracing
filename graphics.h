@@ -45,6 +45,11 @@ public :
 	Graphics();
 	Graphics(const char window_name[]);
 
+	// ---------- DESTRUCTORS ----------
+ 
+public :
+	~Graphics();
+
 	// ---------- ACCESSORS ----------
 
     // ---------- METHODS ----------
@@ -74,9 +79,9 @@ private :
 	SDL_Surface* surface;
 	SDL_Renderer* renderer;
 	TTF_Font* font;
-	std::vector<colored_rect> rectangles;
-	std::vector< colored_line> lines;
-	std::vector<txt> texts;
+	std::vector<const colored_rect*> rectangles;
+	std::vector<const colored_line*> lines;
+	std::vector<const txt*> texts;
 	float min_value;
 	float max_value;
 	const Vector offset; // displace the origin
