@@ -6,25 +6,38 @@
 
 int main(int argc, char* argv[]) {
 
-    bool ray = true;
-    bool optimize = true;
+    bool ray = false;
+    bool dB = true;
+    bool optimize = false;
     int optimize_order = 2;
 
-    Graphics g = Graphics("Data Rate");
+    Graphics* g;
+
+    // Transform show rays to display power instead of |E|
 
     Map* m;
 
     if (EXERCISE) {
-        m = new Map(Vector(32, 70), Vector(47, 15), &g);
-        m->show_rays(true);
+        if (dB) {
+            g = new Graphics("TODO");
+            m = new Map(Vector(32, 70), Vector(47, 15), g);
+            m->show_rays(true);
+        }
+        else {
+            g = new Graphics("Rays, in V^2");
+            m = new Map(Vector(32, 70), Vector(47, 15), g);
+            m->show_rays(false);
+        }
     }
     else {
         if (ray) {
-            m = new Map(Vector(9.5f, 6.9f), Vector(11.1f, 4.1f), &g);
+            g = new Graphics("TODO");
+            m = new Map(Vector(9.5f, 6.9f), Vector(11.1f, 4.1f), g);
             m->show_rays();
         }
         else {
-            m = new Map(&g);
+            g = new Graphics("Data rate");
+            m = new Map(g);
             if (optimize) {
                 m->optimize_placement(optimize_order);
             }
@@ -34,7 +47,10 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    g.start();
+    g->start();
+
+    delete m;
+    delete g;
 
     return 0;
 }

@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include <iostream>
 #include <cmath>
+#include <sstream> // to transform double in char[]
 
 #define ABS(x) ((x>=0)? x : -x)
 
@@ -153,6 +154,11 @@ void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 				add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
 			}
 		}
+		std::stringstream s1;
+		s1 << log10(tx->get_min_attenuation());
+		std::stringstream s2;
+		s2 << log10(tx->get_max_attenuation());
+		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());
 	}
 	else {
 		set_colormap_scale(tx->get_min_attenuation(), tx->get_max_attenuation());
@@ -163,8 +169,12 @@ void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 				add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
 			}
 		}
+		std::stringstream s1;
+		s1 << tx->get_min_attenuation();
+		std::stringstream s2;
+		s2 << tx->get_max_attenuation();
+		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());
 	}
-	add_colormap_legend();
 }
 void Graphics::add_text(const char text[], const Vector& p, const color& c) {
 	if (*text != '\0') {
