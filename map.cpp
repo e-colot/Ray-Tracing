@@ -281,7 +281,12 @@ void Map::calculate_data_rate() {
 		for (int j = 0; j < static_cast<int>(accessible_tiles.size()); j++) {
 			if (j < i) {
 				// if we already calculated the situation but in the other side : RX <=> TX
-				accessible_tiles[j]->add_rate(accessible_tiles[i]->get_rate(j));
+				accessible_tiles[j]->add_rate(accessible_tiles[i]->get_rate(j)); //(50% time saved)
+			}
+			 if ((tx->get_pos().get_x() > 4 && tx->get_pos().get_x() < 11 && tx->get_pos().get_y() < 4) && 
+				((accessible_tiles[j]->get_pos().get_x() > 4 && accessible_tiles[j]->get_pos().get_x() < 11 && accessible_tiles[j]->get_pos().get_y() < 4))) {
+				// if both rx and tx are in the kitchen or the bathroom
+				accessible_tiles[j]->add_rate(0.0); // (10% time saved)
 			}
 			else {
 				rx = accessible_tiles[j]->get_antenna();
@@ -360,27 +365,25 @@ Tile* Map::find_closest_tile(const Vector& pos) const {
 	return closest_tile;
 }
 void Map::setup_accessible_tiles() {
+	// using only these tiles for the optimisation
+	// (70% time saved)
 	for (Tile* t : accessible_tiles) {
 		delete t;
 	}
 	accessible_tiles.clear();
 	// deleting accessible_tiles
 	for (Tile* t : tiles) {
-		/*if ((t->get_pos().get_x() < 4 || t->get_pos().get_x() > 11 || t->get_pos().get_y() > 4)) {*/
-		if (true) {
-			// if we are not in the kitchen or in the bathroom
-			bool to_keep = true;
-			for (const Wall* w : walls) {
-				if (w->inside(t->get_pos())) {
-					to_keep = false;
-					break;
-				}
+		bool to_keep = true;
+		for (const Wall* w : walls) {
+			if (w->inside(t->get_pos())) {
+				to_keep = false;
+				break;
 			}
-			if (to_keep) {
-				Tile* new_tile = new Tile(t);
-				virtualize_antenna(new_tile->get_antenna());
-				accessible_tiles.push_back(new_tile);
-			}
+		}
+		if (to_keep) {
+			Tile* new_tile = new Tile(t);
+			virtualize_antenna(new_tile->get_antenna());
+			accessible_tiles.push_back(new_tile);
 		}
 	}
 }
