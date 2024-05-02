@@ -15,4 +15,4 @@ const float BETA_AIR = PULS / C;
 const int SCREEN_WIDTH = 1800;
 const int SCREEN_HEIGHT = 800;
 const int SCALE = ((EXERCISE) ? 8 : 90);
-const float TILE_SIZE = 0.5f;
+float TILE_SIZE = 0.5f;

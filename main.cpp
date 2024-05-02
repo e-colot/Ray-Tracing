@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
 
     bool ray = false;
     bool dB = true;
-    bool optimize = false;
+    bool optimize = true;
     int optimize_order = 2;
 
     Graphics* g;
@@ -16,6 +16,8 @@ int main(int argc, char* argv[]) {
     // Transform show rays to display power instead of |E|
 
     Map* m;
+
+    TILE_SIZE = 2.0f;
 
     if (EXERCISE) {
         if (dB) {

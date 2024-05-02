@@ -11,7 +11,6 @@ glass(nullptr), metal(nullptr), display(nullptr), rx(nullptr), tx(nullptr) {}
 Map::Map(Graphics* g) {
 	setup_materials();
 	setup_walls(false);
-	setup_tiles();
 	add_window(g);
 }
 Map::Map(const Vector& tx_pos, const Vector& rx_pos) : display(nullptr) {
@@ -73,6 +72,7 @@ void Map::show_rays(bool logarithmic) const {
 	}
 }
 void Map::show_data_rate(const Vector& pos, bool dBm) {
+	setup_tiles();
 	if (display == nullptr) {
 		std::cout << "No window given to show the data rate" << std::endl;
 		return;
@@ -83,6 +83,7 @@ void Map::show_data_rate(const Vector& pos, bool dBm) {
 	display->add_tiles(tiles, dBm);
 }
 void Map::show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos, bool dBm) {
+	setup_tiles();
 	if (display == nullptr) {
 		std::cout << "No window given to show the data rate" << std::endl;
 		return;
@@ -99,6 +100,7 @@ void Map::optimize_placement(int antenna_number) {
 	}
 	std::cout << "Starting optimization..." << std::endl;
 	auto start_time = std::chrono::high_resolution_clock::now();
+	setup_tiles();
 	setup_accessible_tiles();
 	calculate_data_rate();
 	if (antenna_number == 1) {
@@ -176,7 +178,7 @@ void Map::optimize_placement(int antenna_number) {
 		tileVect final_antennas = { new Tile(accessible_tiles[i_antenna]) , new Tile(accessible_tiles[j_antenna]) };
 		calculate_data_rate(&final_antennas);
 		show_map();
-		display->add_tiles(tiles);
+		display->add_tiles(tiles, false);
 		for (Tile* t : final_antennas) {
 			delete t;
 		}
@@ -317,7 +319,7 @@ void Map::calculate_data_rate(tileVect* tx_tiles) {
 		tiles[i]->add_rate(MAX(data_rate_values[i], data_rate_values[size + i]));
 	}
 }
-void Map::setup_tiles(float tile_size) {
+void Map::setup_tiles() {
 	for (Tile* t : tiles) {
 		delete t;
 	}
@@ -332,17 +334,15 @@ void Map::setup_tiles(float tile_size) {
 		size[0] = 15;
 		size[1] = 8;
 	}
-	for (int i = 0; i <= static_cast<int>(size[0] / tile_size); i++) {
-		for (int j = 0; j <= static_cast<int>(size[1] / tile_size); j++) {
-			if (!EXERCISE) {
-				if (j > static_cast<int>(-4.0 / 3.0 * i + 24.0 / tile_size)) {
-					continue;
-				}
-				if ((j > static_cast<int>(6 / tile_size)) and (i > static_cast<int>(4 / tile_size)) and (i < static_cast<int>(9 / tile_size))) {
-					continue;
-				}
+	for (int i = 0; i <= static_cast<int>(size[0] / TILE_SIZE); i++) {
+		for (int j = 0; j <= static_cast<int>(size[1] / TILE_SIZE); j++) {
+			if (static_cast<float>(j) > (-4.0 / 3.0 * i + 24.0 / TILE_SIZE)) {
+				continue;
 			}
-			Tile* new_tile = new Tile(Vector(i * tile_size, j * tile_size));
+			if ((static_cast<float>(j) > (6 / TILE_SIZE)) and (static_cast<float>(i) > (4 / TILE_SIZE)) and (static_cast<float>(i) < (9 / TILE_SIZE))) {
+				continue;
+			}
+			Tile* new_tile = new Tile(Vector(i * TILE_SIZE, j * TILE_SIZE));
 			virtualize_antenna(new_tile->get_antenna());
 			tiles.push_back(new_tile);
 		}

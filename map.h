@@ -58,7 +58,7 @@ private:
     void calculate_data_rate(); // Calculates data rate on the map
     void calculate_data_rate(Tile* tx_tile); // Calculates data rate for a specific tile as emmiter
     void calculate_data_rate(tileVect* tx_tiles); // Calculates data rate for multiple tiles as emitters
-    void setup_tiles(float tile_size = TILE_SIZE); // Sets up tiles on the map
+    void setup_tiles(); // Sets up tiles on the map
     Tile* find_closest_tile(const Vector& position) const; // Finds the closest tile to a given position
     void setup_accessible_tiles(); // Sets up accessible tiles
     double calc_rate() const; // Calculates the data rate between rx and tx
