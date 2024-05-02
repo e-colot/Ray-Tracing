@@ -117,6 +117,10 @@ void Graphics::add_wall(const Wall* w) {
 				case (-1) :
 					start = to_pixel(w->get_pos() + w->get_intervals()[i+1] * w->get_dir());
 					break;
+				default :
+					// never called because w->get_dir() is normalized
+					std::cout << "Direction is not normalized in Graphics::add_wall()" << std::endl;
+					break;
 				}
 				add_rect(start, to_pixel(w->get_intervals()[i + 1] - w->get_intervals()[i]), to_pixel(w->get_material(i)->get_thickness()), w->get_material(i)->get_color());
 				break;
@@ -142,9 +146,13 @@ void Graphics::add_corner(const corner* c) {
 void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 	if (logarithmic) {
 		set_colormap_scale(log10(tx->get_min_attenuation()), log10(tx->get_max_attenuation()));
+		std::cout << min_value << "     " << max_value << std::endl;
 		for (const Ray* r : tx->get_rays()) {
 			color c;
-			if (r->get_attenuation() == 0) {
+			std::cout << log10(r->get_attenuation()) << std::endl;
+			if (r->get_attenuation() <= 0.0) {
+				// if attenuation = 0;
+				// -> ray not shown
 				continue;
 			}
 			else {
@@ -155,9 +163,9 @@ void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 			}
 		}
 		std::stringstream s1;
-		s1 << log10(tx->get_min_attenuation());
+		s1 << log10(tx->get_max_attenuation());
 		std::stringstream s2;
-		s2 << log10(tx->get_max_attenuation());
+		s2 << log10(tx->get_min_attenuation());
 		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());
 	}
 	else {
@@ -201,7 +209,7 @@ void Graphics::add_tiles(const tileVect& tiles, bool dBm) {
 		color c;
 		if (dBm) {
 			set_colormap_scale(62.47245f, 106.0206f);
-			if (t->get_rate(0) == 0) {
+			if (t->get_rate(0) <= std::numeric_limits<double>::epsilon()) {
 				c = colormap(62.47245f, static_cast<Uint8>(75));
 				// set to the minimum value of the colormap
 			}
@@ -278,6 +286,7 @@ const color Graphics::colormap(double value, Uint8 alpha) const {
 	case 3: r = p, g = q, b = v; break;
 	case 4: r = t, g = p, b = v; break;
 	case 5: r = v, g = p, b = q; break;
+	default: std::cout << "Should not happend Graphics::colormap()" << std::endl;
 	}
 
 	return color{ static_cast<Uint8>(r * 255), static_cast<Uint8>(g * 255), static_cast<Uint8>(b * 255), alpha };

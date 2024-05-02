@@ -1,5 +1,8 @@
 #pragma once
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-default"
 #include <SDL_types.h> // Include the header for Uint8 type
+#pragma GCC diagnostic pop
 #include <initializer_list> // Include the header for std::initializer_list
 
 extern const bool EXERCISE;

@@ -112,7 +112,8 @@ void Map::optimize_placement(int antenna_number) {
 			float cov = 0.0f;
 			float data = 0;
 			for (Tile* t : accessible_tiles) {
-				if (t->get_rate(i) != 0) {
+				if (t->get_rate(i) >= std::numeric_limits<double>::epsilon()) {
+					// if rate != 0
 					cov++;
 					data += (static_cast<float>(t->get_rate(i)) / 1e9f);
 				}
@@ -120,7 +121,8 @@ void Map::optimize_placement(int antenna_number) {
 			total_rate_GB.push_back(data);
 			std::cout << cov << "   " << static_cast<float>(cov) / static_cast<float>(accessible_tiles.size()) << std::endl;
 			coverage.push_back(static_cast<float>(cov) / static_cast<float>(accessible_tiles.size()));
-			if ((coverage[i] > coverage[max_index]) || ((coverage[i] == coverage[max_index]) && (total_rate_GB[i] >= total_rate_GB[max_index]))) {
+			if ((coverage[i] > coverage[max_index]) || ((coverage[i] >= coverage[max_index] - std::numeric_limits<double>::epsilon()) && 
+					(total_rate_GB[i] >= total_rate_GB[max_index] - std::numeric_limits<double>::epsilon()))) {
 				max_index = i;
 			}
 		}
@@ -151,7 +153,7 @@ void Map::optimize_placement(int antenna_number) {
 					int cov = 0;
 					float data = 0;
 					for (Tile* t : accessible_tiles) {
-						if (t->get_rate(i) != 0 || t->get_rate(j) != 0) {
+						if (t->get_rate(i) > 0 || t->get_rate(j) > 0) {
 							cov++;
 							data += static_cast<float>(static_cast<float>(MAX(t->get_rate(i), t->get_rate(j))) / 1e9f);
 						}
@@ -164,7 +166,8 @@ void Map::optimize_placement(int antenna_number) {
 			total_rate_GB.push_back(data_rate);
 
 			for (int j = 0; j < static_cast<int>(accessible_tiles.size()); j++) {
-				if ((coverage[i][j] > coverage[i_antenna][j_antenna]) || ((coverage[i][j] == coverage[i_antenna][j_antenna]) && (total_rate_GB[i][j] >= total_rate_GB[i_antenna][j_antenna]))) {
+				if ((coverage[i][j] > coverage[i_antenna][j_antenna]) || ((coverage[i][j] >= coverage[i_antenna][j_antenna] - std::numeric_limits<double>::epsilon()) && 
+						(total_rate_GB[i][j] >= total_rate_GB[i_antenna][j_antenna] - std::numeric_limits<double>::epsilon()))) {
 					i_antenna = i;
 					j_antenna = j;
 				}

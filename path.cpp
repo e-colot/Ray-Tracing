@@ -86,9 +86,9 @@ Complex Path::calc_transmission(const Wall* w, float intersection) const {
         // This condition is only true if T_perp.get_real() == NaN
         // Happens if the propagation constant is too big (for metal)
         // Makes something that looks like 1/(e^(7000 - j7000)) = 1 / ((1-j) * 10^300)
-        // So I simplify it to 0
+        // So it is simplified to 0
         // Wich means that physically, no signal can pass through metal
-        // Not a "clean" code but I don't want to handle Nan in Complex
+        // Not a "clean" code but handling NaN might takes some time so this do the trick for the moment
         T_perp = Complex(0, 0);
     }
     return T_perp;

@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[]) {
 
-    bool ray = false;
+    bool ray = true;
     bool dB = true;
     bool optimize = true;
     int optimize_order = 2;
@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
         if (ray) {
             g = new Graphics("TODO");
             m = new Map(Vector(9.5f, 6.9f), Vector(11.1f, 4.1f), g);
-            m->show_rays();
+            m->show_rays(dB);
         }
         else {
             g = new Graphics("Data rate");
