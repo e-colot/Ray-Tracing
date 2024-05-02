@@ -37,7 +37,7 @@ void Antenna::create_ray(const Antenna* rx, const wallVect& walls) {
             if (src->get_max_attenuation() < att) {
                 src->set_max_attenuation(att);
             }
-            else if (src->get_min_attenuation() > att) {
+            else if (att > 0.0 && src->get_min_attenuation() > att) {
                 src->set_min_attenuation(att);
             }
         }
@@ -52,7 +52,7 @@ void Antenna::create_ray(const Antenna* rx, const wallVect& walls) {
 // Constructors
 
 RealAntenna::RealAntenna() : RealAntenna(Vector()) {}
-RealAntenna::RealAntenna(const Vector& position) : Antenna(position, this, nullptr), emission_factor(0.0f), min_attenuation(0.0f), max_attenuation(0.0f) {}
+RealAntenna::RealAntenna(const Vector& position) : Antenna(position, this, nullptr), emission_factor(0.0f), min_attenuation(1.0f), max_attenuation(0.0f) {}
 
 // Destructor
 

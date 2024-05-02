@@ -138,13 +138,30 @@ void Graphics::add_wall(const Wall* w) {
 void Graphics::add_corner(const corner* c) {
 	add_rect(to_pixel(c->pos + c->mat->get_thickness() * Vector(0.0f, -0.5f)), to_pixel(c->mat->get_thickness()), to_pixel(c->mat->get_thickness()), c->mat->get_color());
 }
-void Graphics::add_rays(const RealAntenna* tx) {
-	set_colormap_scale(tx->get_min_attenuation(), tx->get_max_attenuation());
-	for (const Ray* r : tx->get_rays()) {
-		color c;
-		c = colormap(r->get_attenuation());
-		for (const Path* p : r->get_path()) {
-			add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
+void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
+	if (logarithmic) {
+		set_colormap_scale(log10(tx->get_min_attenuation()), log10(tx->get_max_attenuation()));
+		for (const Ray* r : tx->get_rays()) {
+			color c;
+			if (r->get_attenuation() == 0) {
+				continue;
+			}
+			else {
+				c = colormap(log10(r->get_attenuation()));
+			}
+			for (const Path* p : r->get_path()) {
+				add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
+			}
+		}
+	}
+	else {
+		set_colormap_scale(tx->get_min_attenuation(), tx->get_max_attenuation());
+		for (const Ray* r : tx->get_rays()) {
+			color c;
+			c = colormap(r->get_attenuation());
+			for (const Path* p : r->get_path()) {
+				add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
+			}
 		}
 	}
 	add_colormap_legend();

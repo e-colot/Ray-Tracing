@@ -57,7 +57,7 @@ void Map::add_window(Graphics* g) {
 
 // Methods
 
-void Map::show_rays() const {
+void Map::show_rays(bool logarithmic) const {
 	if (display == nullptr) {
 		std::cout << "No window given to show the rays" << std::endl;
 		return;
@@ -66,7 +66,7 @@ void Map::show_rays() const {
 	virtualize_antenna(tx);
 	create_rays();
 	show_map();
-	display->add_rays(tx);
+	display->add_rays(tx, logarithmic);
 	for (const Ray* r : tx->get_rays()) {
 		r->show();
 		std::cout << std::endl;
@@ -328,7 +328,7 @@ void Map::setup_tiles(float tile_size) {
 	}
 	tiles.clear();
 	// deleting tiles
-	int size[2];
+	int size[2]{};
 	if (EXERCISE) {
 		size[0] = 60;
 		size[1] = 80;

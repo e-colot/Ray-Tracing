@@ -42,7 +42,7 @@ public:
 
     // Methods
 public:
-    void show_rays() const; // Shows rays on the map
+    void show_rays(bool logarithmic = false) const; // Shows rays on the map
     void show_data_rate(const Vector& antenna_pos, bool dBm = false); // Shows data rate at a specific router position
     void show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos, bool dBm = false); // Shows data rate with two routers
     void optimize_placement(int number_of_antenna); // Optimizes antenna placement

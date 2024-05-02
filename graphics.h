@@ -68,7 +68,7 @@ public:
     void start(); // Starts the graphics rendering
     void add_wall(const Wall* wall_to_add); // Adds a wall to the window
     void add_corner(const corner* corner_to_show); // Adds a corner to the window
-    void add_rays(const RealAntenna* transmitter); // Adds rays to the window
+    void add_rays(const RealAntenna* transmitter, bool logarithmic); // Adds rays to the window
     void add_text(const char text[], const Vector& pos, const color& col); // Adds text to the window
     void add_tiles(const tileVect& tiles, bool dBm = false); // Adds tiles to the window
 

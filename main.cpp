@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[]) {
 
-    bool ray = false;
+    bool ray = true;
     bool optimize = true;
     int optimize_order = 2;
 
@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
 
     if (EXERCISE) {
         m = new Map(Vector(32, 70), Vector(47, 15), &g);
-        m->show_rays();
+        m->show_rays(true);
     }
     else {
         if (ray) {
