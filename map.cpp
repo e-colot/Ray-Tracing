@@ -283,7 +283,7 @@ void Map::calculate_data_rate() {
 				// if we already calculated the situation but in the other side : RX <=> TX
 				accessible_tiles[j]->add_rate(accessible_tiles[i]->get_rate(j)); //(50% time saved)
 			}
-			 if ((tx->get_pos().get_x() > 4 && tx->get_pos().get_x() < 11 && tx->get_pos().get_y() < 4) && 
+			else if ((tx->get_pos().get_x() > 4 && tx->get_pos().get_x() < 11 && tx->get_pos().get_y() < 4) && 
 				((accessible_tiles[j]->get_pos().get_x() > 4 && accessible_tiles[j]->get_pos().get_x() < 11 && accessible_tiles[j]->get_pos().get_y() < 4))) {
 				// if both rx and tx are in the kitchen or the bathroom
 				accessible_tiles[j]->add_rate(0.0); // (10% time saved)
@@ -366,7 +366,7 @@ Tile* Map::find_closest_tile(const Vector& pos) const {
 }
 void Map::setup_accessible_tiles() {
 	// using only these tiles for the optimisation
-	// (70% time saved)
+	// (75% time saved)
 	for (Tile* t : accessible_tiles) {
 		delete t;
 	}
