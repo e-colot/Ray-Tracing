@@ -86,14 +86,14 @@ void Map::show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos,
 		return;
 	}
 	tileVect these_tiles = { find_closest_tile(antenna1_pos) , find_closest_tile(antenna2_pos) };
-	calculate_data_rate(&these_tiles);
+	calculate_data_rate(these_tiles);
 	show_map();
 	display->add_tiles(tiles, dBm);
 }
 vectorVect Map::brut_force(int antenna_number, float tile_size) {
 	if (display == nullptr) {
 		std::cout << "No window given to show the data rate" << std::endl;
-		return;
+		return vectorVect{};
 	}
 	vectorVect res;
 	std::cout << "Starting optimization..." << std::endl;
@@ -107,10 +107,10 @@ vectorVect Map::brut_force(int antenna_number, float tile_size) {
 		int max_index = 0;
 		// the following finds the coverage and the total data rate of each antenna
 		for (int i = 0; i < static_cast<int>(accessible_tiles.size()); i++) {
-			float cov = 0.0f;
+			int cov = 0;
 			float data = 0;
 			for (Tile* t : accessible_tiles) {
-				if (t->get_rate(i) >= std::numeric_limits<double>::epsilon()) {
+				if (t->get_rate(i) > std::numeric_limits<double>::epsilon()) {
 					// if rate != 0
 					cov++;
 					data += (static_cast<float>(t->get_rate(i)) / 1e9f);
@@ -151,7 +151,7 @@ vectorVect Map::brut_force(int antenna_number, float tile_size) {
 					int cov = 0;
 					float data = 0;
 					for (Tile* t : accessible_tiles) {
-						if (t->get_rate(i) > 0 || t->get_rate(j) > 0) {
+						if (t->get_rate(i) > std::numeric_limits<double>::epsilon() || t->get_rate(j) > std::numeric_limits<double>::epsilon()) {
 							cov++;
 							data += static_cast<float>(static_cast<float>(MAX(t->get_rate(i), t->get_rate(j))) / 1e9f);
 						}
@@ -179,17 +179,44 @@ vectorVect Map::brut_force(int antenna_number, float tile_size) {
 		tileVect final_antennas = { new Tile(accessible_tiles[i_antenna]) , new Tile(accessible_tiles[j_antenna]) };
 		res.push_back(accessible_tiles[i_antenna]->get_pos());
 		res.push_back(accessible_tiles[j_antenna]->get_pos());
-		calculate_data_rate(&final_antennas);
+		calculate_data_rate(final_antennas);
 		show_map();
 		display->add_tiles(tiles, false);
 		for (Tile* t : final_antennas) {
 			delete t;
 		}
-		return res;
 	}
+	// more antennas could be handled using the same kind of code but with higher dimensions vectors
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
 	std::cout << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
+	return res;
+}
+vectorVect Map::gradient_descent(vectorVect initial_pos, float tile_size, float precision) {
+	setup_tiles(tile_size);
+	vectorVect res = initial_pos;
+	for (Vector pos : res) {
+		// putting a new antenna in each direction
+		RealAntenna* E = new RealAntenna(pos + Vector(precision, 0.0f));
+		virtualize_antenna(E);
+		RealAntenna* W = new RealAntenna(pos + Vector(-precision, 0.0f));
+		virtualize_antenna(W);
+		RealAntenna* N = new RealAntenna(pos + Vector(0.0f, precision));
+		virtualize_antenna(N);
+		RealAntenna* S = new RealAntenna(pos + Vector(0.0f, -precision));
+		virtualize_antenna(S);
+		realantennaVect antennas = realantennaVect{ E, W, N, S };
+		calculate_data_rate(antennas);
+	}
+	/*
+	For each pos :
+		for each dir :
+			create antenna
+			virtualize antenna
+			calc data rate
+	for each couple :
+		find best*/
+	return vectorVect();
 }
 void Map::show_map() const {
 	for (const Wall* w : walls) {
@@ -308,11 +335,12 @@ void Map::calculate_data_rate(Tile* tx_tile) {
 	tx = nullptr;
 	rx = nullptr;
 }
-void Map::calculate_data_rate(tileVect* tx_tiles) {
+void Map::calculate_data_rate(const realantennaVect& tx_antenna)
+{
 	clean_accessible_tiles_data();
 	floatVect data_rate_values;
-	for (Tile* tx_tile : *tx_tiles) {
-		tx = tx_tile->get_antenna();
+	for (RealAntenna* tx_ant : tx_antenna) {
+		tx = tx_ant;
 		for (Tile* t : tiles) {
 			rx = t->get_antenna();
 			data_rate_values.push_back(static_cast<float>(calc_rate())); // not a final result so losing some precision is acceptable
@@ -324,6 +352,13 @@ void Map::calculate_data_rate(tileVect* tx_tiles) {
 	for (int i = 0; i < size; i++) {
 		tiles[i]->add_rate(MAX(data_rate_values[i], data_rate_values[size + i]));
 	}
+}
+void Map::calculate_data_rate(const tileVect& tx_tiles) {
+	realantennaVect antennas;
+	for (Tile* t : tx_tiles) {
+		antennas.push_back(t->get_antenna());
+	}
+	calculate_data_rate(antennas);
 }
 void Map::setup_tiles(float tile_size) {
 	display->set_tile_size(tile_size);
