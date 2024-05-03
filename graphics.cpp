@@ -103,7 +103,7 @@ void Graphics::start() {
 
 		//Update screen
 		SDL_RenderPresent(renderer);
-		SDL_Delay(100);
+		SDL_Delay(250);
 	}
 	//Free resources and close SDL
 	close();

@@ -43,8 +43,9 @@ public:
     // Methods
 public:
     void show_rays(bool logarithmic = false) const; // Shows rays on the map
-    void show_data_rate(const Vector& antenna_pos, bool dBm = false); // Shows data rate at a specific router position
-    void show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos, bool dBm = false); // Shows data rate with two routers
+    void show_data_rate(const Vector& antenna_pos, bool dBm = false, float tilesize = TILE_SIZE); // Shows data rate at a specific router position
+    void show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos, bool dBm = false, float tilesize = TILE_SIZE); // Shows data rate with two routers
+    vectorVect brut_force(int number_of_antenna, float tile_size); // Search best tile to place the router(s) by trying every accessible tile
     void optimize_placement(int number_of_antenna); // Optimizes antenna placement
 
 private:
@@ -58,7 +59,7 @@ private:
     void calculate_data_rate(); // Calculates data rate on the map
     void calculate_data_rate(Tile* tx_tile); // Calculates data rate for a specific tile as emmiter
     void calculate_data_rate(tileVect* tx_tiles); // Calculates data rate for multiple tiles as emitters
-    void setup_tiles(); // Sets up tiles on the map
+    void setup_tiles(float tile_size = TILE_SIZE); // Sets up tiles on the map
     Tile* find_closest_tile(const Vector& position) const; // Finds the closest tile to a given position
     void setup_accessible_tiles(); // Sets up accessible tiles
     double calc_rate() const; // Calculates the data rate between rx and tx

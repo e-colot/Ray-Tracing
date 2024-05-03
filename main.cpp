@@ -8,14 +8,14 @@ int main(int argc, char* argv[]) {
 
     bool ray = false;
     bool dB = false;
-    bool optimize = true;
-    int optimize_order = 2;
+    bool optimize = false;
+    int optimize_order = 1;
 
     Graphics* g;
 
     Map* m;
 
-    TILE_SIZE = 1.0f;
+    TILE_SIZE = 0.5f;
 
     if (EXERCISE) {
         if (dB) {
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
             g = new Graphics("Data rate");
             m = new Map(g);
             if (optimize) {
-                m->optimize_placement(optimize_order);
+                m->brut_force(optimize_order, TILE_SIZE);
             }
             else {
                 m->show_data_rate(Vector(12.5f, 4.0f), Vector(2.0f, 2.5f), dB);
