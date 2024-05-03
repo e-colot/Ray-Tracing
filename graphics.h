@@ -56,6 +56,7 @@ private:
     double min_value; // Minimum value for colormap scaling
     double max_value; // Maximum value for colormap scaling
     const Vector offset; // Offset for the origin
+    float tile_size; // Size of a tile
 
     // Constructors
 public:
@@ -65,6 +66,10 @@ public:
     // Destructor
 public:
     ~Graphics(); // Destructor
+
+    // Mutator
+public:
+    void set_tile_size(float size);
 
     // Methods
 public:

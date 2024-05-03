@@ -8,7 +8,7 @@
 // Constructors
 
 Graphics::Graphics() : Graphics("No name") {}
-Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset((EXERCISE) ? Vector(750, 50) : Vector(200, 25)) {
+Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset((EXERCISE) ? Vector(750, 50) : Vector(200, 25)), tile_size(TILE_SIZE) {
 	window = NULL;
 	surface = NULL;
 	renderer = NULL;
@@ -59,6 +59,12 @@ Graphics::~Graphics() {
 	for (const txt* t : texts) {
 		delete t;
 	}
+}
+
+// Mutator
+
+void Graphics::set_tile_size(float size) {
+	tile_size = size;
 }
 
 // Methods
@@ -221,7 +227,7 @@ void Graphics::add_tiles(const tileVect& tiles, bool dBm) {
 			set_colormap_scale(0, 40e9f);
 			c = colormap(t->get_rate(0), static_cast<Uint8>(75));
 		}
-		add_rect(to_pixel(t->get_pos() + Vector(0.0f, -TILE_SIZE / 2.0f)), to_pixel(TILE_SIZE), to_pixel(TILE_SIZE), c);
+		add_rect(to_pixel(t->get_pos() + Vector(0.0f, -tile_size / 2.0f)), to_pixel(tile_size), to_pixel(tile_size), c);
 	}
 	if (dBm) {
 		add_colormap_legend("40 GB/s", "1.4 GB/s", "50 MB/s", "0  GB/s");
