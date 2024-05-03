@@ -43,9 +43,6 @@ Map::~Map() {
 	for (Tile* t : tiles) {
 		delete t;
 	}
-	for (Tile* t : accessible_tiles) {
-		delete t;
-	}
 }
 
 // Mutator
@@ -298,6 +295,7 @@ void Map::calculate_data_rate() {
 	}
 }
 void Map::calculate_data_rate(Tile* tx_tile) {
+	clean_accessible_tiles_data();
 	tx = tx_tile->get_antenna();
 	for (Tile* t : tiles) {
 		rx = t->get_antenna();
@@ -307,6 +305,7 @@ void Map::calculate_data_rate(Tile* tx_tile) {
 	rx = nullptr;
 }
 void Map::calculate_data_rate(tileVect* tx_tiles) {
+	clean_accessible_tiles_data();
 	floatVect data_rate_values;
 	for (Tile* tx_tile : *tx_tiles) {
 		tx = tx_tile->get_antenna();
@@ -323,11 +322,11 @@ void Map::calculate_data_rate(tileVect* tx_tiles) {
 	}
 }
 void Map::setup_tiles() {
+	// deleting tiles
 	for (Tile* t : tiles) {
 		delete t;
 	}
 	tiles.clear();
-	// deleting tiles
 	int size[2]{};
 	if (EXERCISE) {
 		size[0] = 60;
@@ -363,11 +362,8 @@ Tile* Map::find_closest_tile(const Vector& pos) const {
 	return closest_tile;
 }
 void Map::setup_accessible_tiles() {
-	// using only these tiles for the optimisation
+	// using only some tiles for the optimisation
 	// (75% time saved)
-	for (Tile* t : accessible_tiles) {
-		delete t;
-	}
 	accessible_tiles.clear();
 	// deleting accessible_tiles
 	for (Tile* t : tiles) {
@@ -379,9 +375,7 @@ void Map::setup_accessible_tiles() {
 			}
 		}
 		if (to_keep) {
-			Tile* new_tile = new Tile(t);
-			virtualize_antenna(new_tile->get_antenna());
-			accessible_tiles.push_back(new_tile);
+			accessible_tiles.push_back(t);
 		}
 	}
 }
@@ -398,4 +392,9 @@ double Map::calc_rate() const {
 	tx->reset();
 	rx->reset();
 	return output;
+}
+void Map::clean_accessible_tiles_data() const {
+	for (Tile* t : accessible_tiles) {
+		t->delete_rates();
+	}
 }

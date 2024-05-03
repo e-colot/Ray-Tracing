@@ -34,6 +34,7 @@ public:
     // Method
 public:
     void add_rate(double rate); // Adds a rate to the tile
+    void delete_rates(); // Clears the "rates" vector
 
 
 };

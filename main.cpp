@@ -6,18 +6,16 @@
 
 int main(int argc, char* argv[]) {
 
-    bool ray = true;
-    bool dB = true;
+    bool ray = false;
+    bool dB = false;
     bool optimize = true;
     int optimize_order = 2;
 
     Graphics* g;
 
-    // Transform show rays to display power instead of |E|
-
     Map* m;
 
-    TILE_SIZE = 2.0f;
+    TILE_SIZE = 1.0f;
 
     if (EXERCISE) {
         if (dB) {
@@ -44,7 +42,7 @@ int main(int argc, char* argv[]) {
                 m->optimize_placement(optimize_order);
             }
             else {
-                m->show_data_rate(Vector(12.5f, 4.0f), Vector(2.0f, 2.5f), true);
+                m->show_data_rate(Vector(12.5f, 4.0f), Vector(2.0f, 2.5f), dB);
             }
         }
     }

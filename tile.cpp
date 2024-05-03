@@ -30,3 +30,6 @@ const Vector& Tile::get_pos() const {
 void Tile::add_rate(double rate_in) {
     rates.push_back(rate_in);
 }
+void Tile::delete_rates() {
+    rates.clear();
+}

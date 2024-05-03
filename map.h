@@ -62,4 +62,5 @@ private:
     Tile* find_closest_tile(const Vector& position) const; // Finds the closest tile to a given position
     void setup_accessible_tiles(); // Sets up accessible tiles
     double calc_rate() const; // Calculates the data rate between rx and tx
+    void clean_accessible_tiles_data() const; // Deletes the rates calculated for the accessible tiles
 };
