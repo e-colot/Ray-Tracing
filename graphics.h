@@ -1,9 +1,6 @@
 #pragma once
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch-default"
 #include <SDL.h>
 #include <SDL_ttf.h>
-#pragma GCC diagnostic pop
 #include <stdio.h>
 #include <vector>
 #include "tile.h"

@@ -27,7 +27,8 @@ Vector Vector::operator/(int a) const {
 
 bool Vector::operator==(const Vector& other) const
 {
-    return ((*this - other).squared_norm() <= 1e-3f);
+    return ((*this - other).squared_norm() <= 1e-6f);
+    // differnce smaller than a millimeter
 }
 
 // Accessors

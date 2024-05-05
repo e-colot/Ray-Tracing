@@ -90,14 +90,31 @@ void Map::show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos,
 	show_map();
 	display->add_tiles(tiles, dBm);
 }
+void Map::optimize_placement(int number_of_antenna)
+{
+	std::cout << "Starting optimization..." << std::endl;
+	auto start_time = std::chrono::high_resolution_clock::now();
+
+	vectorVect ant_pos = brut_force(number_of_antenna, 1.0f);
+	gradient_descent(&ant_pos, 0.5f, 0.1f);
+	realantennaVect final_antennas;
+	for (Vector pos : ant_pos) {
+		final_antennas.push_back(new RealAntenna(pos));
+	}
+	calculate_data_rate(final_antennas);
+	show_map();
+	display->add_tiles(tiles, false);
+
+	auto end_time = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+	std::cout << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
+}
 vectorVect Map::brut_force(int antenna_number, float tile_size) {
 	if (display == nullptr) {
 		std::cout << "No window given to show the data rate" << std::endl;
 		return vectorVect{};
 	}
 	vectorVect res;
-	std::cout << "Starting optimization..." << std::endl;
-	auto start_time = std::chrono::high_resolution_clock::now();
 	setup_tiles(tile_size);
 	setup_accessible_tiles();
 	calculate_data_rate();
@@ -124,13 +141,13 @@ vectorVect Map::brut_force(int antenna_number, float tile_size) {
 			}
 		}
 
-		std::cout << "Optimal antenna position : ";
-		accessible_tiles[max_index]->get_pos().show();
-		std::cout << "Coverage : " << coverage[max_index] * 100.0 << "%" << std::endl;
+		//std::cout << "Optimal antenna position : ";
+		//accessible_tiles[max_index]->get_pos().show();
+		//std::cout << "Coverage : " << coverage[max_index] * 100.0 << "%" << std::endl;
 		res.push_back(accessible_tiles[max_index]->get_pos());
-		calculate_data_rate(accessible_tiles[max_index]);
-		show_map();
-		display->add_tiles(tiles);
+		//calculate_data_rate(accessible_tiles[max_index]);
+		//show_map();
+		//display->add_tiles(tiles);
 	}
 	else if (antenna_number == 2) {
 		floatMatrix coverage;
@@ -171,52 +188,153 @@ vectorVect Map::brut_force(int antenna_number, float tile_size) {
 				}
 			}
 		}
-		std::cout << "Coverage : " << coverage[i_antenna][j_antenna] * 100.0 << "%" << std::endl;
+		//std::cout << "Coverage : " << coverage[i_antenna][j_antenna] * 100.0 << "%" << std::endl;
 
-		std::cout << "Optimal positions for 2 antennas : " << std::endl;
-		accessible_tiles[i_antenna]->get_pos().show();
-		accessible_tiles[j_antenna]->get_pos().show();
-		tileVect final_antennas = { new Tile(accessible_tiles[i_antenna]) , new Tile(accessible_tiles[j_antenna]) };
+		//std::cout << "Optimal positions for 2 antennas : " << std::endl;
+		//accessible_tiles[i_antenna]->get_pos().show();
+		//accessible_tiles[j_antenna]->get_pos().show();
+		//tileVect final_antennas = { new Tile(accessible_tiles[i_antenna]) , new Tile(accessible_tiles[j_antenna]) };
 		res.push_back(accessible_tiles[i_antenna]->get_pos());
 		res.push_back(accessible_tiles[j_antenna]->get_pos());
-		calculate_data_rate(final_antennas);
-		show_map();
-		display->add_tiles(tiles, false);
-		for (Tile* t : final_antennas) {
-			delete t;
-		}
+		//calculate_data_rate(final_antennas);
+		//show_map();
+		//display->add_tiles(tiles, false);
+		//for (Tile* t : final_antennas) {
+		//	delete t;
+		//}
 	}
 	// more antennas could be handled using the same kind of code but with higher dimensions vectors
-	auto end_time = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-	std::cout << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
 	return res;
 }
-vectorVect Map::gradient_descent(vectorVect initial_pos, float tile_size, float precision) {
+void Map::gradient_descent(vectorVect* pos, float tile_size, float precision) {
 	setup_tiles(tile_size);
-	vectorVect res = initial_pos;
-	for (Vector pos : res) {
-		// putting a new antenna in each direction
-		RealAntenna* E = new RealAntenna(pos + Vector(precision, 0.0f));
-		virtualize_antenna(E);
-		RealAntenna* W = new RealAntenna(pos + Vector(-precision, 0.0f));
-		virtualize_antenna(W);
-		RealAntenna* N = new RealAntenna(pos + Vector(0.0f, precision));
-		virtualize_antenna(N);
-		RealAntenna* S = new RealAntenna(pos + Vector(0.0f, -precision));
-		virtualize_antenna(S);
-		realantennaVect antennas = realantennaVect{ E, W, N, S };
-		calculate_data_rate(antennas);
+	RealAntenna* E = nullptr;
+	RealAntenna* W = nullptr;
+	RealAntenna* N = nullptr;
+	RealAntenna* S = nullptr;
+	realantennaVect antennas;
+	for (Vector p : *pos) {
+		antennas.push_back(new RealAntenna(p));
 	}
+	for (int i = 0; i < static_cast<int>(pos->size()); i++) {
+		bool searching = true;
+		while (searching) {
+			floatMatrix direction_values = floatMatrix{ {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f} };
+			direction_values[0] = calculate_coverage_and_rate(antennas);
+			// putting a new antenna in each direction
+			if (W == nullptr) {
+				W = new RealAntenna(pos->at(i) + Vector(-precision, 0.0f));
+				virtualize_antenna(W);
+				antennas[i] = W;
+				direction_values[1] = calculate_coverage_and_rate(antennas);
+			}
+			if (E == nullptr) {
+				E = new RealAntenna(pos->at(i) + Vector(precision, 0.0f));
+				virtualize_antenna(E);
+				antennas[i] = E;
+				direction_values[2] = calculate_coverage_and_rate(antennas);
+			}
+			if (S == nullptr) {
+				S = new RealAntenna(pos->at(i) + Vector(0.0f, -precision));
+				virtualize_antenna(S);
+				antennas[i] = S;
+				direction_values[3] = calculate_coverage_and_rate(antennas);
+			}
+			if (N == nullptr) {
+				N = new RealAntenna(pos->at(i) + Vector(0.0f, precision));
+				virtualize_antenna(N);
+				antennas[i] = N;
+				direction_values[4] = calculate_coverage_and_rate(antennas);
+			}
+			int best_pos = best_direction(direction_values);
+			Vector store_pos;
+			switch (best_pos) {
+			case(1):
+				delete E; direction_values[2] = direction_values[4]; E = N; N = nullptr;
+				delete S; direction_values[3] = direction_values[1]; S = W; W = nullptr;
+				store_pos = antennas[i]->get_pos();
+				delete antennas[i]; antennas[i] = new RealAntenna(store_pos + Vector(-precision, +precision)); break;
+			case(2):
+				delete E; E = nullptr;
+				delete W; W = nullptr;
+				delete S; direction_values[3] = direction_values[0]; S = antennas[i];
+				direction_values[0] = direction_values[4]; antennas[i] = N; N = nullptr; break;
+			case(3):
+				delete W; direction_values[1] = direction_values[4]; W = N; N = nullptr;
+				delete S; direction_values[3] = direction_values[2]; S = E; E = nullptr;
+				store_pos = antennas[i]->get_pos();
+				delete antennas[i]; antennas[i] = new RealAntenna(store_pos + Vector(+precision, +precision)); break;
+			case(4):
+				delete N; N = nullptr;
+				delete S; S = nullptr;
+				delete E; direction_values[2] = direction_values[0]; E = antennas[i];
+				direction_values[0] = direction_values[1]; antennas[i] = W; W = nullptr; break;
+			case(5):
+				delete E; delete W; delete N; delete S;
+				searching = false; break;
+			case(6):
+				delete N; N = nullptr;
+				delete S; S = nullptr;
+				delete W; direction_values[1] = direction_values[0]; W = antennas[i];
+				direction_values[0] = direction_values[2]; antennas[i] = E; E = nullptr; break;
+			case(7):
+				delete E; direction_values[2] = direction_values[3]; E = S; S = nullptr;
+				delete N; direction_values[4] = direction_values[1]; N = W; W = nullptr;
+				store_pos = antennas[i]->get_pos();
+				delete antennas[i]; antennas[i] = new RealAntenna(store_pos + Vector(-precision, -precision)); break;
+			case(8):
+				delete E; E = nullptr;
+				delete W; W = nullptr;
+				delete N; direction_values[4] = direction_values[0]; N = antennas[i];
+				direction_values[0] = direction_values[3]; antennas[i] = S; S = nullptr; break;
+			case(9):
+				delete W; direction_values[1] = direction_values[3]; W = S; S = nullptr;
+				delete N; direction_values[4] = direction_values[2]; N = E; E = nullptr;
+				store_pos = antennas[i]->get_pos();
+				delete antennas[i]; antennas[i] = new RealAntenna(store_pos + Vector(+precision, -precision)); break;
+			default:
+				break;
+			}
+		}
+	}
+	pos->clear();
+	for (RealAntenna* ant : antennas) {
+		pos->push_back(ant->get_pos());
+		delete ant;
+	}
+}
+int Map::best_direction(const floatMatrix& dir_val) {
+	/* returns the placement of the best antenna
+	*
+						1	2	3
+						4	5	6
+						7	8	9
+	*/
 	/*
-	For each pos :
-		for each dir :
-			create antenna
-			virtualize antenna
-			calc data rate
-	for each couple :
-		find best*/
-	return vectorVect();
+	best_x stores the best antenna between (W, C, E) = (-1, 0, 1)	(C = center)
+	best_y stores the best antenna between (S, C, N) = (-1, 0, 1)	(C = center)
+	*/
+	intVect best = { 0, 0 }; // = { best_x, best_y }
+	for (int j = 0; j <= 1; j++) {
+		// for each axis
+		for (int i = (2 * j + 1); i <= 2 * (j + 1); i++) {
+			if ((dir_val[i][0] > dir_val[best[j]][0]) || (dir_val[i][0] >= dir_val[best[j]][0] && dir_val[i][1] > dir_val[best[j]][1])) {
+				best[j] = i;
+			}
+		}
+	}
+	if (best[0] == 0) {
+		if (best[1] == 0) {
+			return 5;
+		}
+		return 26 - 6 * best[1];
+	}
+	else if (best[1] == 0) {
+		return 2 + 2 * best[0];
+	}
+	else {
+		return 23 + 2 * best[0] - 6 * best[1];
+	}
 }
 void Map::show_map() const {
 	for (const Wall* w : walls) {
@@ -350,7 +468,11 @@ void Map::calculate_data_rate(const realantennaVect& tx_antenna)
 	}
 	int size = static_cast<int>(tiles.size());
 	for (int i = 0; i < size; i++) {
-		tiles[i]->add_rate(MAX(data_rate_values[i], data_rate_values[size + i]));
+		float data = 0.0f;
+		for (int j = 0; j < static_cast<int>(tx_antenna.size()); j++) {
+			data = MAX(data, data_rate_values[i + j * size]);
+		}
+		tiles[i]->add_rate(data);
 	}
 }
 void Map::calculate_data_rate(const tileVect& tx_tiles) {
@@ -359,6 +481,34 @@ void Map::calculate_data_rate(const tileVect& tx_tiles) {
 		antennas.push_back(t->get_antenna());
 	}
 	calculate_data_rate(antennas);
+}
+floatVect Map::calculate_coverage_and_rate(const realantennaVect& tx_antenna)
+{
+	// returns (coverage, data_rate)
+	floatVect data_rate_values;
+	for (RealAntenna* tx_ant : tx_antenna) {
+		tx = tx_ant;
+		for (Tile* t : tiles) {
+			rx = t->get_antenna();
+			data_rate_values.push_back(static_cast<float>(calc_rate())); // not a final result so losing some precision is acceptable
+		}
+		tx = nullptr;
+		rx = nullptr;
+	}
+	float total_data = 0.0f;
+	float coverage = 0.0f;
+	int size = static_cast<int>(tiles.size());
+	for (int i = 0; i < size; i++) {
+		float data = 0.0f;
+		for (int j = 0; j < static_cast<int>(tx_antenna.size()); j++) {
+			data = static_cast<float>(MAX(data, data_rate_values[i + j * size]));
+		}
+		if (data > 0.0f) {
+			coverage++;
+			total_data += data * 1e-9; // in Gb
+		}
+	}
+	return floatVect{ coverage, total_data };
 }
 void Map::setup_tiles(float tile_size) {
 	display->set_tile_size(tile_size);
@@ -421,8 +571,8 @@ void Map::setup_accessible_tiles() {
 }
 double Map::calc_rate() const {
 	double output;
-	if (tx == rx) {
-		// if it is the same tile
+	if (tx->get_pos() == rx->get_pos()) {
+		// if the emitter are close enough
 		output = 4e10f;
 	}
 	else {

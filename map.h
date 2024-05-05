@@ -9,6 +9,7 @@ class Map;
 using cornerVect = std::vector<const corner*>;
 using floatMatrix = std::vector<std::vector<float>>;
 using realantennaVect = std::vector<RealAntenna*>;
+using intVect = std::vector<int>;
 
 class Map {
     // Attributes
@@ -49,9 +50,10 @@ public:
     void optimize_placement(int number_of_antenna); // Optimizes antenna placement
 
     vectorVect brut_force(int number_of_antenna, float tile_size); // Search best tile to place the router(s) by trying every accessible tile
-    vectorVect gradient_descent(vectorVect initial_pos, float tile_size, float precision);
+    void gradient_descent(vectorVect* pos, float tile_size, float precision);
 
 private:
+    int best_direction(const floatMatrix& direction_values); // determines the best direction for the gradient descent
     void show_map() const; // Shows the map in the window
     void add_wall(const Wall* wall_to_add); // Adds a wall to the map
     void add_corner(const corner* corner_to_add); // Adds a corner to the map
@@ -63,6 +65,7 @@ private:
     void calculate_data_rate(Tile* tx_tile); // Calculates data rate for a specific tile as emmiter
     void calculate_data_rate(const realantennaVect& tx_antenna); // Calculates data rate for multiple antennas as emitters
     void calculate_data_rate(const tileVect& tx_tiles); // Calculates data rate for multiple tiles as emitters
+    floatVect calculate_coverage_and_rate(const realantennaVect& tx_antenna);
     void setup_tiles(float tile_size = TILE_SIZE); // Sets up tiles on the map
     Tile* find_closest_tile(const Vector& position) const; // Finds the closest tile to a given position
     void setup_accessible_tiles(); // Sets up accessible tiles
