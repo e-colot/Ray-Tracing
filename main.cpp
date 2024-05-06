@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
                 m->optimize_placement(optimize_order);
             }
             else {
-                m->show_data_rate(Vector(12.5f, 4.0f), Vector(2.0f, 2.5f), dB);
+                m->show_data_rate(vectorVect{ Vector(12.5f, 4.0f), Vector(2.0f, 2.5f) }, dB);
             }
         }
     }

@@ -45,8 +45,7 @@ public:
     // Methods
 public:
     void show_rays(bool logarithmic = false) const; // Shows rays on the map
-    void show_data_rate(const Vector& antenna_pos, bool dBm = false, float tilesize = TILE_SIZE); // Shows data rate at a specific router position
-    void show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos, bool dBm = false, float tilesize = TILE_SIZE); // Shows data rate with two routers
+    void show_data_rate(const vectorVect& antenna_pos, bool dBm = false, float tilesize = TILE_SIZE); // Shows data rate with multiple routers
     void optimize_placement(int number_of_antenna); // Optimizes antenna placement
 
     vectorVect brut_force(int number_of_antenna, float tile_size); // Search best tile to place the router(s) by trying every accessible tile

@@ -68,24 +68,16 @@ void Map::show_rays(bool logarithmic) const {
 		std::cout << std::endl;
 	}
 }
-void Map::show_data_rate(const Vector& pos, bool dBm, float tile_size) {
+void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_size) {
 	setup_tiles(tile_size);
 	if (display == nullptr) {
 		std::cout << "No window given to show the data rate" << std::endl;
 		return;
 	}
-	Tile* this_tile = find_closest_tile(pos);
-	calculate_data_rate(this_tile);
-	show_map();
-	display->add_tiles(tiles, dBm);
-}
-void Map::show_data_rate(const Vector& antenna1_pos, const Vector& antenna2_pos, bool dBm, float tile_size) {
-	setup_tiles(tile_size);
-	if (display == nullptr) {
-		std::cout << "No window given to show the data rate" << std::endl;
-		return;
+	tileVect these_tiles;
+	for (Vector pos : antenna_pos) {
+		these_tiles.push_back(find_closest_tile(pos));
 	}
-	tileVect these_tiles = { find_closest_tile(antenna1_pos) , find_closest_tile(antenna2_pos) };
 	calculate_data_rate(these_tiles);
 	show_map();
 	display->add_tiles(tiles, dBm);
@@ -95,15 +87,15 @@ void Map::optimize_placement(int number_of_antenna)
 	std::cout << "Starting optimization..." << std::endl;
 	auto start_time = std::chrono::high_resolution_clock::now();
 
-	vectorVect ant_pos = brut_force(number_of_antenna, 1.0f);
+	vectorVect ant_pos = brut_force(number_of_antenna, 2.0f);
+	std::cout << "Gradient descent" << std::endl;
 	gradient_descent(&ant_pos, 0.5f, 0.1f);
 	realantennaVect final_antennas;
+	std::cout << "Optimized router positions :" << std::endl;
 	for (Vector pos : ant_pos) {
-		final_antennas.push_back(new RealAntenna(pos));
+		pos.show();
 	}
-	calculate_data_rate(final_antennas);
-	show_map();
-	display->add_tiles(tiles, false);
+	show_data_rate(ant_pos);
 
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
@@ -212,13 +204,19 @@ void Map::gradient_descent(vectorVect* pos, float tile_size, float precision) {
 	RealAntenna* W = nullptr;
 	RealAntenna* N = nullptr;
 	RealAntenna* S = nullptr;
+	RealAntenna* C = nullptr;
 	realantennaVect antennas;
 	for (Vector p : *pos) {
-		antennas.push_back(new RealAntenna(p));
+		antennas.push_back(new RealAntenna(p)); // the few antennas created here are never deleted ?
+	}
+	for (RealAntenna* ant : antennas) {
+		virtualize_antenna(ant);
 	}
 	for (int i = 0; i < static_cast<int>(pos->size()); i++) {
 		bool searching = true;
+		C = antennas[i];
 		while (searching) {
+			C->get_pos().show();
 			floatMatrix direction_values = floatMatrix{ {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f} };
 			direction_values[0] = calculate_coverage_and_rate(antennas);
 			// putting a new antenna in each direction
@@ -250,48 +248,110 @@ void Map::gradient_descent(vectorVect* pos, float tile_size, float precision) {
 			Vector store_pos;
 			switch (best_pos) {
 			case(1):
-				delete E; direction_values[2] = direction_values[4]; E = N; N = nullptr;
-				delete S; direction_values[3] = direction_values[1]; S = W; W = nullptr;
-				store_pos = antennas[i]->get_pos();
-				delete antennas[i]; antennas[i] = new RealAntenna(store_pos + Vector(-precision, +precision)); break;
+				delete E; 
+				direction_values[2] = direction_values[4]; 
+				E = N; 
+				N = nullptr;
+				delete S; 
+				direction_values[3] = direction_values[1]; 
+				S = W;
+				W = nullptr;
+				store_pos = C->get_pos();
+				delete C; 
+				C = new RealAntenna(store_pos + Vector(-precision, +precision));
+				virtualize_antenna(C);
+				break;
 			case(2):
 				delete E; E = nullptr;
 				delete W; W = nullptr;
-				delete S; direction_values[3] = direction_values[0]; S = antennas[i];
-				direction_values[0] = direction_values[4]; antennas[i] = N; N = nullptr; break;
+				delete S; 
+				direction_values[3] = direction_values[0]; 
+				S = C;
+				direction_values[0] = direction_values[4];
+				C = N; N = nullptr; 
+				break;
 			case(3):
-				delete W; direction_values[1] = direction_values[4]; W = N; N = nullptr;
-				delete S; direction_values[3] = direction_values[2]; S = E; E = nullptr;
-				store_pos = antennas[i]->get_pos();
-				delete antennas[i]; antennas[i] = new RealAntenna(store_pos + Vector(+precision, +precision)); break;
+				delete W;
+				direction_values[1] = direction_values[4]; 
+				W = N; 
+				N = nullptr;
+				delete S; direction_values[3] = direction_values[2]; 
+				S = E; 
+				E = nullptr;
+				store_pos = C->get_pos();
+				delete C; 
+				C = new RealAntenna(store_pos + Vector(+precision, +precision));
+				virtualize_antenna(C);
+				break;
 			case(4):
-				delete N; N = nullptr;
-				delete S; S = nullptr;
-				delete E; direction_values[2] = direction_values[0]; E = antennas[i];
-				direction_values[0] = direction_values[1]; antennas[i] = W; W = nullptr; break;
+				delete N; 
+				N = nullptr;
+				delete S; 
+				S = nullptr;
+				delete E;
+				direction_values[2] = direction_values[0]; 
+				E = C;
+				direction_values[0] = direction_values[1];
+				C = W;
+				W = nullptr; 
+				break;
 			case(5):
 				delete E; delete W; delete N; delete S;
-				searching = false; break;
+				E = nullptr; W = nullptr; N = nullptr; S = nullptr;
+				antennas[i] = C;
+				searching = false; 
+				break;
 			case(6):
-				delete N; N = nullptr;
-				delete S; S = nullptr;
-				delete W; direction_values[1] = direction_values[0]; W = antennas[i];
-				direction_values[0] = direction_values[2]; antennas[i] = E; E = nullptr; break;
+				delete N;
+				N = nullptr;
+				delete S;
+				S = nullptr;
+				delete W;
+				direction_values[1] = direction_values[0]; 
+				W = C;
+				direction_values[0] = direction_values[2]; C = E;
+				E = nullptr; 
+				break;
 			case(7):
-				delete E; direction_values[2] = direction_values[3]; E = S; S = nullptr;
-				delete N; direction_values[4] = direction_values[1]; N = W; W = nullptr;
-				store_pos = antennas[i]->get_pos();
-				delete antennas[i]; antennas[i] = new RealAntenna(store_pos + Vector(-precision, -precision)); break;
+				delete E; 
+				direction_values[2] = direction_values[3]; 
+				E = S; 
+				S = nullptr;
+				delete N; 
+				direction_values[4] = direction_values[1]; 
+				N = W; 
+				W = nullptr;
+				store_pos = C->get_pos();
+				delete C; 
+				C = new RealAntenna(store_pos + Vector(-precision, -precision));
+				virtualize_antenna(C);
+				break;
 			case(8):
-				delete E; E = nullptr;
-				delete W; W = nullptr;
-				delete N; direction_values[4] = direction_values[0]; N = antennas[i];
-				direction_values[0] = direction_values[3]; antennas[i] = S; S = nullptr; break;
+				delete E; 
+				E = nullptr;
+				delete W;
+				W = nullptr;
+				delete N; 
+				direction_values[4] = direction_values[0];
+				N = C;
+				direction_values[0] = direction_values[3];
+				C = S; 
+				S = nullptr; 
+				break;
 			case(9):
-				delete W; direction_values[1] = direction_values[3]; W = S; S = nullptr;
-				delete N; direction_values[4] = direction_values[2]; N = E; E = nullptr;
-				store_pos = antennas[i]->get_pos();
-				delete antennas[i]; antennas[i] = new RealAntenna(store_pos + Vector(+precision, -precision)); break;
+				delete W; 
+				direction_values[1] = direction_values[3];
+				W = S;
+				S = nullptr;
+				delete N; 
+				direction_values[4] = direction_values[2];
+				N = E;
+				E = nullptr;
+				store_pos = C->get_pos();
+				delete C;
+				C = new RealAntenna(store_pos + Vector(+precision, -precision)); 
+				virtualize_antenna(C);
+				break;
 			default:
 				break;
 			}
@@ -482,8 +542,7 @@ void Map::calculate_data_rate(const tileVect& tx_tiles) {
 	}
 	calculate_data_rate(antennas);
 }
-floatVect Map::calculate_coverage_and_rate(const realantennaVect& tx_antenna)
-{
+floatVect Map::calculate_coverage_and_rate(const realantennaVect& tx_antenna) {
 	// returns (coverage, data_rate)
 	floatVect data_rate_values;
 	for (RealAntenna* tx_ant : tx_antenna) {
@@ -497,15 +556,25 @@ floatVect Map::calculate_coverage_and_rate(const realantennaVect& tx_antenna)
 	}
 	float total_data = 0.0f;
 	float coverage = 0.0f;
-	int size = static_cast<int>(tiles.size());
-	for (int i = 0; i < size; i++) {
-		float data = 0.0f;
+	//int size = static_cast<int>(tx_antenna.size());
+	//for (int i = 0; i < size; i++) {
+	//	float data = 0.0f;
+	//	for (int j = 0; j < static_cast<int>(tiles.size()); j++) {
+	//		data = static_cast<float>(MAX(data, data_rate_values[i + j * size]));
+	//	}
+	//	if (data > 0.0f) {
+	//		coverage++;
+	//		total_data += data * 1e-9; // in Gb
+	//	}
+	//}
+	for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
+		float tile_data = 0.0f;
 		for (int j = 0; j < static_cast<int>(tx_antenna.size()); j++) {
-			data = static_cast<float>(MAX(data, data_rate_values[i + j * size]));
+			tile_data = MAX(tile_data, data_rate_values[i + j * static_cast<int>(tiles.size())]);
 		}
-		if (data > 0.0f) {
+		if (tile_data > 0.0f) {
 			coverage++;
-			total_data += data * 1e-9; // in Gb
+			total_data += tile_data * 1e-9; // in Gb
 		}
 	}
 	return floatVect{ coverage, total_data };
