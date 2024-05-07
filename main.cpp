@@ -8,14 +8,14 @@ int main(int argc, char* argv[]) {
 
     bool ray = false;
     bool dB = false;
-    bool optimize = true;
+    bool optimize = false;
     int optimize_order = 2;
 
     Graphics* g;
 
     Map* m;
 
-    TILE_SIZE = 1.0f;
+    TILE_SIZE = 0.1f;
 
     if (EXERCISE) {
         if (dB) {
