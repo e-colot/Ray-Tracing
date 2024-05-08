@@ -1,6 +1,7 @@
 #include "map.h"
 #include <chrono>
 #include <iostream>
+#include <variant>
 
 #define MAX(a, b) ((a > b) ? a : b)
 
@@ -74,11 +75,11 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 		std::cout << "No window given to show the data rate" << std::endl;
 		return;
 	}
-	tileVect these_tiles;
+	realantennaVect antennas;
 	for (Vector pos : antenna_pos) {
-		these_tiles.push_back(find_closest_tile(pos));
+		antennas.push_back(find_closest_tile(pos)->get_antenna());
 	}
-	calculate_data_rate(these_tiles);
+	calculate_data_rate(antennas);
 	show_map();
 	display->add_tiles(tiles, dBm);
 }
@@ -132,14 +133,7 @@ vectorVect Map::brut_force(int antenna_number, float tile_size) {
 				max_index = i;
 			}
 		}
-
-		//std::cout << "Optimal antenna position : ";
-		//accessible_tiles[max_index]->get_pos().show();
-		//std::cout << "Coverage : " << coverage[max_index] * 100.0 << "%" << std::endl;
 		res.push_back(accessible_tiles[max_index]->get_pos());
-		//calculate_data_rate(accessible_tiles[max_index]);
-		//show_map();
-		//display->add_tiles(tiles);
 	}
 	else if (antenna_number == 2) {
 		floatMatrix coverage;
@@ -180,23 +174,16 @@ vectorVect Map::brut_force(int antenna_number, float tile_size) {
 				}
 			}
 		}
-		//std::cout << "Coverage : " << coverage[i_antenna][j_antenna] * 100.0 << "%" << std::endl;
-
-		//std::cout << "Optimal positions for 2 antennas : " << std::endl;
-		//accessible_tiles[i_antenna]->get_pos().show();
-		//accessible_tiles[j_antenna]->get_pos().show();
-		//tileVect final_antennas = { new Tile(accessible_tiles[i_antenna]) , new Tile(accessible_tiles[j_antenna]) };
 		res.push_back(accessible_tiles[i_antenna]->get_pos());
 		res.push_back(accessible_tiles[j_antenna]->get_pos());
-		//calculate_data_rate(final_antennas);
-		//show_map();
-		//display->add_tiles(tiles, false);
-		//for (Tile* t : final_antennas) {
-		//	delete t;
-		//}
 	}
 	// more antennas could be handled using the same kind of code but with higher dimensions vectors
 	return res;
+}
+
+void Map::gradient_descent(vectorVect* pos, float tile_size, float precision)
+{
+	return;
 }
 
 void Map::show_map() const {
@@ -306,18 +293,7 @@ void Map::calculate_data_rate() {
 		rx = nullptr;
 	}
 }
-void Map::calculate_data_rate(Tile* tx_tile) {
-	clean_accessible_tiles_data();
-	tx = tx_tile->get_antenna();
-	for (Tile* t : tiles) {
-		rx = t->get_antenna();
-		t->add_rate(calc_rate());
-	}
-	tx = nullptr;
-	rx = nullptr;
-}
-void Map::calculate_data_rate(const realantennaVect& tx_antenna)
-{
+void Map::calculate_data_rate(const realantennaVect& tx_antenna) {
 	clean_accessible_tiles_data();
 	floatVect data_rate_values;
 	for (RealAntenna* tx_ant : tx_antenna) {
@@ -337,13 +313,6 @@ void Map::calculate_data_rate(const realantennaVect& tx_antenna)
 		}
 		tiles[i]->add_rate(data);
 	}
-}
-void Map::calculate_data_rate(const tileVect& tx_tiles) {
-	realantennaVect antennas;
-	for (Tile* t : tx_tiles) {
-		antennas.push_back(t->get_antenna());
-	}
-	calculate_data_rate(antennas);
 }
 void Map::setup_tiles(float tile_size) {
 	display->set_tile_size(tile_size);
@@ -422,4 +391,12 @@ void Map::clean_accessible_tiles_data() const {
 	for (Tile* t : accessible_tiles) {
 		t->delete_rates();
 	}
+}
+
+vectorVect Map::best_position(int nbr_antennas) const {
+	using floatElement = std::variant<float, floatVect>;
+
+	// DO SOMETHING PLS
+
+	return vectorVect();
 }

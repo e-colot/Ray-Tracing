@@ -52,20 +52,20 @@ public:
     void gradient_descent(vectorVect* pos, float tile_size, float precision);
 
 private:
-    void show_map() const; // Shows the map in the window
-    void add_wall(const Wall* wall_to_add); // Adds a wall to the map
-    void add_corner(const corner* corner_to_add); // Adds a corner to the map
+    void show_map() const; // Shows the walls and the corners in the window
+    void add_wall(const Wall* wall_to_add); // Adds a wall to the list of walls
+    void add_corner(const corner* corner_to_add); // Adds a corner to the list of corners
     void setup_materials(); // Sets up materials for the map
     void setup_walls(bool lift); // Sets up walls on the map
     void virtualize_antenna(RealAntenna* antenna) const; // Virtualizes an antenna
     void create_rays() const; // Creates rays on the map
-    void calculate_data_rate(); // Calculates data rate on the map
-    void calculate_data_rate(Tile* tx_tile); // Calculates data rate for a specific tile as emmiter
-    void calculate_data_rate(const realantennaVect& tx_antenna); // Calculates data rate for multiple antennas as emitters
-    void calculate_data_rate(const tileVect& tx_tiles); // Calculates data rate for multiple tiles as emitters
+    void calculate_data_rate(); // Calculates data rate with an router on each accessible_tile
+    void calculate_data_rate(const realantennaVect& tx_antenna); // Calculates data rate for the given routers
     void setup_tiles(float tile_size = TILE_SIZE); // Sets up tiles on the map
     Tile* find_closest_tile(const Vector& position) const; // Finds the closest tile to a given position
     void setup_accessible_tiles(); // Sets up accessible tiles
     double calc_rate() const; // Calculates the data rate between rx and tx
     void clean_accessible_tiles_data() const; // Deletes the rates calculated for the accessible tiles
+
+    vectorVect best_position(int nbr_antennas) const;
 };
