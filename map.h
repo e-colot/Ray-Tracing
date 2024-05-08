@@ -30,8 +30,6 @@ private:
 public:
     Map(); // Default constructor
     Map(Graphics* window); // Constructor with Graphics window
-    Map(const Vector& tx_pos, const Vector& rx_pos); // Constructor with antenna positions
-    Map(const Vector& tx_pos, const Vector& rx_pos, Graphics* window); // Constructor with antenna positions and Graphics window
 
     // Destructor
 public:
@@ -43,7 +41,7 @@ public:
 
     // Methods
 public:
-    void show_rays(bool logarithmic = false) const; // Shows rays on the map
+    void show_rays(Vector tx_pos, Vector rx_pos, bool logarithmic = false); // Shows rays on the map
     void show_data_rate(const vectorVect& antenna_pos, bool dBm = false, float tilesize = TILE_SIZE); // Shows data rate with multiple routers
     void optimize_placement(int number_of_antenna); // Optimizes antenna placement
 

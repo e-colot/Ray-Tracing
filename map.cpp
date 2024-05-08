@@ -7,20 +7,11 @@
 
 // Constructors
 
-Map::Map() : exo_4_1(nullptr), concrete(nullptr), gyproc(nullptr),
-glass(nullptr), metal(nullptr), display(nullptr), rx(nullptr), tx(nullptr) {}
-Map::Map(Graphics* g) {
+Map::Map() : rx(nullptr), tx(nullptr) {
 	setup_materials();
 	setup_walls(false);
-	add_window(g);
 }
-Map::Map(const Vector& tx_pos, const Vector& rx_pos) : display(nullptr) {
-	setup_materials();
-	setup_walls(false);
-	tx = new RealAntenna(tx_pos);
-	rx = new RealAntenna(rx_pos);
-}
-Map::Map(const Vector& tx_pos, const Vector& rx_pos, Graphics* g) : Map(tx_pos, rx_pos) {
+Map::Map(Graphics* g) : Map() {
 	add_window(g);
 }
 
@@ -54,11 +45,12 @@ void Map::add_window(Graphics* g) {
 
 // Methods
 
-void Map::show_rays(bool logarithmic) const {
+void Map::show_rays(Vector tx_pos, Vector rx_pos, bool logarithmic) {
 	if (display == nullptr) {
-		std::cout << "No window given to show the rays" << std::endl;
-		return;
+		std::logic_error("No window given to show the rays");
 	}
+	rx = new RealAntenna(rx_pos);
+	tx = new RealAntenna(tx_pos);
 	virtualize_antenna(rx);
 	virtualize_antenna(tx);
 	create_rays();
@@ -75,7 +67,7 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 	}
 	setup_tiles(tile_size, false);
 	if (display == nullptr) {
-		std::cout << "No window given to show the data rate" << std::endl;
+		std::logic_error("No window given to show the data rate");
 		return;
 	}
 	realantennaVect antennas;
@@ -108,10 +100,6 @@ void Map::optimize_placement(int number_of_antenna) {
 	std::cout << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
 }
 vectorVect Map::brut_force(int antenna_number, float tile_size) {
-	if (display == nullptr) {
-		std::cout << "No window given to show the data rate" << std::endl;
-		return vectorVect{};
-	}
 	setup_tiles(tile_size, true);
 	calculate_data_rate();
 	return best_position(antenna_number);
@@ -309,7 +297,7 @@ double Map::calc_rate() const {
 }
 vectorVect Map::best_position(int nbr_antennas) const {
 	if (nbr_antennas > 2) {
-		throw std::logic_error("More than 2 antennas not handled (yet)");
+		throw std::logic_error("More than 2 antennas not handled (yet ?)");
 	}
 	vectorVect res;
 	if (nbr_antennas == 1) {

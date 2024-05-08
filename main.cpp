@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[]) {
 
-    bool ray = false;
+    bool ray = true;
     bool dB = false;
     bool optimize = false;
     int optimize_order = 2;
@@ -15,25 +15,25 @@ int main(int argc, char* argv[]) {
 
     Map* m;
 
-    TILE_SIZE = 0.2f;
+    TILE_SIZE = 0.1f;
 
     if (EXERCISE) {
         if (dB) {
             g = new Graphics("TODO");
-            m = new Map(Vector(32, 70), Vector(47, 15), g);
-            m->show_rays(true);
+            m = new Map(g);
+            m->show_rays(Vector(32, 70), Vector(47, 15), true);
         }
         else {
             g = new Graphics("Rays, in V^2");
-            m = new Map(Vector(32, 70), Vector(47, 15), g);
-            m->show_rays(false);
+            m = new Map(g);
+            m->show_rays(Vector(32, 70), Vector(47, 15), false);
         }
     }
     else {
         if (ray) {
             g = new Graphics("TODO");
-            m = new Map(Vector(9.5f, 6.9f), Vector(11.1f, 4.1f), g);
-            m->show_rays(dB);
+            m = new Map(g);
+            m->show_rays(Vector(9.5f, 6.9f), Vector(11.1f, 4.1f), dB);
         }
         else {
             g = new Graphics("Data rate");
