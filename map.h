@@ -23,7 +23,6 @@ private:
     wallVect walls; // Walls on the map
     cornerVect corners; // Corners on the map
     tileVect tiles; // Tiles on the map
-    tileVect accessible_tiles; // Accessible tiles on the map
     RealAntenna* rx; // Receiving antenna
     RealAntenna* tx; // Transmitting antenna
 
@@ -61,11 +60,9 @@ private:
     void create_rays() const; // Creates rays on the map
     void calculate_data_rate(); // Calculates data rate with an router on each accessible_tile
     void calculate_data_rate(const realantennaVect& tx_antenna); // Calculates data rate for the given routers
-    void setup_tiles(float tile_size = TILE_SIZE); // Sets up tiles on the map
     Tile* find_closest_tile(const Vector& position) const; // Finds the closest tile to a given position
-    void setup_accessible_tiles(); // Sets up accessible tiles
+    void setup_tiles(float tile_size, bool restrained); // Sets up tiles on the map, restrained don't add tiles in the walls
     double calc_rate() const; // Calculates the data rate between rx and tx
-    void clean_accessible_tiles_data() const; // Deletes the rates calculated for the accessible tiles
 
     vectorVect best_position(int nbr_antennas) const;
 };

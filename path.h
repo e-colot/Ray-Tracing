@@ -28,5 +28,6 @@ public:
     double calc_attenuation(const wallVect& map) const; // Calculates attenuation along the path
 
 private:
-    Complex calc_transmission(const Wall* wall_to_transmit_through, float intersection) const; // Calculates transmission through a wall
+    Complex calc_transmission(const Wall* wall_to_transmit_through, float intersection, Complex* gamma_perp = nullptr, std::vector<float*> geometric_values = {}) const; // Calculates transmission through a wall
+    Complex calc_gamma_perp(const Wall* w, float intersection, std::vector<float*> geometric_values) const; // returns in gamma_perp and geometric_values = { sin(\theta_i), sin(\theta_t), s }
 };

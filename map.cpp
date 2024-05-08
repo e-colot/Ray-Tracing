@@ -1,7 +1,7 @@
 #include "map.h"
 #include <chrono>
 #include <iostream>
-#include <variant>
+#include <stdexcept>
 
 #define MAX(a, b) ((a > b) ? a : b)
 
@@ -70,7 +70,10 @@ void Map::show_rays(bool logarithmic) const {
 	}
 }
 void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_size) {
-	setup_tiles(tile_size);
+	if (EXERCISE) {
+		throw std::logic_error("Cannot show tiles outside of the appartment");
+	}
+	setup_tiles(tile_size, false);
 	if (display == nullptr) {
 		std::cout << "No window given to show the data rate" << std::endl;
 		return;
@@ -83,8 +86,10 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 	show_map();
 	display->add_tiles(tiles, dBm);
 }
-void Map::optimize_placement(int number_of_antenna)
-{
+void Map::optimize_placement(int number_of_antenna) {
+	if (EXERCISE) {
+		throw std::logic_error("Cannot show tiles outside of the appartment");
+	}
 	std::cout << "Starting optimization..." << std::endl;
 	auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -107,82 +112,11 @@ vectorVect Map::brut_force(int antenna_number, float tile_size) {
 		std::cout << "No window given to show the data rate" << std::endl;
 		return vectorVect{};
 	}
-	vectorVect res;
-	setup_tiles(tile_size);
-	setup_accessible_tiles();
+	setup_tiles(tile_size, true);
 	calculate_data_rate();
-	if (antenna_number == 1) {
-		floatVect coverage;
-		floatVect total_rate_GB;
-		int max_index = 0;
-		// the following finds the coverage and the total data rate of each antenna
-		for (int i = 0; i < static_cast<int>(accessible_tiles.size()); i++) {
-			int cov = 0;
-			float data = 0;
-			for (Tile* t : accessible_tiles) {
-				if (t->get_rate(i) > std::numeric_limits<double>::epsilon()) {
-					// if rate != 0
-					cov++;
-					data += (static_cast<float>(t->get_rate(i)) / 1e9f);
-				}
-			}
-			total_rate_GB.push_back(data);
-			coverage.push_back(static_cast<float>(cov) / static_cast<float>(accessible_tiles.size()));
-			if ((coverage[i] > coverage[max_index]) || ((coverage[i] >= coverage[max_index] - std::numeric_limits<double>::epsilon()) && 
-					(total_rate_GB[i] >= total_rate_GB[max_index] - std::numeric_limits<double>::epsilon()))) {
-				max_index = i;
-			}
-		}
-		res.push_back(accessible_tiles[max_index]->get_pos());
-	}
-	else if (antenna_number == 2) {
-		floatMatrix coverage;
-		floatMatrix total_rate_GB;
-		int i_antenna = 0;
-		int j_antenna = 0;
-
-		// the following finds the coverage and the total data rate of each pair of antenna
-		for (int i = 0; i < static_cast<int>(accessible_tiles.size()); i++) {
-			floatVect cover;
-			floatVect data_rate;
-			for (int j = 0; j < static_cast<int>(accessible_tiles.size()); j++) {
-				if (j < i) {
-					cover.push_back(coverage[j][i]);
-					data_rate.push_back(total_rate_GB[j][i]);
-				}
-				else {
-					int cov = 0;
-					float data = 0;
-					for (Tile* t : accessible_tiles) {
-						if (t->get_rate(i) > std::numeric_limits<double>::epsilon() || t->get_rate(j) > std::numeric_limits<double>::epsilon()) {
-							cov++;
-							data += static_cast<float>(static_cast<float>(MAX(t->get_rate(i), t->get_rate(j))) / 1e9f);
-						}
-					}
-					cover.push_back(static_cast<float>(cov) / static_cast<float>(accessible_tiles.size()));
-					data_rate.push_back(data);
-				}
-			}
-			coverage.push_back(cover);
-			total_rate_GB.push_back(data_rate);
-
-			for (int j = 0; j < static_cast<int>(accessible_tiles.size()); j++) {
-				if ((coverage[i][j] > coverage[i_antenna][j_antenna]) || ((coverage[i][j] >= coverage[i_antenna][j_antenna] - std::numeric_limits<double>::epsilon()) && 
-						(total_rate_GB[i][j] >= total_rate_GB[i_antenna][j_antenna] - std::numeric_limits<double>::epsilon()))) {
-					i_antenna = i;
-					j_antenna = j;
-				}
-			}
-		}
-		res.push_back(accessible_tiles[i_antenna]->get_pos());
-		res.push_back(accessible_tiles[j_antenna]->get_pos());
-	}
-	// more antennas could be handled using the same kind of code but with higher dimensions vectors
-	return res;
+	return best_position(antenna_number);
 }
-
-void Map::gradient_descent(vectorVect* pos, float tile_size, float precision)
-{
+void Map::gradient_descent(vectorVect* pos, float tile_size, float precision) {
 	return;
 }
 
@@ -272,21 +206,21 @@ void Map::create_rays() const {
 	}
 }
 void Map::calculate_data_rate() {
-	for (int i = 0; i < static_cast<int>(accessible_tiles.size()); i++) {
-		tx = accessible_tiles[i]->get_antenna();
-		for (int j = 0; j < static_cast<int>(accessible_tiles.size()); j++) {
+	for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
+		tx = tiles[i]->get_antenna();
+		for (int j = 0; j < static_cast<int>(tiles.size()); j++) {
 			if (j < i) {
 				// if we already calculated the situation but in the other side : RX <=> TX
-				accessible_tiles[j]->add_rate(accessible_tiles[i]->get_rate(j)); //(50% time saved)
+				tiles[j]->add_rate(tiles[i]->get_rate(j)); //(50% time saved)
 			}
 			else if ((tx->get_pos().get_x() > 4 && tx->get_pos().get_x() < 11 && tx->get_pos().get_y() < 4) && 
-				((accessible_tiles[j]->get_pos().get_x() > 4 && accessible_tiles[j]->get_pos().get_x() < 11 && accessible_tiles[j]->get_pos().get_y() < 4))) {
+				((tiles[j]->get_pos().get_x() > 4 && tiles[j]->get_pos().get_x() < 11 && tiles[j]->get_pos().get_y() < 4))) {
 				// if both rx and tx are in the kitchen or the bathroom
-				accessible_tiles[j]->add_rate(0.0); // (10% time saved)
+				tiles[j]->add_rate(0.0); // (10% time saved)
 			}
 			else {
-				rx = accessible_tiles[j]->get_antenna();
-				accessible_tiles[j]->add_rate(calc_rate());
+				rx = tiles[j]->get_antenna();
+				tiles[j]->add_rate(calc_rate());
 			}
 		}
 		tx = nullptr;
@@ -294,7 +228,6 @@ void Map::calculate_data_rate() {
 	}
 }
 void Map::calculate_data_rate(const realantennaVect& tx_antenna) {
-	clean_accessible_tiles_data();
 	floatVect data_rate_values;
 	for (RealAntenna* tx_ant : tx_antenna) {
 		tx = tx_ant;
@@ -314,36 +247,6 @@ void Map::calculate_data_rate(const realantennaVect& tx_antenna) {
 		tiles[i]->add_rate(data);
 	}
 }
-void Map::setup_tiles(float tile_size) {
-	display->set_tile_size(tile_size);
-	// deleting tiles
-	for (Tile* t : tiles) {
-		delete t;
-	}
-	tiles.clear();
-	int size[2]{};
-	if (EXERCISE) {
-		size[0] = 60;
-		size[1] = 80;
-	}
-	else {
-		size[0] = 15;
-		size[1] = 8;
-	}
-	for (int i = 0; i <= static_cast<int>(size[0] / tile_size); i++) {
-		for (int j = 0; j <= static_cast<int>(size[1] / tile_size); j++) {
-			if (static_cast<float>(j) > (-4.0 / 3.0 * i + 24.0 / tile_size)) {
-				continue;
-			}
-			if ((static_cast<float>(j) > (6 / tile_size)) and (static_cast<float>(i) > (4 / tile_size)) and (static_cast<float>(i) < (9 / tile_size))) {
-				continue;
-			}
-			Tile* new_tile = new Tile(Vector(i * tile_size, j * tile_size));
-			virtualize_antenna(new_tile->get_antenna());
-			tiles.push_back(new_tile);
-		}
-	}
-}
 Tile* Map::find_closest_tile(const Vector& pos) const {
 	Tile* closest_tile = nullptr;
 	float distance = 999999.9f;
@@ -355,21 +258,38 @@ Tile* Map::find_closest_tile(const Vector& pos) const {
 	}
 	return closest_tile;
 }
-void Map::setup_accessible_tiles() {
-	// using only some tiles for the optimisation
-	// (75% time saved)
-	accessible_tiles.clear();
-	// deleting accessible_tiles
+void Map::setup_tiles(float tile_size, bool restrained) {
+	display->set_tile_size(tile_size);
+	// deleting tiles
 	for (Tile* t : tiles) {
-		bool to_keep = true;
-		for (const Wall* w : walls) {
-			if (w->inside(t->get_pos())) {
-				to_keep = false;
-				break;
+		delete t;
+	}
+	tiles.clear();
+	int size[2]{15, 8};
+	for (int i = 0; i <= static_cast<int>(size[0] / tile_size); i++) {
+		for (int j = 0; j <= static_cast<int>(size[1] / tile_size); j++) {
+			if (static_cast<float>(j) > (-4.0 / 3.0 * i + 24.0 / tile_size)) {
+				continue;
 			}
-		}
-		if (to_keep) {
-			accessible_tiles.push_back(t);
+			if ((static_cast<float>(j) > (6 / tile_size)) and (static_cast<float>(i) > (4 / tile_size)) and (static_cast<float>(i) < (9 / tile_size))) {
+				continue;
+			}
+			if (restrained) {
+				// using only some tiles for the optimisation saves 75% time for the brut force part
+				bool to_keep = true;
+				for (const Wall* w : walls) {
+					if (w->inside(Vector(i * tile_size, j * tile_size))) {
+						to_keep = false;
+						break;
+					}
+				}
+				if (!to_keep) {
+					continue;
+				}
+			}
+			Tile* new_tile = new Tile(Vector(i * tile_size, j * tile_size));
+			virtualize_antenna(new_tile->get_antenna());
+			tiles.push_back(new_tile);
 		}
 	}
 }
@@ -387,16 +307,77 @@ double Map::calc_rate() const {
 	rx->reset();
 	return output;
 }
-void Map::clean_accessible_tiles_data() const {
-	for (Tile* t : accessible_tiles) {
-		t->delete_rates();
-	}
-}
-
 vectorVect Map::best_position(int nbr_antennas) const {
-	using floatElement = std::variant<float, floatVect>;
+	if (nbr_antennas > 2) {
+		throw std::logic_error("More than 2 antennas not handled (yet)");
+	}
+	vectorVect res;
+	if (nbr_antennas == 1) {
+		floatVect coverage;
+		floatVect total_rate_GB;
+		int max_index = 0;
+		// the following finds the coverage and the total data rate of each antenna
+		for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
+			int cov = 0;
+			float data = 0;
+			for (Tile* t : tiles) {
+				if (t->get_rate(i) > std::numeric_limits<double>::epsilon()) {
+					// if rate != 0
+					cov++;
+					data += (static_cast<float>(t->get_rate(i)) / 1e9f);
+				}
+			}
+			total_rate_GB.push_back(data);
+			coverage.push_back(static_cast<float>(cov) / static_cast<float>(tiles.size()));
+			if ((coverage[i] > coverage[max_index]) || ((coverage[i] >= coverage[max_index] - std::numeric_limits<double>::epsilon()) &&
+				(total_rate_GB[i] >= total_rate_GB[max_index] - std::numeric_limits<double>::epsilon()))) {
+				max_index = i;
+			}
+		}
+		res.push_back(tiles[max_index]->get_pos());
+	}
+	else if (nbr_antennas == 2) {
+		floatMatrix coverage;
+		floatMatrix total_rate_GB;
+		int i_antenna = 0;
+		int j_antenna = 0;
 
-	// DO SOMETHING PLS
+		// the following finds the coverage and the total data rate of each pair of antenna
+		for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
+			floatVect cover;
+			floatVect data_rate;
+			for (int j = 0; j < static_cast<int>(tiles.size()); j++) {
+				if (j < i) {
+					cover.push_back(coverage[j][i]);
+					data_rate.push_back(total_rate_GB[j][i]);
+				}
+				else {
+					int cov = 0;
+					float data = 0;
+					for (Tile* t : tiles) {
+						if (t->get_rate(i) > std::numeric_limits<double>::epsilon() || t->get_rate(j) > std::numeric_limits<double>::epsilon()) {
+							cov++;
+							data += static_cast<float>(static_cast<float>(MAX(t->get_rate(i), t->get_rate(j))) / 1e9f);
+						}
+					}
+					cover.push_back(static_cast<float>(cov) / static_cast<float>(tiles.size()));
+					data_rate.push_back(data);
+				}
+			}
+			coverage.push_back(cover);
+			total_rate_GB.push_back(data_rate);
 
-	return vectorVect();
+			for (int j = 0; j < static_cast<int>(tiles.size()); j++) {
+				if ((coverage[i][j] > coverage[i_antenna][j_antenna]) || ((coverage[i][j] >= coverage[i_antenna][j_antenna] - std::numeric_limits<double>::epsilon()) &&
+					(total_rate_GB[i][j] >= total_rate_GB[i_antenna][j_antenna] - std::numeric_limits<double>::epsilon()))) {
+					i_antenna = i;
+					j_antenna = j;
+				}
+			}
+		}
+		res.push_back(tiles[i_antenna]->get_pos());
+		res.push_back(tiles[j_antenna]->get_pos());
+	}
+	// more antennas could be handled using the same kind of code but with higher dimensions vectors
+	return res;
 }

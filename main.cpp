@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
 
     Map* m;
 
-    TILE_SIZE = 0.1f;
+    TILE_SIZE = 0.2f;
 
     if (EXERCISE) {
         if (dB) {

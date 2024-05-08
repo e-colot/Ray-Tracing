@@ -38,8 +38,8 @@ void Complex::operator+=(const Complex& c) {
 }
 bool Complex::operator==(const Complex& other) const
 {
-    return ((*this - other).squared_norm() <= 1e-12f);
-    // differnce smaller than 1e-6
+    return ((*this - other).squared_norm() <= 1e-6f);
+    // differnce smaller than 1e-3
 }
 
 // Accessors
