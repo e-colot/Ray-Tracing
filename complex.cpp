@@ -36,6 +36,11 @@ void Complex::operator+=(const Complex& c) {
     re = re + c.get_real();
     im = im + c.get_imag();
 }
+bool Complex::operator==(const Complex& other) const
+{
+    return ((*this - other).squared_norm() <= 1e-12f);
+    // differnce smaller than 1e-6
+}
 
 // Accessors
 

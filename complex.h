@@ -25,6 +25,7 @@ public:
     Complex operator/(const Complex& other) const; // Division operator
     void operator*=(const Complex& other); // Multiplication assignment operator
     void operator+=(const Complex& other); // Addition assignment operator
+    bool operator==(const Complex& other) const; // Equality comparison operator
 
     // Accessors
 public:
