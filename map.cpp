@@ -47,7 +47,7 @@ void Map::add_window(Graphics* g) {
 
 void Map::show_rays(Vector tx_pos, Vector rx_pos, bool logarithmic) {
 	if (display == nullptr) {
-		std::logic_error("No window given to show the rays");
+		throw std::logic_error("No window given to show the rays");
 	}
 	rx = new RealAntenna(rx_pos);
 	tx = new RealAntenna(tx_pos);
@@ -67,9 +67,9 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 	}
 	setup_tiles(tile_size, false);
 	if (display == nullptr) {
-		std::logic_error("No window given to show the data rate");
-		return;
+		throw std::logic_error("No window given to show the data rate");
 	}
+	display->set_tile_size(tile_size);
 	realantennaVect antennas;
 	for (Vector pos : antenna_pos) {
 		antennas.push_back(find_closest_tile(pos)->get_antenna());
@@ -84,16 +84,16 @@ void Map::optimize_placement(int number_of_antenna) {
 	}
 	std::cout << "Starting optimization..." << std::endl;
 	auto start_time = std::chrono::high_resolution_clock::now();
-
-	vectorVect ant_pos = brut_force(number_of_antenna, 2.0f);
+	Map brut_force_map = Map();
+	vectorVect ant_pos = brut_force_map.brut_force(number_of_antenna, 2.0f);
 	std::cout << "Gradient descent" << std::endl;
-	gradient_descent(&ant_pos, 0.5f, 0.1f);
-	realantennaVect final_antennas;
+	Map gradient_descent_map = Map();
+	gradient_descent_map.gradient_descent(&ant_pos, 0.5f, 0.1f);
 	std::cout << "Optimized router positions :" << std::endl;
 	for (Vector pos : ant_pos) {
 		pos.show();
 	}
-	show_data_rate(ant_pos);
+	show_data_rate(ant_pos, true, 0.5f);
 
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
@@ -247,7 +247,6 @@ Tile* Map::find_closest_tile(const Vector& pos) const {
 	return closest_tile;
 }
 void Map::setup_tiles(float tile_size, bool restrained) {
-	display->set_tile_size(tile_size);
 	// deleting tiles
 	for (Tile* t : tiles) {
 		delete t;
@@ -363,6 +362,7 @@ vectorVect Map::best_position(int nbr_antennas) const {
 				}
 			}
 		}
+		std::cout << "Coverage after brut force : " << coverage[i_antenna][j_antenna] << std::endl;
 		res.push_back(tiles[i_antenna]->get_pos());
 		res.push_back(tiles[j_antenna]->get_pos());
 	}

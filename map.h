@@ -12,6 +12,7 @@ using realantennaVect = std::vector<RealAntenna*>;
 using intVect = std::vector<int>;
 
 class Map {
+    friend Map; // allows the main Map to call private function (brut force and gradient descent) of other maps
     // Attributes
 private:
     const Material* exo_4_1; // Material for exercise 4.1
@@ -45,9 +46,6 @@ public:
     void show_data_rate(const vectorVect& antenna_pos, bool dBm = false, float tilesize = TILE_SIZE); // Shows data rate with multiple routers
     void optimize_placement(int number_of_antenna); // Optimizes antenna placement
 
-    vectorVect brut_force(int number_of_antenna, float tile_size); // Search best tile to place the router(s) by trying every accessible tile
-    void gradient_descent(vectorVect* pos, float tile_size, float precision);
-
 private:
     void show_map() const; // Shows the walls and the corners in the window
     void add_wall(const Wall* wall_to_add); // Adds a wall to the list of walls
@@ -63,4 +61,6 @@ private:
     double calc_rate() const; // Calculates the data rate between rx and tx
 
     vectorVect best_position(int nbr_antennas) const;
+    vectorVect brut_force(int number_of_antenna, float tile_size); // Search best tile to place the router(s) by trying every accessible tile
+    void gradient_descent(vectorVect* pos, float tile_size, float precision);
 };

@@ -230,7 +230,7 @@ void Graphics::add_tiles(const tileVect& tiles, bool dBm) {
 		add_rect(to_pixel(t->get_pos() + Vector(0.0f, -tile_size / 2.0f)), to_pixel(tile_size), to_pixel(tile_size), c);
 	}
 	if (dBm) {
-		add_colormap_legend("40 GB/s", "1.4 GB/s", "50 MB/s", "0  GB/s");
+		add_colormap_legend("40 GB/s", "1.4 GB/s", "50 MB/s", "0  MB/s");
 	}
 	else {
 		add_colormap_legend("40 GB/s", "30 GB/s", "10 GB/s", "0  GB/s");
