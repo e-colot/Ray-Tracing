@@ -59,8 +59,7 @@ private:
     Tile* find_closest_tile(const Vector& position) const; // Finds the closest tile to a given position
     void setup_tiles(float tile_size, bool restrained); // Sets up tiles on the map, restrained don't add tiles in the walls
     double calc_rate() const; // Calculates the data rate between rx and tx
-
-    vectorVect best_position(int nbr_antennas) const;
+    vectorVect best_position(int nbr_antennas) const; // returns the best positions for the given number of routers
     vectorVect brut_force(int number_of_antenna, float tile_size); // Search best tile to place the router(s) by trying every accessible tile
     void gradient_descent(vectorVect* pos, float tile_size, float precision);
     int best_of_3(floatVect* best) const; // returns the best direction (by index) and stores the parametres in best
