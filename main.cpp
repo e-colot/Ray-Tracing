@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
             g = new Graphics("Data rate");
             m = new Map(g);
             if (optimize) {
-                m->optimize_placement(optimize_order);
+                m->optimize_placement(optimize_order, 0.05f);
             }
             else {
                 m->show_data_rate(vectorVect{ Vector(12.5f, 4.0f), Vector(2.0f, 2.5f) }, dB);

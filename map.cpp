@@ -84,7 +84,11 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 	show_map();
 	display->add_tiles(tiles, dBm);
 }
-void Map::optimize_placement(int number_of_antenna) {
+void Map::optimize_placement(int number_of_antenna, float precision) {
+	// parameters :									Reliable (& fast)		Precise
+	float BRUT_FORCE_TILE_SIZE = 1.0f;			//			1.0				  0.5
+	float GRADIENT_DESCENT_TILE_SIZE = 0.5f;	//			0.5				  0.2
+	float DISPLAY_TILE_SIZE = 0.2f;				//			0.2				  0.1
 	if (EXERCISE) {
 		throw std::logic_error("Cannot show tiles outside of the appartment");
 	}
@@ -92,19 +96,19 @@ void Map::optimize_placement(int number_of_antenna) {
 	auto start_time = std::chrono::high_resolution_clock::now();
 	std::cout << std::endl << "    Brut force :" << std::endl << std::endl;
 	Map brut_force_map = Map();
-	vectorVect ant_pos = brut_force_map.brut_force(number_of_antenna, 1.0f);
+	vectorVect ant_pos = brut_force_map.brut_force(number_of_antenna, BRUT_FORCE_TILE_SIZE);
 	std::cout << std::endl << "    Gradient descent" << std::endl << std::endl;
 	Map gradient_descent_map = Map();
-	gradient_descent_map.gradient_descent(&ant_pos, 0.5f, 0.05f);
-	std::cout << "Optimized router positions :" << std::endl;
+	gradient_descent_map.gradient_descent(&ant_pos, GRADIENT_DESCENT_TILE_SIZE, precision);
+	std::cout << std::endl << "Optimized router position(s) :" << std::endl;
 	for (Vector pos : ant_pos) {
 		pos.show();
 	}
-	show_data_rate(ant_pos, true, 0.5f);
+	show_data_rate(ant_pos, true, DISPLAY_TILE_SIZE);
 
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-	std::cout << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
+	std::cout << std::endl << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
 }
 vectorVect Map::brut_force(int antenna_number, float tile_size) {
 	setup_tiles(tile_size, true);
@@ -149,10 +153,12 @@ void Map::gradient_descent(vectorVect* pos, float tile_size, float precision) {
 				}
 			}
 		}
-		for (Vector p : *pos) {
-			p.show();
+		if (searching) {
+			for (Vector p : *pos) {
+				p.show();
+			}
+			std::cout << std::endl;
 		}
-		std::cout << std::endl;
 	}
 	for (RealAntenna* a : antennas) {
 		delete a;
@@ -417,6 +423,10 @@ vectorVect Map::best_position(int nbr_antennas) const { // only called from brut
 			}
 		}
 		res.push_back(tiles[max_index]->get_pos());
+		for (Vector pos : res) {
+			pos.show();
+		}
+		std::cout << std::endl << "Approached coverage after brut force : " << 100 * coverage[max_index] << "%" << std::endl;
 	}
 	else if (nbr_antennas == 2) {
 		floatMatrix coverage;
@@ -462,7 +472,7 @@ vectorVect Map::best_position(int nbr_antennas) const { // only called from brut
 		for (Vector pos : res) {
 			pos.show();
 		}
-		std::cout << "Coverage after brut force : " << 100*coverage[i_antenna][j_antenna] << "%" << std::endl;
+		std::cout << std::endl << "Approached coverage after brut force : " << 100*coverage[i_antenna][j_antenna] << "%" << std::endl;
 	}
 	// more antennas could be handled using the same kind of code but with higher dimensions vectors
 	return res;
