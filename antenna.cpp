@@ -24,22 +24,15 @@ const Wall* Antenna::get_wall() const {
 // Method
 
 void Antenna::create_ray(const Antenna* rx, const wallVect& walls) {
-    if ((get_wall() != rx->get_wall()) or ((get_wall() == nullptr) && (rx->get_wall() == nullptr))) {
+    if ((wall != rx->get_wall()) or ((wall == nullptr) && (rx->get_wall() == nullptr))) {
         // making sure it's not two virtual antennas mirrored on the same wall
         // the condition after the or is true if the two antennas are RealAntennas -> direct link
         Ray* new_ray_ptr = nullptr;
-        // using new so the location of the pointer don't get deleted out of this stack
         Ray* new_ray = new Ray(this, rx, &new_ray_ptr, walls);
-        // implies that it needs to be deleted when we don't use it anymore
         if (new_ray_ptr != nullptr) {
+            //  => if the ray can exist
+            // <=> if the ray bounces on each wall
             add_ray(new_ray);
-            double att = new_ray->get_attenuation();
-            if (src->get_max_attenuation() < att) {
-                src->set_max_attenuation(att);
-            }
-            else if (att > 0.0 && src->get_min_attenuation() > att) {
-                src->set_min_attenuation(att);
-            }
         }
         new_ray_ptr = nullptr;
     }
@@ -121,9 +114,7 @@ double RealAntenna::get_binary_rate() const {
     double binary_rate_dB = static_cast<double>(76.9897 + ((received_power_dBm + 90) / 50 * (106.0206 - 76.9897)));
     return (pow(10.0f, binary_rate_dB / 10));
 }
-
-void RealAntenna::reset()
-{
+void RealAntenna::reset() {
     for (const Ray* r : rays) {
         delete r;
     }
@@ -131,6 +122,17 @@ void RealAntenna::reset()
     emission_factor = 0.0f;
     min_attenuation = 0.0f;
     max_attenuation = 0.0f;
+}
+void RealAntenna::calc_attenuation() {
+    for (const Ray* r : rays) {
+        double att = r->get_attenuation();
+        if (get_max_attenuation() < att) {
+            set_max_attenuation(att);
+        }
+        else if (att > 0.0 && get_min_attenuation() > att) {
+            set_min_attenuation(att);
+        }
+    }
 }
 
 

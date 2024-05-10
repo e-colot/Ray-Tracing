@@ -26,8 +26,6 @@ Ray::~Ray() {
         delete path[i];
         path[i] = nullptr;
     }
-    tx = nullptr;
-    rx = nullptr;
 }
 
 // Accessors

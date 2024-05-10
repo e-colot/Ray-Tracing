@@ -3,6 +3,8 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <thread>
+
 #define MAX(a, b) ((a > b) ? a : b)
 
 // Constructors
@@ -87,10 +89,10 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 	display->add_tiles(tiles, dBm);
 }
 void Map::optimize_placement(int number_of_antenna, float precision) {
-	// parameters :									Reliable (& fast)		Precise
-	float BRUT_FORCE_TILE_SIZE = 1.0f;			//			1.0				  0.5
-	float GRADIENT_DESCENT_TILE_SIZE = 0.5f;	//			0.5				  0.2
-	float DISPLAY_TILE_SIZE = 0.2f;				//			0.2				  0.1
+	// parameters :									Fast		Reliable		Precise
+	float BRUT_FORCE_TILE_SIZE = 1.0f;			//	 2.0		  1.0			  0.5
+	float GRADIENT_DESCENT_TILE_SIZE = 0.5f;	//	 1.0		  0.5			  0.2
+	float DISPLAY_TILE_SIZE = 0.2f;				//	 0.5		  0.2			  0.1
 	if (EXERCISE) {
 		throw std::logic_error("Cannot show tiles outside of the appartment");
 	}
@@ -298,6 +300,7 @@ void Map::create_rays() const {
 			tx->get_virtual_network()[i]->create_ray(rx->get_virtual_network()[j], walls);
 		}
 	}
+	tx->calc_attenuation();
 }
 void Map::calculate_data_rate() {
 	for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
@@ -323,8 +326,8 @@ void Map::calculate_data_rate() {
 }
 void Map::calculate_data_rate(const realantennaVect& tx_antenna) {
 	floatVect data_rate_values;
-	for (RealAntenna* tx_ant : tx_antenna) {
-		tx = tx_ant;
+	for (int k = 0; k < static_cast<int>(tx_antenna.size()); k++) {
+		tx = tx_antenna[k];
 		for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
 			rx = tiles[i]->get_antenna();
 			data_rate_values.push_back(static_cast<float>(calc_rate())); // not a final result so losing some precision is acceptable
