@@ -85,7 +85,7 @@ void Map::optimize_placement(int number_of_antenna) {
 	std::cout << "Starting optimization..." << std::endl;
 	auto start_time = std::chrono::high_resolution_clock::now();
 	Map brut_force_map = Map();
-	vectorVect ant_pos = brut_force_map.brut_force(number_of_antenna, 2.0f);
+	vectorVect ant_pos = brut_force_map.brut_force(number_of_antenna, 1.0f);
 	std::cout << "Gradient descent" << std::endl;
 	Map gradient_descent_map = Map();
 	gradient_descent_map.gradient_descent(&ant_pos, 0.5f, 0.1f);
@@ -105,9 +105,60 @@ vectorVect Map::brut_force(int antenna_number, float tile_size) {
 	return best_position(antenna_number);
 }
 void Map::gradient_descent(vectorVect* pos, float tile_size, float precision) {
-	return;
+	setup_tiles(tile_size, true);
+	bool searching = true;
+	realantennaVect antennas;
+	floatVect actual;
+	while (searching) {
+		searching = false;
+		for (int i = 0; i < static_cast<int>((*pos).size()); i++) {
+			for (Vector p : *pos) {
+				antennas.push_back(new RealAntenna(p));
+			}
+			for (Vector dir : {Vector(1, 0), Vector(0, 1)}) {
+				for (float value : {-precision, 0.0f, precision}) {
+					delete antennas[i];
+					antennas[i] = new RealAntenna(pos->at(i) + dir*value);
+					calculate_data_rate(antennas);
+				}
+				int val = best_of_3();
+				if (val != 0) {
+					searching = true;
+				}
+				pos->at(i) = pos->at(i) + dir * val * precision;
+			}
+		}
+		for (Vector p : *pos) {
+			p.show();
+		}
+		std::cout << std::endl;
+	}
 }
-
+int Map::best_of_3() const { // should only be called from gradient descent
+	int best_index = 0;
+	int best_coverage = 0;
+	float best_data = 0;
+	for (int i : {0, 1, 2}) {
+		int cov = 0;
+		float data = 0.0f;
+		for (Tile* t : tiles) {
+			if (t->get_rate(i) > std::numeric_limits<double>::epsilon()) {
+				cov++;
+				data += t->get_rate(i);
+			}
+		}
+		if ((cov > best_coverage) || (cov >= best_coverage && data >= best_data)) {
+			best_index = i;
+			best_coverage = cov;
+			best_data = data;
+		}
+	}
+	// clear the rates for each tile (to call the function again)
+	for (Tile* t : tiles) {
+		t->delete_rates();
+	}
+	return (best_index - 1); // -1 to get the direction (in accordance to Map::gradient_descent)
+}
 void Map::show_map() const {
 	for (const Wall* w : walls) {
 		display->add_wall(w);
