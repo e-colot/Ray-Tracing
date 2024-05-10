@@ -72,9 +72,15 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 	display->set_tile_size(tile_size);
 	realantennaVect antennas;
 	for (Vector pos : antenna_pos) {
-		antennas.push_back(find_closest_tile(pos)->get_antenna());
+		RealAntenna* ant = new RealAntenna(pos);
+		virtualize_antenna(ant);
+		antennas.push_back(ant);
 	}
 	calculate_data_rate(antennas);
+	for (RealAntenna* ant : antennas) {
+		delete ant;
+	}
+	antennas.clear();
 	show_map();
 	display->add_tiles(tiles, dBm);
 }
@@ -84,11 +90,12 @@ void Map::optimize_placement(int number_of_antenna) {
 	}
 	std::cout << "Starting optimization..." << std::endl;
 	auto start_time = std::chrono::high_resolution_clock::now();
+	std::cout << std::endl << "    Brut force :" << std::endl << std::endl;
 	Map brut_force_map = Map();
 	vectorVect ant_pos = brut_force_map.brut_force(number_of_antenna, 1.0f);
-	std::cout << "Gradient descent" << std::endl;
+	std::cout << std::endl << "    Gradient descent" << std::endl << std::endl;
 	Map gradient_descent_map = Map();
-	gradient_descent_map.gradient_descent(&ant_pos, 0.5f, 0.1f);
+	gradient_descent_map.gradient_descent(&ant_pos, 0.5f, 0.05f);
 	std::cout << "Optimized router positions :" << std::endl;
 	for (Vector pos : ant_pos) {
 		pos.show();
@@ -109,23 +116,37 @@ void Map::gradient_descent(vectorVect* pos, float tile_size, float precision) {
 	bool searching = true;
 	realantennaVect antennas;
 	floatVect actual;
+	floatVect best;
 	while (searching) {
 		searching = false;
 		for (int i = 0; i < static_cast<int>((*pos).size()); i++) {
+			for (RealAntenna* a : antennas) {
+				delete a;
+			}
+			antennas.clear();
 			for (Vector p : *pos) {
 				antennas.push_back(new RealAntenna(p));
 			}
 			for (Vector dir : {Vector(1, 0), Vector(0, 1)}) {
+				// chosing the direction (left/right or up/down)
 				for (float value : {-precision, 0.0f, precision}) {
 					delete antennas[i];
 					antennas[i] = new RealAntenna(pos->at(i) + dir*value);
 					calculate_data_rate(antennas);
 				}
-				int val = best_of_3();
+				int val = best_of_3(&best);
 				if (val != 0) {
 					searching = true;
 				}
-				pos->at(i) = pos->at(i) + dir * val * precision;
+				// while going in this direction is better, goes in this direction
+				bool better = true;
+				while (better && val != 0) {
+					pos->at(i) = pos->at(i) + dir * val * precision;
+					delete antennas[i];
+					antennas[i] = new RealAntenna(pos->at(i));
+					calculate_data_rate(antennas);
+					better = best_of_2(&best);
+				}
 			}
 		}
 		for (Vector p : *pos) {
@@ -133,8 +154,12 @@ void Map::gradient_descent(vectorVect* pos, float tile_size, float precision) {
 		}
 		std::cout << std::endl;
 	}
+	for (RealAntenna* a : antennas) {
+		delete a;
+	}
+	std::cout << "Coverage after gradient descent : " << 100*best[0]/tiles.size() << "%" << std::endl;
 }
-int Map::best_of_3() const { // should only be called from gradient descent
+int Map::best_of_3(floatVect* best) const { // should only be called from gradient descent
 	int best_index = 0;
 	int best_coverage = 0;
 	float best_data = 0;
@@ -147,17 +172,36 @@ int Map::best_of_3() const { // should only be called from gradient descent
 				data += t->get_rate(i);
 			}
 		}
-		if ((cov > best_coverage) || (cov >= best_coverage && data >= best_data)) {
+		if ((cov > best_coverage) || (cov >= best_coverage && data > best_data + std::numeric_limits<float>::epsilon())) {
 			best_index = i;
 			best_coverage = cov;
 			best_data = data;
 		}
 	}
+	*best = { static_cast<float>(best_coverage), best_data };
 	// clear the rates for each tile (to call the function again)
 	for (Tile* t : tiles) {
 		t->delete_rates();
 	}
 	return (best_index - 1); // -1 to get the direction (in accordance to Map::gradient_descent)
+}
+bool Map::best_of_2(floatVect* best) const {
+	int cov = 0;
+	float data = 0.0f;
+	for (Tile* t : tiles) {
+		if (t->get_rate(0) > std::numeric_limits<double>::epsilon()) {
+			cov++;
+			data += t->get_rate(0);
+		}
+	}
+	for (Tile* t : tiles) {
+		t->delete_rates();
+	}
+	if ((cov > best->at(0) || (cov >= best->at(0) && data > (best->at(1) + std::numeric_limits<float>::epsilon())))) {
+		*best = { static_cast<float>(cov), data };
+		return true;
+	}
+	return false;
 }
 void Map::show_map() const {
 	for (const Wall* w : walls) {
@@ -345,7 +389,7 @@ double Map::calc_rate() const {
 	rx->reset();
 	return output;
 }
-vectorVect Map::best_position(int nbr_antennas) const {
+vectorVect Map::best_position(int nbr_antennas) const { // only called from brutforce
 	if (nbr_antennas > 2) {
 		throw std::logic_error("More than 2 antennas not handled (yet ?)");
 	}
@@ -413,9 +457,12 @@ vectorVect Map::best_position(int nbr_antennas) const {
 				}
 			}
 		}
-		std::cout << "Coverage after brut force : " << coverage[i_antenna][j_antenna] << std::endl;
 		res.push_back(tiles[i_antenna]->get_pos());
 		res.push_back(tiles[j_antenna]->get_pos());
+		for (Vector pos : res) {
+			pos.show();
+		}
+		std::cout << "Coverage after brut force : " << 100*coverage[i_antenna][j_antenna] << "%" << std::endl;
 	}
 	// more antennas could be handled using the same kind of code but with higher dimensions vectors
 	return res;

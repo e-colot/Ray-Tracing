@@ -63,5 +63,6 @@ private:
     vectorVect best_position(int nbr_antennas) const;
     vectorVect brut_force(int number_of_antenna, float tile_size); // Search best tile to place the router(s) by trying every accessible tile
     void gradient_descent(vectorVect* pos, float tile_size, float precision);
-    int best_of_3() const;
+    int best_of_3(floatVect* best) const; // returns the best direction (by index) and stores the parametres in best
+    bool best_of_2(floatVect* best) const; // returns (new pos >= last_pos)
 };
