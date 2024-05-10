@@ -211,12 +211,17 @@ void Graphics::add_text(const char text[], const Vector& p, const color& c) {
 	}
 }
 void Graphics::add_tiles(const tileVect& tiles, bool dBm) {
+	if (dBm) {
+		set_colormap_scale(62.47245f, 106.0206f);
+	}
+	else {
+		set_colormap_scale(0, 40e9f);
+	}
 	for (Tile* t : tiles) {
 		color c;
 		if (dBm) {
-			set_colormap_scale(62.47245f, 106.0206f);
 			if (t->get_rate(0) <= std::numeric_limits<double>::epsilon()) {
-				c = colormap(62.47245f, static_cast<Uint8>(75));
+				c = color({ static_cast<Uint8>(0), static_cast<Uint8>(64), static_cast<Uint8>(255), static_cast<Uint8>(75) });
 				// set to the minimum value of the colormap
 			}
 			else {
@@ -224,7 +229,6 @@ void Graphics::add_tiles(const tileVect& tiles, bool dBm) {
 			}
 		}
 		else {
-			set_colormap_scale(0, 40e9f);
 			c = colormap(t->get_rate(0), static_cast<Uint8>(75));
 		}
 		add_rect(to_pixel(t->get_pos() + Vector(0.0f, -tile_size / 2.0f)), to_pixel(tile_size), to_pixel(tile_size), c);
