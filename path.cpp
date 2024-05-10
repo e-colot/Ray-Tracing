@@ -128,14 +128,14 @@ Complex Path::calc_gamma_perp(const Wall* w, float intersection, std::vector<flo
 }
 double Path::calc_attenuation(const wallVect& walls) const {
     // determine the attenuation due to all the walls that are crossed
-    Complex attenuation = Complex(1, 0);
-    for (const Wall* w : walls) {
+    double attenuation = 1;
+    for (int i = 0; i < static_cast<int>(walls.size()); i++) {
         float intersection = -1.0f;
-        intersection = intersect_wall(w);
+        intersection = intersect_wall(walls[i]);
         if (intersection >= 0.0f) {
             // si on intersecte le mur i
-            attenuation *= calc_transmission(w, intersection);
+            attenuation *= calc_transmission(walls[i], intersection).squared_norm();
         }
     }
-    return attenuation.squared_norm();
+    return attenuation;
 }

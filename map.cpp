@@ -2,7 +2,6 @@
 #include <chrono>
 #include <iostream>
 #include <stdexcept>
-#include <omp.h> // used for parallel processing instructions
 
 #define MAX(a, b) ((a > b) ? a : b)
 
@@ -61,6 +60,8 @@ void Map::show_rays(Vector tx_pos, Vector rx_pos, bool logarithmic) {
 		r->show();
 		std::cout << std::endl;
 	}
+	delete rx; rx = nullptr;
+	delete tx; tx = nullptr;
 }
 void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_size) {
 	if (EXERCISE) {
