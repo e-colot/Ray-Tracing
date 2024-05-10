@@ -7,7 +7,7 @@
 int main(int argc, char* argv[]) {
 
     bool ray = false;
-    bool dB = false;
+    bool dB = true;
     bool optimize = true;
     int optimize_order = 2;
 
@@ -42,7 +42,8 @@ int main(int argc, char* argv[]) {
                 m->optimize_placement(optimize_order, 0.05f);
             }
             else {
-                m->show_data_rate(vectorVect{ Vector(12.5f, 4.0f), Vector(2.0f, 2.5f) }, dB);
+                //m->show_data_rate(vectorVect{ Vector(12.5f, 4.0f), Vector(2.0f, 2.5f) }, dB);
+                m->show_data_rate(vectorVect{ Vector(9.4f, 7.0f) }, dB);
             }
         }
     }

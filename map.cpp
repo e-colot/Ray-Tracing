@@ -2,6 +2,7 @@
 #include <chrono>
 #include <iostream>
 #include <stdexcept>
+#include <omp.h> // used for parallel processing instructions
 
 #define MAX(a, b) ((a > b) ? a : b)
 
@@ -280,17 +281,20 @@ void Map::virtualize_antenna(RealAntenna* a) const {
 		a->virtualize(w);
 	}
 }
+
 void Map::create_rays() const {
 	// direct link
 	tx->create_ray(rx, walls);
+
 	// 1 reflexion
-	for (Antenna* a : rx->get_virtual_network()) {
-		tx->create_ray(a, walls);
+	for (int i = 0; i < static_cast<int>(rx->get_virtual_network().size()); i++) {
+		tx->create_ray(rx->get_virtual_network()[i], walls);
 	}
+
 	// 2 reflexions
-	for (Antenna* a : tx->get_virtual_network()) {
-		for (Antenna* b : rx->get_virtual_network()) {
-			a->create_ray(b, walls);
+	for (int i = 0; i < static_cast<int>(tx->get_virtual_network().size()); i++) {
+		for (int j = 0; j < static_cast<int>(rx->get_virtual_network().size()); j++) {
+			tx->get_virtual_network()[i]->create_ray(rx->get_virtual_network()[j], walls);
 		}
 	}
 }
@@ -320,8 +324,8 @@ void Map::calculate_data_rate(const realantennaVect& tx_antenna) {
 	floatVect data_rate_values;
 	for (RealAntenna* tx_ant : tx_antenna) {
 		tx = tx_ant;
-		for (Tile* t : tiles) {
-			rx = t->get_antenna();
+		for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
+			rx = tiles[i]->get_antenna();
 			data_rate_values.push_back(static_cast<float>(calc_rate())); // not a final result so losing some precision is acceptable
 		}
 		tx = nullptr;
@@ -381,7 +385,7 @@ void Map::setup_tiles(float tile_size, bool restrained) {
 		}
 	}
 }
-double Map::calc_rate() const {
+double Map::calc_rate() const { // only called from calculate_data_rate
 	double output;
 	if (tx->get_pos() == rx->get_pos()) {
 		// if the emitter are close enough
