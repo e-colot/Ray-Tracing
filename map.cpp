@@ -88,7 +88,7 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 	show_map();
 	display->add_tiles(tiles, dBm);
 }
-void Map::optimize_placement(int number_of_antenna, float precision) {
+void Map::optimize_placement(int number_of_antenna, float precision, bool dBm) {
 	// parameters :									Fast		Reliable		Precise
 	float BRUT_FORCE_TILE_SIZE = 1.0f;			//	 2.0		  1.0			  0.5
 	float GRADIENT_DESCENT_TILE_SIZE = 0.5f;	//	 1.0		  0.5			  0.2
@@ -108,7 +108,7 @@ void Map::optimize_placement(int number_of_antenna, float precision) {
 	for (Vector pos : ant_pos) {
 		pos.show();
 	}
-	show_data_rate(ant_pos, true, DISPLAY_TILE_SIZE);
+	show_data_rate(ant_pos, dBm, DISPLAY_TILE_SIZE);
 
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);

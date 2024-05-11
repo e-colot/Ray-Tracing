@@ -44,7 +44,7 @@ public:
 public:
     void show_rays(Vector tx_pos, Vector rx_pos, bool logarithmic = false); // Shows rays on the map
     void show_data_rate(const vectorVect& antenna_pos, bool dBm = false, float tilesize = TILE_SIZE); // Shows data rate with multiple routers
-    void optimize_placement(int number_of_antenna, float precision); // Optimizes antenna placement
+    void optimize_placement(int number_of_antenna, float precision, bool dBm); // Optimizes antenna placement
 
 private:
     void show_map() const; // Shows the walls and the corners in the window
