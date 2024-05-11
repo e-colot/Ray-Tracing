@@ -71,6 +71,8 @@ void Graphics::set_tile_size(float size) {
 
 void Graphics::start() {
 	bool quit = false;
+	int x, y;
+	Vector pos;
 
 	//Event handler
 	SDL_Event e;
@@ -83,6 +85,14 @@ void Graphics::start() {
 			if (e.type == SDL_QUIT)
 			{
 				quit = true;
+			}
+			else if (e.type == SDL_MOUSEBUTTONDOWN) {
+				// Get the mouse position
+				SDL_GetMouseState(&x, &y);
+				// Print the position to the console
+				std::cout << "Mouse clicked at ";
+				pos = Vector(x, y);
+				to_pos(pos).show();
 			}
 		}
 
@@ -309,4 +319,7 @@ int Graphics::to_pixel(float f) const {
 }
 int Graphics::to_pixel(int i) const {
 	return SCALE * i;
+}
+const Vector Graphics::to_pos(const Vector& v) const {
+	return (v - offset) / SCALE;
 }
