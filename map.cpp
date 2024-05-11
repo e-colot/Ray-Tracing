@@ -9,7 +9,7 @@
 
 // Constructors
 
-Map::Map() : rx(nullptr), tx(nullptr) {
+Map::Map() {
 	setup_materials();
 	setup_walls(false);
 }
@@ -21,8 +21,6 @@ Map::Map(Graphics* g) : Map() {
 
 Map::~Map() {
 	display = nullptr;
-	rx = nullptr;
-	tx = nullptr;
 	delete exo_4_1;
 	delete concrete;
 	delete gyproc;
@@ -51,11 +49,11 @@ void Map::show_rays(Vector tx_pos, Vector rx_pos, bool logarithmic) {
 	if (display == nullptr) {
 		throw std::logic_error("No window given to show the rays");
 	}
-	rx = new RealAntenna(rx_pos);
-	tx = new RealAntenna(tx_pos);
+	RealAntenna* rx = new RealAntenna(rx_pos);
+	RealAntenna* tx = new RealAntenna(tx_pos);
 	virtualize_antenna(rx);
 	virtualize_antenna(tx);
-	create_rays();
+	create_rays(tx, rx);
 	show_map();
 	display->add_rays(tx, logarithmic);
 	for (const Ray* r : tx->get_rays()) {
@@ -285,7 +283,7 @@ void Map::virtualize_antenna(RealAntenna* a) const {
 	}
 }
 
-void Map::create_rays() const {
+void Map::create_rays(RealAntenna* tx, const RealAntenna* rx) const {
 	// direct link
 	tx->create_ray(rx, walls);
 
@@ -303,6 +301,8 @@ void Map::create_rays() const {
 	tx->calc_attenuation();
 }
 void Map::calculate_data_rate() {
+	RealAntenna* tx = nullptr;
+	RealAntenna* rx = nullptr;
 	for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
 		tx = tiles[i]->get_antenna();
 		for (int j = 0; j < static_cast<int>(tiles.size()); j++) {
@@ -317,7 +317,7 @@ void Map::calculate_data_rate() {
 			}
 			else {
 				rx = tiles[j]->get_antenna();
-				tiles[j]->add_rate(calc_rate());
+				tiles[j]->add_rate(calc_rate(tx, rx));
 			}
 		}
 		tx = nullptr;
@@ -326,11 +326,13 @@ void Map::calculate_data_rate() {
 }
 void Map::calculate_data_rate(const realantennaVect& tx_antenna) {
 	floatVect data_rate_values;
+	RealAntenna* tx = nullptr;
+	RealAntenna* rx = nullptr;
 	for (int k = 0; k < static_cast<int>(tx_antenna.size()); k++) {
 		tx = tx_antenna[k];
 		for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
 			rx = tiles[i]->get_antenna();
-			data_rate_values.push_back(static_cast<float>(calc_rate())); // not a final result so losing some precision is acceptable
+			data_rate_values.push_back(static_cast<float>(calc_rate(tx, rx))); // not a final result so losing some precision is acceptable
 		}
 		tx = nullptr;
 		rx = nullptr;
@@ -389,18 +391,17 @@ void Map::setup_tiles(float tile_size, bool restrained) {
 		}
 	}
 }
-double Map::calc_rate() const { // only called from calculate_data_rate
+double Map::calc_rate(RealAntenna* tx, const RealAntenna* rx) const { // only called from calculate_data_rate
 	double output;
 	if (tx->get_pos() == rx->get_pos()) {
 		// if the emitter are close enough
 		output = 4e10f;
 	}
 	else {
-		create_rays();
+		create_rays(tx, rx);
 		output = tx->get_binary_rate();
 	}
 	tx->reset();
-	rx->reset();
 	return output;
 }
 vectorVect Map::best_position(int nbr_antennas) const { // only called from brutforce
