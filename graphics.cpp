@@ -72,10 +72,10 @@ void Graphics::set_tile_size(float size) {
 
 void Graphics::start() {
 	if (EXERCISE) {
-		add_axis(50, 80);
+		add_axis(50, 80, 10);
 	}
 	else {
-		add_axis(15, 8);
+		add_axis(15, 8, 1);
 	}
 	bool quit = false;
 	int x, y;
@@ -276,7 +276,7 @@ void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const c
 	add_text(txt2, Vector(SCREEN_WIDTH - 120, 270), color({ 255, 255, 255, 255 }));
 	add_text(txt1, Vector(SCREEN_WIDTH - 120, 100), color({ 255, 255, 255, 255 }));
 }
-void Graphics::add_axis(int x_size, int y_size) {
+void Graphics::add_axis(int x_size, int y_size, int interval) {
 	int axis_width = 6; // even number to still be int while divided by 2
 	int space = 50; // space between axis and true (0, 0)
 	int big_side = 16; // even number to still be int while divided by 2
@@ -285,19 +285,19 @@ void Graphics::add_axis(int x_size, int y_size) {
 	int txt_space_y = txt_space_x + big_side/2;
 	color white = color({ 255, 255, 255, 255 });
 	add_rect(offset + Vector(to_pixel(x_size) / 2, -space - axis_width/2), axis_width, to_pixel(x_size + 2), white);
-	for (int x = 0; x <= x_size; x++) {
-		add_rect(to_pixel(Vector(x, 0)) + Vector(0, -space - big_side/2), big_side, small_side, white);
+	for (int x = 0; x <= x_size/interval; x++) {
+		add_rect(to_pixel(Vector(x * interval, 0)) + Vector(0, -space - big_side/2), big_side, small_side, white);
 		std::stringstream s;
-		s << x << " m";
-		Vector pos = to_pixel(Vector(x, 0)) + Vector(0, -space - txt_space_x - big_side / 2);
+		s << x * interval << " m";
+		Vector pos = to_pixel(Vector(x * interval, 0)) + Vector(0, -space - txt_space_x - big_side / 2);
 		add_text(s.str().c_str(), pos, white);
 	}
 	add_rect(offset + Vector(-space - axis_width/2, to_pixel(-1)), to_pixel(y_size + 2), axis_width, white);
-	for (int y = 0; y <= y_size; y++) {
-		add_rect(to_pixel(Vector(0, y)) + Vector(-space - axis_width / 2, - small_side / 2), small_side, big_side, white);
+	for (int y = 0; y <= y_size/interval; y++) {
+		add_rect(to_pixel(Vector(0, y * interval)) + Vector(-space - axis_width / 2, - small_side / 2), small_side, big_side, white);
 		std::stringstream s;
-		s << y << " m";
-		Vector pos = to_pixel(Vector(0, y)) + Vector(-space - big_side/2 - txt_space_y, 0);
+		s << y * interval << " m";
+		Vector pos = to_pixel(Vector(0, y * interval)) + Vector(-space - big_side/2 - txt_space_y, 0);
 		add_text(s.str().c_str(), pos, white);
 	}
 }
