@@ -100,7 +100,7 @@ void RealAntenna::add_ray(const Ray* r) {
 double RealAntenna::get_binary_rate() const {
     // 4.5 from exercises syllabus
     // + 5.27 from syllabus
-    // + 5.49 from syllabus with theta = 0
+    // + 5.49 from syllabus with theta = pi/2
     // + 1.12 from syllabus
     double received_power_mw;
     received_power_mw = static_cast<double>(emission_factor * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));

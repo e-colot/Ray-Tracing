@@ -12,7 +12,7 @@ Ray::Ray(const Antenna* t, const Antenna* r, Ray** ptr, const wallVect& walls) :
         // the following line adds the exponential and the decrease with distance terms of 4.5 from exercises syllabus
         // attenuation = cplx_exp(Complex(0.0f, -(BETA_AIR)*translation.get_norm())) / translation.get_norm();
         // it is however simplified because we don't take the phase into account 
-        attenuation = 1 / (translation.squared_norm());
+        attenuation *= 1 / (translation.squared_norm());
         create_path(walls);
     }
     delete virtual_path;
@@ -58,8 +58,9 @@ void Ray::show() const {
     for (const Path* p : path) {
         p->show();
     }
-    std::cout << "|E|^2 = " << attenuation  << " V^2" << std::endl;
-    std::cout << "P = " << (attenuation * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY))  << " mW" << std::endl;
+    // |E|^2 = 60 * P_TX (in W not mW) * G_TX * attenuation
+    std::cout << "|E|^2 = " << attenuation * P_TX / 1000 * 0.13 * 4 * PI * 60 << " (V/m)^2" << std::endl;
+    std::cout << "P = " << (attenuation * (30 * P_TX / 1000 * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY))  << " W" << std::endl;
 }
 void Ray::add_reflect(const Vector& r) {
     reflects.push_back(r);
