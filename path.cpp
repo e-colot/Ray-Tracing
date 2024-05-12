@@ -75,7 +75,7 @@ Complex Path::calc_reflection(const Wall* w, float intersection) const {
         // looks logic but only God knows why when T_m = 0, Gamma_m = NaN + j*NaN        
     }
     else {
-        Gamma_m = gamma_perp - T_m * (gamma_perp * cplx_exp(Complex(0.0f, -s + 2 * s * BETA_AIR * sin_i * sin_t) * w->get_material(intersection)->get_propagation_cst()));
+        Gamma_m = gamma_perp - T_m * (gamma_perp * cplx_exp(-s * w->get_material(intersection)->get_propagation_cst()) * cplx_exp(Complex(0.0f, BETA_AIR * 2 * s * sin_t * sin_i)));
     }
     if (gamma_perp.get_real() != gamma_perp.get_real()) {
         // happens if the ray is parallel to the wall -> no reflexion
@@ -99,8 +99,8 @@ Complex Path::calc_transmission(const Wall* w, float intersection, Complex* gamm
         // happens if the ray is parallel to the wall -> full transmission
         return Complex(1, 0);
     }
-    Complex T_m = (((1 - (gamma_perp * gamma_perp)) * cplx_exp(Complex(0.0f, - s) * w->get_material(intersection)->get_propagation_cst())) /
-        (1 - gamma_perp * gamma_perp * cplx_exp(Complex(0.0f, - 2 * s) * w->get_material(intersection)->get_propagation_cst() +
+    Complex T_m = (((1 - (gamma_perp * gamma_perp)) * cplx_exp(- s * w->get_material(intersection)->get_propagation_cst())) /
+        (1 - gamma_perp * gamma_perp * cplx_exp(- 2 * s * w->get_material(intersection)->get_propagation_cst() +
             Complex(0.0f, BETA_AIR * 2 * s * sin_t * sin_i))));
     if (T_m.get_real() != T_m.get_real() || T_m.get_imag() != T_m.get_imag()) {
         // This condition is only true if T_m.get_real() == NaN

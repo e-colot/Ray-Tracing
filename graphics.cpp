@@ -162,10 +162,8 @@ void Graphics::add_corner(const corner* c) {
 void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 	if (logarithmic) {
 		set_colormap_scale(log10(tx->get_min_attenuation()), log10(tx->get_max_attenuation()));
-		std::cout << min_value << "     " << max_value << std::endl;
 		for (const Ray* r : tx->get_rays()) {
 			color c;
-			std::cout << log10(r->get_attenuation()) << std::endl;
 			if (r->get_attenuation() <= 0.0) {
 				// if attenuation = 0;
 				// -> ray not shown

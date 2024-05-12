@@ -24,13 +24,12 @@ private:
     wallVect walls; // Walls on the map
     cornerVect corners; // Corners on the map
     tileVect tiles; // Tiles on the map
-    //RealAntenna* rx; // Receiving antenna
-    //RealAntenna* tx; // Transmitting antenna
+    bool lift;
 
     // Constructors
 public:
-    Map(); // Default constructor
-    Map(Graphics* window); // Constructor with Graphics window
+    Map(bool lift = false); // Default constructor
+    Map(Graphics* window, bool lift = false); // Constructor with Graphics window
 
     // Destructor
 public:
@@ -51,7 +50,7 @@ private:
     void add_wall(const Wall* wall_to_add); // Adds a wall to the list of walls
     void add_corner(const corner* corner_to_add); // Adds a corner to the list of corners
     void setup_materials(); // Sets up materials for the map
-    void setup_walls(bool lift); // Sets up walls on the map
+    void setup_walls(); // Sets up walls on the map
     void virtualize_antenna(RealAntenna* antenna) const; // Virtualizes an antenna
     void create_rays(RealAntenna* tx, const RealAntenna* rx) const; // Creates rays on the map
     void calculate_data_rate(); // Calculates data rate with an router on each accessible_tile
