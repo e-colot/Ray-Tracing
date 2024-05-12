@@ -46,6 +46,14 @@ void Antenna::create_ray(const Antenna* rx, const wallVect& walls) {
 
 RealAntenna::RealAntenna() : RealAntenna(Vector()) {}
 RealAntenna::RealAntenna(const Vector& position) : Antenna(position, this, nullptr), emission_factor(0.0f), min_attenuation(1.0f), max_attenuation(0.0f) {}
+RealAntenna::RealAntenna(const RealAntenna* src) : RealAntenna(src->get_pos()) {
+    for (Antenna* virtual_ant : src->get_virtual_network()) {
+        // virtual_network.push_back(virtual_ant);
+        // keeping the same and not a copy bcs the virtual antennas are not changed (not const tho bcs inherits add_ray that is not const)
+        // this above was the initial idea but it destroys the virtual antennas in the destructor so new virtual antennas are needed
+        virtual_network.push_back(new VirtualAntenna(virtual_ant));
+    }
+}
 
 // Destructor
 
@@ -143,6 +151,7 @@ void RealAntenna::calc_attenuation() {
 
 VirtualAntenna::VirtualAntenna() : Antenna() {}
 VirtualAntenna::VirtualAntenna(RealAntenna* realAntenna, const Wall* reflectedWall) : Antenna(reflectedWall->mirror(realAntenna->get_pos()), realAntenna, reflectedWall) {}
+VirtualAntenna::VirtualAntenna(const Antenna* src) : VirtualAntenna(src->get_src(), src->get_wall()) {}
 
 // Method
 

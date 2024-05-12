@@ -16,7 +16,8 @@ Tile::~Tile() {
 }
 
 // Accessors
-double Tile::get_rate(int i) const {
+double Tile::get_rate(int i) {
+    std::lock_guard<std::mutex> lock(mtx);
     return rates[i];
 }
 RealAntenna* Tile::get_antenna() const {

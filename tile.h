@@ -3,6 +3,7 @@
 #include "antenna.h"
 #include <map>
 #include <vector>
+#include <mutex>
 
 class Tile;
 
@@ -14,6 +15,7 @@ private:
     const Vector pos; // Position of the tile
     doubleVect rates; // Rates associated with the tile
     RealAntenna* antenna; // Antenna associated with the tile
+    std::mutex mtx; // to lock access while doing parallel operations
 
     // Constructors
 public:
@@ -27,7 +29,7 @@ public:
 
     // Accessors
 public:
-    double get_rate(int position) const; // Returns the rate at a specific position within the tile
+    double get_rate(int position); // Returns the rate at a specific position within the tile (non const bcs of the mutex)
     RealAntenna* get_antenna() const; // Returns the antenna associated with the tile
     const Vector& get_pos() const; // Returns the position of the tile
 

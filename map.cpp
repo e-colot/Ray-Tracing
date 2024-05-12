@@ -2,8 +2,7 @@
 #include <chrono>
 #include <iostream>
 #include <stdexcept>
-
-#include <thread>
+#include <omp.h>
 
 #define MAX(a, b) ((a > b) ? a : b)
 
@@ -88,9 +87,9 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 }
 void Map::optimize_placement(int number_of_antenna, float precision, bool dBm) {
 	// parameters :									Fast		Reliable		Precise
-	float BRUT_FORCE_TILE_SIZE = 0.5f;			//	 2.0		  1.0			  0.5
-	float GRADIENT_DESCENT_TILE_SIZE = 0.2f;	//	 1.0		  0.5			  0.2
-	float DISPLAY_TILE_SIZE = 0.1f;				//	 0.5		  0.2			  0.1
+	float BRUT_FORCE_TILE_SIZE = 1.0f;			//	 2.0		  1.0			  0.5
+	float GRADIENT_DESCENT_TILE_SIZE = 0.5f;	//	 1.0		  0.5			  0.2
+	float DISPLAY_TILE_SIZE = 0.2f;				//	 0.5		  0.2			  0.1
 	if (EXERCISE) {
 		throw std::logic_error("Cannot show tiles outside of the appartment");
 	}
@@ -303,21 +302,25 @@ void Map::create_rays(RealAntenna* tx, const RealAntenna* rx) const {
 void Map::calculate_data_rate() {
 	RealAntenna* tx = nullptr;
 	RealAntenna* rx = nullptr;
+	std::mutex mtx1;
 	for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
 		tx = tiles[i]->get_antenna();
+		float tx_pos_x = tx->get_pos().get_x();
+		float tx_pos_y = tx->get_pos().get_y();
+//#pragma omp parallel for
 		for (int j = 0; j < static_cast<int>(tiles.size()); j++) {
 			if (j < i) {
 				// if we already calculated the situation but in the other side : RX <=> TX
 				tiles[j]->add_rate(tiles[i]->get_rate(j)); //(50% time saved)
 			}
-			else if ((tx->get_pos().get_x() > 4 && tx->get_pos().get_x() < 11 && tx->get_pos().get_y() < 4) && 
+			else if ((tx_pos_x > 4 && tx_pos_x < 11 && tx_pos_y < 4) &&
 				((tiles[j]->get_pos().get_x() > 4 && tiles[j]->get_pos().get_x() < 11 && tiles[j]->get_pos().get_y() < 4))) {
 				// if both rx and tx are in the kitchen or the bathroom (ensures that putting the router in one of those rooms has a huge prejudice)
 				tiles[j]->add_rate(0.0); // (10% time saved)
 			}
 			else {
 				rx = tiles[j]->get_antenna();
-				tiles[j]->add_rate(calc_rate(tx, rx));
+				tiles[j]->add_rate(calc_rate(tx, rx, &mtx1));
 			}
 		}
 		tx = nullptr;
@@ -399,15 +402,30 @@ void Map::setup_tiles(float tile_size, bool restrained) {
 }
 double Map::calc_rate(RealAntenna* tx, const RealAntenna* rx) const { // only called from calculate_data_rate
 	double output;
-	if (tx->get_pos() == rx->get_pos()) {
+	RealAntenna tx_copy = RealAntenna(tx); // no need to virtualize bcs this constructor copy the virtual network
+	if (tx_copy.get_pos() == rx->get_pos()) {
 		// if the emitter are close enough
 		output = 4e10f;
 	}
 	else {
-		create_rays(tx, rx);
+		create_rays(&tx_copy, rx);
 		output = tx->get_binary_rate();
 	}
-	tx->reset();
+	return output;
+}
+double Map::calc_rate(const RealAntenna* tx, const RealAntenna* rx, std::mutex* mtx) const { // only called from calculate_data_rate
+	double output;
+	mtx->lock();
+	RealAntenna tx_copy = RealAntenna(tx); // no need to virtualize bcs this constructor copy the virtual network
+	mtx->unlock();
+	if (tx_copy.get_pos() == rx->get_pos()) {
+		// if the emitter are close enough
+		output = 4e10f;
+	}
+	else {
+		create_rays(&tx_copy, rx);
+		output = tx_copy.get_binary_rate();
+	}
 	return output;
 }
 vectorVect Map::best_position(int nbr_antennas) const { // only called from brutforce

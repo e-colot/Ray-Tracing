@@ -56,6 +56,7 @@ private:
 public:
     RealAntenna(); // Default constructor
     RealAntenna(const Vector& position); // Constructor with position
+    RealAntenna(const RealAntenna* src); // Copy constructor
 
     // Destructor
 public:
@@ -93,6 +94,7 @@ class VirtualAntenna : public Antenna {
 public:
     VirtualAntenna(); // Default constructor
     VirtualAntenna(RealAntenna* realAntenna, const Wall* reflectedWall); // Constructor with real antenna and reflected wall
+    VirtualAntenna(const Antenna* src); // Copy constructor
 
     // Destructor
 public:
