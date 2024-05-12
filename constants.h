@@ -11,7 +11,7 @@ extern  long long PULS;
 extern const int C;
 extern const float Z_0;
 extern const int R_A;
-extern const float P_TX;
+extern float P_TX;
 extern float BETA_AIR;
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;

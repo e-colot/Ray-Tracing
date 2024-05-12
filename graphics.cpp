@@ -9,7 +9,7 @@
 // Constructors
 
 Graphics::Graphics() : Graphics("No name") {}
-Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset((EXERCISE) ? Vector(750, 100) : Vector(200, 75)), tile_size(TILE_SIZE) {
+Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset((EXERCISE) ? Vector(750, 150) : Vector(200, 125)), tile_size(TILE_SIZE) {
 	window = NULL;
 	surface = NULL;
 	renderer = NULL;
@@ -72,7 +72,7 @@ void Graphics::set_tile_size(float size) {
 
 void Graphics::start() {
 	if (EXERCISE) {
-		//add_axis(40, 80); to correct
+		add_axis(50, 80);
 	}
 	else {
 		add_axis(15, 8);
@@ -277,16 +277,29 @@ void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const c
 	add_text(txt1, Vector(SCREEN_WIDTH - 120, 100), color({ 255, 255, 255, 255 }));
 }
 void Graphics::add_axis(int x_size, int y_size) {
-	int axis_width = 6;
+	int axis_width = 6; // even number to still be int while divided by 2
 	int space = 50; // space between axis and true (0, 0)
 	int big_side = 16; // even number to still be int while divided by 2
 	int small_side = 6; // even number to still be int while divided by 2
+	int txt_space_x = 10;
+	int txt_space_y = txt_space_x + big_side/2;
 	color white = color({ 255, 255, 255, 255 });
 	add_rect(offset + Vector(to_pixel(x_size) / 2, -space - axis_width/2), axis_width, to_pixel(x_size + 2), white);
 	for (int x = 0; x <= x_size; x++) {
 		add_rect(to_pixel(Vector(x, 0)) + Vector(0, -space - big_side/2), big_side, small_side, white);
+		std::stringstream s;
+		s << x << " m";
+		Vector pos = to_pixel(Vector(x, 0)) + Vector(0, -space - txt_space_x - big_side / 2);
+		add_text(s.str().c_str(), pos, white);
 	}
 	add_rect(offset + Vector(-space - axis_width/2, to_pixel(-1)), to_pixel(y_size + 2), axis_width, white);
+	for (int y = 0; y <= y_size; y++) {
+		add_rect(to_pixel(Vector(0, y)) + Vector(-space - axis_width / 2, - small_side / 2), small_side, big_side, white);
+		std::stringstream s;
+		s << y << " m";
+		Vector pos = to_pixel(Vector(0, y)) + Vector(-space - big_side/2 - txt_space_y, 0);
+		add_text(s.str().c_str(), pos, white);
+	}
 }
 void Graphics::add_line(const Vector& start, const Vector& end, const color& col) {
 	colored_line* line = new colored_line(start, end, col);
