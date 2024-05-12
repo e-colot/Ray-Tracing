@@ -88,9 +88,9 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 }
 void Map::optimize_placement(int number_of_antenna, float precision, bool dBm) {
 	// parameters :									Fast		Reliable		Precise
-	float BRUT_FORCE_TILE_SIZE = 0.5f;			//	 2.0		  1.0			  0.5
-	float GRADIENT_DESCENT_TILE_SIZE = 0.2f;	//	 1.0		  0.5			  0.2
-	float DISPLAY_TILE_SIZE = 0.1f;				//	 0.5		  0.2			  0.1
+	float BRUT_FORCE_TILE_SIZE = 1.0f;			//	 2.0		  1.0			  0.5
+	float GRADIENT_DESCENT_TILE_SIZE = 0.5f;	//	 1.0		  0.5			  0.2
+	float DISPLAY_TILE_SIZE = 0.2f;				//	 0.5		  0.2			  0.1
 	if (EXERCISE) {
 		throw std::logic_error("Cannot show tiles outside of the appartment");
 	}

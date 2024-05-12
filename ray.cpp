@@ -58,7 +58,8 @@ void Ray::show() const {
     for (const Path* p : path) {
         p->show();
     }
-    std::cout << "|E|^2 = " << attenuation << std::endl;
+    std::cout << "|E|^2 = " << attenuation  << " V^2" << std::endl;
+    std::cout << "P = " << (attenuation * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY))  << " mW" << std::endl;
 }
 void Ray::add_reflect(const Vector& r) {
     reflects.push_back(r);
