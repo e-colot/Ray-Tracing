@@ -8,11 +8,14 @@
 #pragma warning(disable : 4100) // disables the warning bcs it don't use argc and argv (without which SDL don't work)
 int main(int argc, char* argv[]) {
 
+    bool exercise = true;
     bool ray = true;
     bool dB = true;
     bool optimize = true;
     bool lift = false;
     int optimize_order = 2;
+
+    CHANGE_TYPE(exercise);
 
     Graphics* g;
 

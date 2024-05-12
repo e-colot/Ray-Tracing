@@ -176,11 +176,13 @@ void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 				add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
 			}
 		}
+		/* the following shows value on the colormap legend but it' don't looks good's not useful
 		std::stringstream s1;
 		s1 << log10(tx->get_max_attenuation());
 		std::stringstream s2;
 		s2 << log10(tx->get_min_attenuation());
-		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());
+		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());*/
+		add_colormap_legend();
 	}
 	else {
 		set_colormap_scale(tx->get_min_attenuation(), tx->get_max_attenuation());
@@ -191,11 +193,13 @@ void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 				add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
 			}
 		}
+		/* the following shows value on the colormap legend but it' don't looks good's not useful
 		std::stringstream s1;
 		s1 << tx->get_min_attenuation();
 		std::stringstream s2;
 		s2 << tx->get_max_attenuation();
-		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());
+		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());*/
+		add_colormap_legend();
 	}
 }
 void Graphics::add_text(const char text[], const Vector& p, const color& c) {
