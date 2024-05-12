@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
     if (EXERCISE) {
         g = new Graphics("Rays, in V^2");
         m = new Map(g);
-        m->show_rays(Vector(32, 70), Vector(47, 15), false);
+        m->show_rays(Vector(32, 70), Vector(47, 15), dB);
     }
     else {
         if (ray) {
