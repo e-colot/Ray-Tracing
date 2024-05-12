@@ -13,7 +13,7 @@ const int R_A = 71; // R_A = R_AR because the antenna has no loss (R_AL = 0)
 const float P_TX = 100.0f; // 10^(20/10), in mW
 float BETA_AIR = static_cast<float>(PULS / C);
 const int SCREEN_WIDTH = 1800;
-const int SCREEN_HEIGHT = 800;
+const int SCREEN_HEIGHT = 900;
 int SCALE = ((EXERCISE) ? 8 : 90);
 float TILE_SIZE = 0.5f;
 

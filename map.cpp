@@ -226,12 +226,15 @@ void Map::add_corner(const corner* c) {
 	corners.push_back(c);
 }
 void Map::setup_materials() {
-	exo_4_1 = new Material(4.8f, 0.018f, color({ 168, 168, 160, 255 }), 0.15f);
-
-	concrete = new Material(6.4954f, 1.43f, color({ 69, 69, 61, 255 }), 0.3f);
-	gyproc = new Material(2.7f, 0.05346f, color({ 168, 168, 160, 255 }), 0.1f);
-	glass = new Material(6.3919f, 0.00107f, color({ 126, 235, 230, 200 }), 0.05f);
-	metal = new Material(1.0f, 1e7f, color({ 117, 117, 117, 255 }), 0.05f);
+	if (EXERCISE) {
+		exo_4_1 = new Material(4.8f, 0.018f, color({ 168, 168, 160, 255 }), 0.15f);
+	}
+	else {
+		concrete = new Material(6.4954f, 1.43f, color({ 69, 69, 61, 255 }), 0.3f);
+		gyproc = new Material(2.7f, 0.05346f, color({ 168, 168, 160, 255 }), 0.1f);
+		glass = new Material(6.3919f, 0.00107f, color({ 126, 235, 230, 200 }), 0.05f);
+		metal = new Material(1.0f, 1e7f, color({ 117, 117, 117, 255 }), 0.05f);
+	}
 }
 void Map::setup_walls() {
 	// clearing old list
