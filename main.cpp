@@ -4,18 +4,21 @@
 #include "map.h"
 #include "graphics.h"
 
+#pragma warning(push)
+#pragma warning(disable : 4100) // disables the warning bcs it don't use argc and argv (without which SDL don't work)
 int main(int argc, char* argv[]) {
 
     bool ray = false;
-    bool dB = false;
+    bool dB = true;
     bool optimize = true;
+    bool lift = false;
     int optimize_order = 2;
 
     Graphics* g;
 
     Map* m;
 
-    TILE_SIZE = 0.1f;
+    TILE_SIZE = 0.5f;
 
     if (EXERCISE) {
         g = new Graphics("Rays, in V^2");
@@ -24,19 +27,18 @@ int main(int argc, char* argv[]) {
     }
     else {
         if (ray) {
-            g = new Graphics("TODO");
-            m = new Map(g);
-            m->show_rays(Vector(9.5f, 6.9f), Vector(11.1f, 4.1f), dB);
+            g = new Graphics("Rays");
+            m = new Map(g, lift);
+            m->show_rays(Vector(13.0f, 4.0f), Vector(14.0f, 7.0f), dB);
         }
         else {
             g = new Graphics("Data rate");
-            m = new Map(g);
+            m = new Map(g, lift);
             if (optimize) {
                 m->optimize_placement(optimize_order, 0.05f, dB);
             }
             else {
-                //m->show_data_rate(vectorVect{ Vector(12.5f, 4.0f), Vector(2.0f, 2.5f) }, dB);
-                m->show_data_rate(vectorVect{ Vector(9.4f, 7.0f) }, dB);
+                m->show_data_rate(vectorVect{ Vector(13.0f, 4.05f), Vector(5.8f, 5.0f) }, dB);
             }
         }
     }
@@ -48,3 +50,4 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+#pragma warning(pop)

@@ -9,11 +9,11 @@
 
 // Constructors
 
-Map::Map() : rx(nullptr), tx(nullptr) {
+Map::Map(bool lift) : lift(lift) {
 	setup_materials();
-	setup_walls(false);
+	setup_walls();
 }
-Map::Map(Graphics* g) : Map() {
+Map::Map(Graphics* g, bool lift) : Map(lift) {
 	add_window(g);
 }
 
@@ -21,8 +21,6 @@ Map::Map(Graphics* g) : Map() {
 
 Map::~Map() {
 	display = nullptr;
-	rx = nullptr;
-	tx = nullptr;
 	delete exo_4_1;
 	delete concrete;
 	delete gyproc;
@@ -51,11 +49,11 @@ void Map::show_rays(Vector tx_pos, Vector rx_pos, bool logarithmic) {
 	if (display == nullptr) {
 		throw std::logic_error("No window given to show the rays");
 	}
-	rx = new RealAntenna(rx_pos);
-	tx = new RealAntenna(tx_pos);
+	RealAntenna* rx = new RealAntenna(rx_pos);
+	RealAntenna* tx = new RealAntenna(tx_pos);
 	virtualize_antenna(rx);
 	virtualize_antenna(tx);
-	create_rays();
+	create_rays(tx, rx);
 	show_map();
 	display->add_rays(tx, logarithmic);
 	for (const Ray* r : tx->get_rays()) {
@@ -90,19 +88,19 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 }
 void Map::optimize_placement(int number_of_antenna, float precision, bool dBm) {
 	// parameters :									Fast		Reliable		Precise
-	float BRUT_FORCE_TILE_SIZE = 1.0f;			//	 2.0		  1.0			  0.5
-	float GRADIENT_DESCENT_TILE_SIZE = 0.5f;	//	 1.0		  0.5			  0.2
-	float DISPLAY_TILE_SIZE = 0.2f;				//	 0.5		  0.2			  0.1
+	float BRUT_FORCE_TILE_SIZE = 0.5f;			//	 2.0		  1.0			  0.5
+	float GRADIENT_DESCENT_TILE_SIZE = 0.2f;	//	 1.0		  0.5			  0.2
+	float DISPLAY_TILE_SIZE = 0.1f;				//	 0.5		  0.2			  0.1
 	if (EXERCISE) {
 		throw std::logic_error("Cannot show tiles outside of the appartment");
 	}
 	std::cout << "Starting optimization..." << std::endl;
 	auto start_time = std::chrono::high_resolution_clock::now();
 	std::cout << std::endl << "    Brut force :" << std::endl << std::endl;
-	Map brut_force_map = Map();
+	Map brut_force_map = Map(lift);
 	vectorVect ant_pos = brut_force_map.brut_force(number_of_antenna, BRUT_FORCE_TILE_SIZE);
 	std::cout << std::endl << "    Gradient descent" << std::endl << std::endl;
-	Map gradient_descent_map = Map();
+	Map gradient_descent_map = Map(lift);
 	gradient_descent_map.gradient_descent(&ant_pos, GRADIENT_DESCENT_TILE_SIZE, precision);
 	std::cout << std::endl << "Optimized router position(s) :" << std::endl;
 	for (Vector pos : ant_pos) {
@@ -179,7 +177,7 @@ int Map::best_of_3(floatVect* best) const { // should only be called from gradie
 		for (Tile* t : tiles) {
 			if (t->get_rate(i) > std::numeric_limits<double>::epsilon()) {
 				cov++;
-				data += t->get_rate(i);
+				data += static_cast<float>(t->get_rate(i));
 			}
 		}
 		if ((cov > best_coverage) || (cov >= best_coverage && data > best_data + std::numeric_limits<float>::epsilon())) {
@@ -201,7 +199,7 @@ bool Map::best_of_2(floatVect* best) const {
 	for (Tile* t : tiles) {
 		if (t->get_rate(0) > std::numeric_limits<double>::epsilon()) {
 			cov++;
-			data += t->get_rate(0);
+			data += static_cast<float>(t->get_rate(0));
 		}
 	}
 	for (Tile* t : tiles) {
@@ -235,7 +233,7 @@ void Map::setup_materials() {
 	glass = new Material(6.3919f, 0.00107f, color({ 126, 235, 230, 200 }), 0.05f);
 	metal = new Material(1.0f, 1e7f, color({ 117, 117, 117, 255 }), 0.05f);
 }
-void Map::setup_walls(bool lift) {
+void Map::setup_walls() {
 	// clearing old list
 	walls.clear();
 	if (EXERCISE) {
@@ -285,7 +283,7 @@ void Map::virtualize_antenna(RealAntenna* a) const {
 	}
 }
 
-void Map::create_rays() const {
+void Map::create_rays(RealAntenna* tx, const RealAntenna* rx) const {
 	// direct link
 	tx->create_ray(rx, walls);
 
@@ -303,6 +301,8 @@ void Map::create_rays() const {
 	tx->calc_attenuation();
 }
 void Map::calculate_data_rate() {
+	RealAntenna* tx = nullptr;
+	RealAntenna* rx = nullptr;
 	for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
 		tx = tiles[i]->get_antenna();
 		for (int j = 0; j < static_cast<int>(tiles.size()); j++) {
@@ -312,12 +312,12 @@ void Map::calculate_data_rate() {
 			}
 			else if ((tx->get_pos().get_x() > 4 && tx->get_pos().get_x() < 11 && tx->get_pos().get_y() < 4) && 
 				((tiles[j]->get_pos().get_x() > 4 && tiles[j]->get_pos().get_x() < 11 && tiles[j]->get_pos().get_y() < 4))) {
-				// if both rx and tx are in the kitchen or the bathroom
+				// if both rx and tx are in the kitchen or the bathroom (ensures that putting the router in one of those rooms has a huge prejudice)
 				tiles[j]->add_rate(0.0); // (10% time saved)
 			}
 			else {
 				rx = tiles[j]->get_antenna();
-				tiles[j]->add_rate(calc_rate());
+				tiles[j]->add_rate(calc_rate(tx, rx));
 			}
 		}
 		tx = nullptr;
@@ -326,11 +326,13 @@ void Map::calculate_data_rate() {
 }
 void Map::calculate_data_rate(const realantennaVect& tx_antenna) {
 	floatVect data_rate_values;
+	RealAntenna* tx = nullptr;
+	RealAntenna* rx = nullptr;
 	for (int k = 0; k < static_cast<int>(tx_antenna.size()); k++) {
 		tx = tx_antenna[k];
 		for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
 			rx = tiles[i]->get_antenna();
-			data_rate_values.push_back(static_cast<float>(calc_rate())); // not a final result so losing some precision is acceptable
+			data_rate_values.push_back(static_cast<float>(calc_rate(tx, rx))); // not a final result so losing some precision is acceptable
 		}
 		tx = nullptr;
 		rx = nullptr;
@@ -356,6 +358,9 @@ Tile* Map::find_closest_tile(const Vector& pos) const {
 	return closest_tile;
 }
 void Map::setup_tiles(float tile_size, bool restrained) {
+	if (EXERCISE) {
+		throw std::logic_error("Cannot calculate tiles outside of the appartment");
+	}
 	// deleting tiles
 	for (Tile* t : tiles) {
 		delete t;
@@ -364,14 +369,17 @@ void Map::setup_tiles(float tile_size, bool restrained) {
 	int size[2]{15, 8};
 	for (int i = 0; i <= static_cast<int>(size[0] / tile_size); i++) {
 		for (int j = 0; j <= static_cast<int>(size[1] / tile_size); j++) {
-			if (static_cast<float>(j) > (-4.0 / 3.0 * i + 24.0 / tile_size)) {
-				continue;
-			}
-			if ((static_cast<float>(j) > (6 / tile_size)) and (static_cast<float>(i) > (4 / tile_size)) and (static_cast<float>(i) < (9 / tile_size))) {
-				continue;
+			if (!lift) {
+				// if there is no lift, we don't calculate the tiles outside of the appartment
+				if (static_cast<float>(j) > (-4.0 / 3.0 * i + 24.0 / tile_size)) {
+					continue;
+				}
+				if ((static_cast<float>(j) > (6 / tile_size)) and (static_cast<float>(i) > (4 / tile_size)) and (static_cast<float>(i) < (9 / tile_size))) {
+					continue;
+				}
 			}
 			if (restrained) {
-				// using only some tiles for the optimisation saves 75% time for the brut force part
+				// using only some tiles for the optimisation saves 75% time for the brut force part (with 0.5 x 0.5 tiles)
 				bool to_keep = true;
 				for (const Wall* w : walls) {
 					if (w->inside(Vector(i * tile_size, j * tile_size))) {
@@ -389,18 +397,17 @@ void Map::setup_tiles(float tile_size, bool restrained) {
 		}
 	}
 }
-double Map::calc_rate() const { // only called from calculate_data_rate
+double Map::calc_rate(RealAntenna* tx, const RealAntenna* rx) const { // only called from calculate_data_rate
 	double output;
 	if (tx->get_pos() == rx->get_pos()) {
 		// if the emitter are close enough
 		output = 4e10f;
 	}
 	else {
-		create_rays();
+		create_rays(tx, rx);
 		output = tx->get_binary_rate();
 	}
 	tx->reset();
-	rx->reset();
 	return output;
 }
 vectorVect Map::best_position(int nbr_antennas) const { // only called from brutforce
