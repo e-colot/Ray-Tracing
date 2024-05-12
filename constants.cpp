@@ -11,7 +11,7 @@ const int C = 299792458;
 const float Z_0 = 376.73f;
 const int R_A = 71; // R_A = R_AR because the antenna has no loss (R_AL = 0)
 const float P_TX = 100.0f; // 10^(20/10), in mW
-const float BETA_AIR = PULS / C;
+float BETA_AIR = PULS / C;
 const int SCREEN_WIDTH = 1800;
 const int SCREEN_HEIGHT = 800;
 int SCALE = ((EXERCISE) ? 8 : 90);
@@ -22,4 +22,5 @@ void CHANGE_TYPE(bool exercise) {
 	FREQUENCY = static_cast<long long>((EXERCISE) ? 8683e5 : 60e9);
 	PULS = static_cast<long long>(2.0f * PI * FREQUENCY);
 	SCALE = ((EXERCISE) ? 8 : 90);
+	BETA_AIR = PULS / C;
 }

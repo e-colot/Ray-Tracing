@@ -12,7 +12,7 @@ extern const int C;
 extern const float Z_0;
 extern const int R_A;
 extern const float P_TX;
-extern const float BETA_AIR;
+extern float BETA_AIR;
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
 extern  int SCALE;
