@@ -168,7 +168,9 @@ void Graphics::add_corner(const corner* c) {
 }
 void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 	if (logarithmic) {
-		set_colormap_scale(log10(tx->get_min_attenuation()), log10(tx->get_max_attenuation()));
+		double min = 10 * log10(static_cast<double>(tx->get_min_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY)));
+		double max = 10 * log10(static_cast<double>(tx->get_max_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY)));
+		set_colormap_scale(min, max);
 		for (const Ray* r : tx->get_rays()) {
 			color c;
 			if (r->get_attenuation() <= 0.0) {
@@ -177,36 +179,34 @@ void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 				continue;
 			}
 			else {
-				c = colormap(log10(r->get_attenuation()));
+				c = colormap(10 * log10(static_cast<double>(r->get_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY))));
 			}
 			for (const Path* p : r->get_path()) {
 				add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
 			}
 		}
-		/* the following shows value on the colormap legend but it' don't looks good's not useful
 		std::stringstream s1;
-		s1 << log10(tx->get_max_attenuation());
+		s1 << max << " dBm";
 		std::stringstream s2;
-		s2 << log10(tx->get_min_attenuation());
-		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());*/
-		add_colormap_legend();
+		s2 << min << " dBm";
+		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());
 	}
 	else {
-		set_colormap_scale(tx->get_min_attenuation(), tx->get_max_attenuation());
+		double min = static_cast<double>(tx->get_min_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
+		double max = static_cast<double>(tx->get_max_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
+		set_colormap_scale(min, max);
 		for (const Ray* r : tx->get_rays()) {
 			color c;
-			c = colormap(r->get_attenuation());
+			c = colormap(static_cast<double>(r->get_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY)));
 			for (const Path* p : r->get_path()) {
 				add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
 			}
 		}
-		/* the following shows value on the colormap legend but it' don't looks good's not useful
 		std::stringstream s1;
-		s1 << tx->get_min_attenuation();
+		s1 << max << " (V/m)^2";
 		std::stringstream s2;
-		s2 << tx->get_max_attenuation();
-		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());*/
-		add_colormap_legend();
+		s2 << min << " (V/m)^2";
+		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());
 	}
 }
 void Graphics::add_text(const char text[], const Vector& p, const color& c) {

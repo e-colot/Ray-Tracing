@@ -9,12 +9,13 @@
 int main(int argc, char* argv[]) {
 
     bool exercise = false;
-    bool ray = false;
-    bool dB = true;
+    bool ray = true;
+    bool dB = false;
     bool optimize = true;
     bool lift = false;
-    int antenna_number = 1;
+    int antenna_number = 2;
     char precision_level = 2; // 0 = fast, 1 = intermediate, 2 = precise
+    TILE_SIZE = 0.5f;
 
     CHANGE_TYPE(exercise);
 
@@ -22,7 +23,6 @@ int main(int argc, char* argv[]) {
 
     Map* m;
 
-    TILE_SIZE = 0.5f;
 
     if (EXERCISE) {
         g = new Graphics("Rays, in V^2");
