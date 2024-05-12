@@ -86,13 +86,41 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 	show_map();
 	display->add_tiles(tiles, dBm);
 }
-void Map::optimize_placement(int number_of_antenna, float precision, bool dBm) {
-	// parameters :									Fast		Reliable		Precise
-	float BRUT_FORCE_TILE_SIZE = 1.0f;			//	 2.0		  1.0			  0.5
-	float GRADIENT_DESCENT_TILE_SIZE = 0.5f;	//	 1.0		  0.5			  0.2
-	float DISPLAY_TILE_SIZE = 0.2f;				//	 0.5		  0.2			  0.1
+void Map::optimize_placement(int number_of_antenna, float precision, char precision_level, bool dBm) {
+	if (number_of_antenna <= 0 || number_of_antenna > 2) {
+		throw std::logic_error("Optimization with unvalid number of antenna");
+	}
+	if (precision <= 0) {
+		throw std::logic_error("Optimization precision must be positive");
+	}
 	if (EXERCISE) {
 		throw std::logic_error("Cannot show tiles outside of the appartment");
+	}
+	if (display == nullptr) {
+		throw std::logic_error("No window given to optimize");
+	}
+	float BRUT_FORCE_TILE_SIZE;
+	float GRADIENT_DESCENT_TILE_SIZE;
+	float DISPLAY_TILE_SIZE;
+	switch (precision_level) // 0 = fast, 1 = intermediate, 2 = precise
+	{
+	case (0):
+		BRUT_FORCE_TILE_SIZE = 2.0f;
+		GRADIENT_DESCENT_TILE_SIZE = 1.0f;
+		DISPLAY_TILE_SIZE = 0.5f;
+		break;
+	case (1):
+		BRUT_FORCE_TILE_SIZE = 1.0f;
+		GRADIENT_DESCENT_TILE_SIZE = 0.5f;
+		DISPLAY_TILE_SIZE = 0.2f;
+		break;
+	case (2):
+		BRUT_FORCE_TILE_SIZE = 0.5f;
+		GRADIENT_DESCENT_TILE_SIZE = 0.2f;
+		DISPLAY_TILE_SIZE = 0.1f;
+		break;
+	default:
+		throw std::logic_error("Optimization precision level not acceptable");
 	}
 	std::cout << "Starting optimization..." << std::endl;
 	auto start_time = std::chrono::high_resolution_clock::now();

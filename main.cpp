@@ -8,12 +8,13 @@
 #pragma warning(disable : 4100) // disables the warning bcs it don't use argc and argv (without which SDL don't work)
 int main(int argc, char* argv[]) {
 
-    bool exercise = true;
-    bool ray = true;
+    bool exercise = false;
+    bool ray = false;
     bool dB = true;
     bool optimize = true;
     bool lift = false;
-    int optimize_order = 2;
+    int antenna_number = 1;
+    char precision_level = 2; // 0 = fast, 1 = intermediate, 2 = precise
 
     CHANGE_TYPE(exercise);
 
@@ -38,7 +39,7 @@ int main(int argc, char* argv[]) {
             g = new Graphics("Data rate");
             m = new Map(g, lift);
             if (optimize) {
-                m->optimize_placement(optimize_order, 0.05f, dB);
+                m->optimize_placement(antenna_number, 0.05f, precision_level, dB);
             }
             else {
                 m->show_data_rate(vectorVect{ Vector(13.0f, 4.05f), Vector(5.8f, 5.0f) }, dB);
