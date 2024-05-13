@@ -37,8 +37,8 @@ public:
 
     // Methods
 public:
-    void show_rays(Vector tx_pos, Vector rx_pos, bool logarithmic = false); // Shows rays on the map
-    void show_data_rate(const vectorVect& antenna_pos, bool dBm = false, float tilesize = TILE_SIZE); // Shows data rate with multiple routers
+    void show_rays(Vector tx_pos, Vector rx_pos, float tile_size, bool logarithmic); // Shows rays on the map
+    void show_data_rate(const vectorVect& antenna_pos, bool dBm, float tilesize); // Shows data rate with multiple routers
     void optimize_placement(int number_of_antenna, float precision, char precision_level, bool dBm); // Optimizes antenna placement
 
 private:

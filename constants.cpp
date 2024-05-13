@@ -15,7 +15,6 @@ float BETA_AIR = static_cast<float>(PULS / C);
 const int SCREEN_WIDTH = 1800;
 const int SCREEN_HEIGHT = 1000;
 int SCALE = ((EXERCISE) ? 8 : 90);
-float TILE_SIZE = 0.5f;
 
 void CHANGE_TYPE(bool exercise) {
 	EXERCISE = exercise;

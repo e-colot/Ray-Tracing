@@ -9,7 +9,7 @@
 // Constructors
 
 Graphics::Graphics() : Graphics("No name") {}
-Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset((EXERCISE) ? Vector(750, 150) : Vector(200, 125)), tile_size(TILE_SIZE) {
+Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset((EXERCISE) ? Vector(750, 150) : Vector(200, 125)), tile_size(1.0f) {
 	window = NULL;
 	surface = NULL;
 	renderer = NULL;

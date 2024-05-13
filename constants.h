@@ -15,8 +15,7 @@ extern float P_TX;
 extern float BETA_AIR;
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
-extern  int SCALE;
-extern float TILE_SIZE;
+extern int SCALE;
 
 struct color {
 	// the line above allows to initialize a color without storing a list before creating the color

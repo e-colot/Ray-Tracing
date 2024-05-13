@@ -39,10 +39,11 @@ Map::~Map() {
 
 // Methods
 
-void Map::show_rays(Vector tx_pos, Vector rx_pos, bool logarithmic) {
+void Map::show_rays(Vector tx_pos, Vector rx_pos, float tile_size, bool logarithmic) {
 	if (display == nullptr) {
 		throw std::logic_error("No window given to show the rays");
 	}
+	display->set_tile_size(tile_size);
 	RealAntenna* rx = new RealAntenna(rx_pos);
 	RealAntenna* tx = new RealAntenna(tx_pos);
 	virtualize_antenna(rx);
