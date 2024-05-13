@@ -16,15 +16,15 @@ private:
     vectorVect reflects; // Stores intermediate positions
     const Antenna* tx; // Transmitting antenna
     const Antenna* rx; // Receiving antenna
-    const Vector start; // Start point of the ray
-    const Vector translation; // Translation vector of the ray
+    const Vector start; // Start point of the ray (pos of the emitter, which can be a virtual antenna)
+    const Vector translation; // From tx to rx
     pathVect path; // Paths of the ray
     double attenuation; // Attenuation of the ray
 
     // Constructors
 public:
     Ray(); // Default constructor
-    Ray(const Antenna* emitter, const Antenna* receiver, Ray** dbl_ptr_to_this, const wallVect& all_walls); // Constructor with parameters
+    Ray(const Antenna* emitter, const Antenna* receiver, Ray** dbl_ptr_to_this, const wallVect& all_walls); // Constructor with parameters (always used)
 
     // Destructor
 public:
@@ -36,7 +36,6 @@ public:
     const Vector get_translation() const; // Returns the translation vector of the ray
     const Antenna* get_rx() const; // Returns the receiving antenna
     const Antenna* get_tx() const; // Returns the transmitting antenna
-    const vectorVect get_reflects() const; // Returns the reflection vectors
     const pathVect get_path() const; // Returns the paths of the ray
     double get_attenuation() const; // Returns the attenuation of the ray
 

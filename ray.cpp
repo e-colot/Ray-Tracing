@@ -42,9 +42,6 @@ const Antenna* Ray::get_rx() const {
 const Antenna* Ray::get_tx() const {
     return tx;
 }
-const vectorVect Ray::get_reflects() const {
-    return reflects;
-}
 const pathVect Ray::get_path() const {
     return path;
 }
