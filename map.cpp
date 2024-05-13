@@ -135,105 +135,8 @@ void Map::optimize_placement(int number_of_antenna, float precision, char precis
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
 	std::cout << std::endl << "Duration : " << duration.count() / 1e6f << " seconds" << std::endl;
 }
-vectorVect Map::brut_force(int antenna_number, float tile_size) {
-	setup_tiles(tile_size, true);
-	calculate_data_rate();
-	return best_position(antenna_number);
-}
-void Map::gradient_descent(vectorVect* pos, float tile_size, float precision) {
-	setup_tiles(tile_size, true);
-	bool searching = true;
-	realantennaVect antennas;
-	floatVect actual;
-	floatVect best;
-	while (searching) {
-		searching = false;
-		for (int i = 0; i < static_cast<int>((*pos).size()); i++) {
-			for (RealAntenna* a : antennas) {
-				delete a;
-			}
-			antennas.clear();
-			for (Vector p : *pos) {
-				antennas.push_back(new RealAntenna(p));
-			}
-			for (Vector dir : {Vector(1, 0), Vector(0, 1)}) {
-				// chosing the direction (left/right or up/down)
-				for (float value : {-precision, 0.0f, precision}) {
-					delete antennas[i];
-					antennas[i] = new RealAntenna(pos->at(i) + dir*value);
-					calculate_data_rate(antennas);
-				}
-				int val = best_of_3(&best);
-				if (val != 0) {
-					searching = true;
-				}
-				// while going in this direction is better, goes in this direction
-				bool better = true;
-				while (better && val != 0) {
-					pos->at(i) = pos->at(i) + dir * val * precision;
-					delete antennas[i];
-					antennas[i] = new RealAntenna(pos->at(i));
-					calculate_data_rate(antennas);
-					better = best_of_2(&best);
-				}
-			}
-		}
-		if (searching) {
-			for (Vector p : *pos) {
-				p.show();
-			}
-			std::cout << std::endl;
-		}
-	}
-	for (RealAntenna* a : antennas) {
-		delete a;
-	}
-	std::cout << "Coverage after gradient descent : " << 100*best[0]/tiles.size() << "%" << std::endl;
-}
-int Map::best_of_3(floatVect* best) const { // should only be called from gradient descent
-	int best_index = 0;
-	int best_coverage = 0;
-	float best_data = 0;
-	for (int i : {0, 1, 2}) {
-		int cov = 0;
-		float data = 0.0f;
-		for (Tile* t : tiles) {
-			if (t->get_rate(i) > std::numeric_limits<double>::epsilon()) {
-				cov++;
-				data += static_cast<float>(t->get_rate(i));
-			}
-		}
-		if ((cov > best_coverage) || (cov >= best_coverage && data > best_data + std::numeric_limits<float>::epsilon())) {
-			best_index = i;
-			best_coverage = cov;
-			best_data = data;
-		}
-	}
-	*best = { static_cast<float>(best_coverage), best_data };
-	// clear the rates for each tile (to call the function again)
-	for (Tile* t : tiles) {
-		t->delete_rates();
-	}
-	return (best_index - 1); // -1 to get the direction (in accordance to Map::gradient_descent)
-}
-bool Map::best_of_2(floatVect* best) const {
-	int cov = 0;
-	float data = 0.0f;
-	for (Tile* t : tiles) {
-		if (t->get_rate(0) > std::numeric_limits<double>::epsilon()) {
-			cov++;
-			data += static_cast<float>(t->get_rate(0));
-		}
-	}
-	for (Tile* t : tiles) {
-		t->delete_rates();
-	}
-	if ((cov > best->at(0) || (cov >= best->at(0) && data > (best->at(1) + std::numeric_limits<float>::epsilon())))) {
-		*best = { static_cast<float>(cov), data };
-		return true;
-	}
-	return false;
-}
+
+// utility
 void Map::show_map() const {
 	for (const Wall* w : walls) {
 		display->add_wall(w);
@@ -303,12 +206,52 @@ void Map::setup_walls() {
 		}
 	}
 }
+void Map::setup_tiles(float tile_size, bool restrained) {
+	if (EXERCISE) {
+		throw std::logic_error("Cannot calculate tiles outside of the appartment");
+	}
+	// deleting tiles
+	for (Tile* t : tiles) {
+		delete t;
+	}
+	tiles.clear();
+	int size[2]{15, 8};
+	for (int i = 0; i <= static_cast<int>(size[0] / tile_size); i++) {
+		for (int j = 0; j <= static_cast<int>(size[1] / tile_size); j++) {
+			if (!lift) {
+				// if there is no lift, we don't calculate the tiles outside of the appartment
+				if (static_cast<float>(j) > (-4.0 / 3.0 * i + 24.0 / tile_size)) {
+					continue;
+				}
+				if ((static_cast<float>(j) > (6 / tile_size)) and (static_cast<float>(i) > (4 / tile_size)) and (static_cast<float>(i) < (9 / tile_size))) {
+					continue;
+				}
+			}
+			if (restrained) {
+				// using only some tiles for the optimisation saves 75% time for the brut force part (with 0.5 x 0.5 tiles)
+				bool to_keep = true;
+				for (const Wall* w : walls) {
+					if (w->inside(Vector(i * tile_size, j * tile_size))) {
+						to_keep = false;
+						break;
+					}
+				}
+				if (!to_keep) {
+					continue;
+				}
+			}
+			Tile* new_tile = new Tile(Vector(i * tile_size, j * tile_size));
+			virtualize_antenna(new_tile->get_antenna());
+			tiles.push_back(new_tile);
+		}
+	}
+}
+// components creation
 void Map::virtualize_antenna(RealAntenna* a) const {
 	for (const Wall* w : walls) {
 		a->virtualize(w);
 	}
 }
-
 void Map::create_rays(RealAntenna* tx, const RealAntenna* rx) const {
 	// direct link
 	tx->create_ray(rx, walls);
@@ -326,6 +269,7 @@ void Map::create_rays(RealAntenna* tx, const RealAntenna* rx) const {
 	}
 	tx->calc_attenuation();
 }
+// calculations
 void Map::calculate_data_rate() {
 	RealAntenna* tx = nullptr;
 	RealAntenna* rx = nullptr;
@@ -372,46 +316,6 @@ void Map::calculate_data_rate(const realantennaVect& tx_antenna) {
 		tiles[i]->add_rate(data);
 	}
 }
-void Map::setup_tiles(float tile_size, bool restrained) {
-	if (EXERCISE) {
-		throw std::logic_error("Cannot calculate tiles outside of the appartment");
-	}
-	// deleting tiles
-	for (Tile* t : tiles) {
-		delete t;
-	}
-	tiles.clear();
-	int size[2]{15, 8};
-	for (int i = 0; i <= static_cast<int>(size[0] / tile_size); i++) {
-		for (int j = 0; j <= static_cast<int>(size[1] / tile_size); j++) {
-			if (!lift) {
-				// if there is no lift, we don't calculate the tiles outside of the appartment
-				if (static_cast<float>(j) > (-4.0 / 3.0 * i + 24.0 / tile_size)) {
-					continue;
-				}
-				if ((static_cast<float>(j) > (6 / tile_size)) and (static_cast<float>(i) > (4 / tile_size)) and (static_cast<float>(i) < (9 / tile_size))) {
-					continue;
-				}
-			}
-			if (restrained) {
-				// using only some tiles for the optimisation saves 75% time for the brut force part (with 0.5 x 0.5 tiles)
-				bool to_keep = true;
-				for (const Wall* w : walls) {
-					if (w->inside(Vector(i * tile_size, j * tile_size))) {
-						to_keep = false;
-						break;
-					}
-				}
-				if (!to_keep) {
-					continue;
-				}
-			}
-			Tile* new_tile = new Tile(Vector(i * tile_size, j * tile_size));
-			virtualize_antenna(new_tile->get_antenna());
-			tiles.push_back(new_tile);
-		}
-	}
-}
 double Map::calc_rate(RealAntenna* tx, const RealAntenna* rx) const { // only called from calculate_data_rate
 	double output;
 	if (tx->get_pos() == rx->get_pos()) {
@@ -424,6 +328,62 @@ double Map::calc_rate(RealAntenna* tx, const RealAntenna* rx) const { // only ca
 	}
 	tx->reset();
 	return output;
+}
+// optimization
+vectorVect Map::brut_force(int antenna_number, float tile_size) {
+	setup_tiles(tile_size, true);
+	calculate_data_rate();
+	return best_position(antenna_number);
+}
+void Map::gradient_descent(vectorVect* pos, float tile_size, float precision) {
+	setup_tiles(tile_size, true);
+	bool searching = true;
+	realantennaVect antennas;
+	floatVect actual;
+	floatVect best;
+	while (searching) {
+		searching = false;
+		for (int i = 0; i < static_cast<int>((*pos).size()); i++) {
+			for (RealAntenna* a : antennas) {
+				delete a;
+			}
+			antennas.clear();
+			for (Vector p : *pos) {
+				antennas.push_back(new RealAntenna(p));
+			}
+			for (Vector dir : {Vector(1, 0), Vector(0, 1)}) {
+				// chosing the direction (left/right or up/down)
+				for (float value : {-precision, 0.0f, precision}) {
+					delete antennas[i];
+					antennas[i] = new RealAntenna(pos->at(i) + dir*value);
+					calculate_data_rate(antennas);
+				}
+				int val = best_of_3(&best);
+				if (val != 0) {
+					searching = true;
+				}
+				// while going in this direction is better, goes in this direction
+				bool better = true;
+				while (better && val != 0) {
+					pos->at(i) = pos->at(i) + dir * val * precision;
+					delete antennas[i];
+					antennas[i] = new RealAntenna(pos->at(i));
+					calculate_data_rate(antennas);
+					better = best_of_2(&best);
+				}
+			}
+		}
+		if (searching) {
+			for (Vector p : *pos) {
+				p.show();
+			}
+			std::cout << std::endl;
+		}
+	}
+	for (RealAntenna* a : antennas) {
+		delete a;
+	}
+	std::cout << "Coverage after gradient descent : " << 100*best[0]/tiles.size() << "%" << std::endl;
 }
 vectorVect Map::best_position(int nbr_antennas) const { // only called from brutforce
 	if (nbr_antennas > 2) {
@@ -506,4 +466,48 @@ vectorVect Map::best_position(int nbr_antennas) const { // only called from brut
 	}
 	// more antennas could be handled using the same kind of code but with higher dimensions vectors
 	return res;
+}
+int Map::best_of_3(floatVect* best) const { // should only be called from gradient descent
+	int best_index = 0;
+	int best_coverage = 0;
+	float best_data = 0;
+	for (int i : {0, 1, 2}) {
+		int cov = 0;
+		float data = 0.0f;
+		for (Tile* t : tiles) {
+			if (t->get_rate(i) > std::numeric_limits<double>::epsilon()) {
+				cov++;
+				data += static_cast<float>(t->get_rate(i));
+			}
+		}
+		if ((cov > best_coverage) || (cov >= best_coverage && data > best_data + std::numeric_limits<float>::epsilon())) {
+			best_index = i;
+			best_coverage = cov;
+			best_data = data;
+		}
+	}
+	*best = { static_cast<float>(best_coverage), best_data };
+	// clear the rates for each tile (to call the function again)
+	for (Tile* t : tiles) {
+		t->delete_rates();
+	}
+	return (best_index - 1); // -1 to get the direction (in accordance to Map::gradient_descent)
+}
+bool Map::best_of_2(floatVect* best) const {
+	int cov = 0;
+	float data = 0.0f;
+	for (Tile* t : tiles) {
+		if (t->get_rate(0) > std::numeric_limits<double>::epsilon()) {
+			cov++;
+			data += static_cast<float>(t->get_rate(0));
+		}
+	}
+	for (Tile* t : tiles) {
+		t->delete_rates();
+	}
+	if ((cov > best->at(0) || (cov >= best->at(0) && data > (best->at(1) + std::numeric_limits<float>::epsilon())))) {
+		*best = { static_cast<float>(cov), data };
+		return true;
+	}
+	return false;
 }
