@@ -168,8 +168,8 @@ void Graphics::add_corner(const corner* c) {
 }
 void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 	if (logarithmic) {
-		double min = 10 * log10(static_cast<double>(tx->get_min_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY)));
-		double max = 10 * log10(static_cast<double>(tx->get_max_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY)));
+		double min = 10 * log10(static_cast<double>(tx->get_min_attenuation() * (30 * P_TX / 1000 * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY)));
+		double max = 10 * log10(static_cast<double>(tx->get_max_attenuation() * (30 * P_TX / 1000 * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY)));
 		set_colormap_scale(min, max);
 		for (const Ray* r : tx->get_rays()) {
 			color c;
@@ -179,7 +179,7 @@ void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 				continue;
 			}
 			else {
-				c = colormap(10 * log10(static_cast<double>(r->get_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY))));
+				c = colormap(10 * log10(static_cast<double>(r->get_attenuation() * (30 * P_TX / 1000 * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY))));
 			}
 			for (const Path* p : r->get_path()) {
 				add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
@@ -192,20 +192,20 @@ void Graphics::add_rays(const RealAntenna* tx, bool logarithmic) {
 		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());
 	}
 	else {
-		double min = static_cast<double>(tx->get_min_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
-		double max = static_cast<double>(tx->get_max_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
+		double min = static_cast<double>(tx->get_min_attenuation() * (30 * P_TX / 1000 * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
+		double max = static_cast<double>(tx->get_max_attenuation() * (30 * P_TX / 1000 * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
 		set_colormap_scale(min, max);
 		for (const Ray* r : tx->get_rays()) {
 			color c;
-			c = colormap(static_cast<double>(r->get_attenuation() * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY)));
+			c = colormap(static_cast<double>(r->get_attenuation() * (30 * P_TX / 1000 * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY)));
 			for (const Path* p : r->get_path()) {
 				add_line(to_pixel(p->get_start()), to_pixel(p->get_end()), c);
 			}
 		}
 		std::stringstream s1;
-		s1 << max << " (V/m)^2";
+		s1 << max/1000 << " W";
 		std::stringstream s2;
-		s2 << min << " (V/m)^2";
+		s2 << min/1000 << " W";
 		add_colormap_legend(s1.str().c_str(), "", "", s2.str().c_str());
 	}
 }

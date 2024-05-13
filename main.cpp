@@ -9,12 +9,12 @@
 int main(int argc, char* argv[]) {
 
     bool exercise = false;
-    bool ray = true;
-    bool dB = false;
+    bool ray = false;
+    bool dB = true;
     bool optimize = true;
     bool lift = false;
     int antenna_number = 2;
-    char precision_level = 2; // 0 = fast, 1 = intermediate, 2 = precise
+    char precision_level = 1; // 0 = fast, 1 = intermediate, 2 = precise
     TILE_SIZE = 0.5f;
 
     CHANGE_TYPE(exercise);

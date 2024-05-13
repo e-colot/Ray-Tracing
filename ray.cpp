@@ -112,6 +112,10 @@ bool Ray::exist(Path* virtual_path) {
 }
 void Ray::create_path(const wallVect& walls) {
     for (int i = 0; i < static_cast<int>((reflects.size()) - 1); i++) {
+        if (attenuation <= 0) {
+            // if attenuation = 0, no need to calculate every transmission
+            break;
+        }
         Path* new_path = new Path(reflects[i], reflects[i + 1]);
         attenuation *= new_path->calc_attenuation(walls);
         add_path(new_path);
