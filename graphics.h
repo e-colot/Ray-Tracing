@@ -67,6 +67,7 @@ public:
     // Mutator
 public:
     void set_tile_size(float size);
+    void set_colormap_scale(double min, double max); // Sets the colormap scale
 
     // Methods
 public:
@@ -80,11 +81,9 @@ public:
 private:
     void add_line(const Vector& start, const Vector& end, const color& col); // Adds a line to the window
     void add_rect(const Vector& start, int length, int width, const color& col); // Adds a rectangle to the window
-    void close(); // Closes the window
-    void set_colormap_scale(double min, double max); // Sets the colormap scale
-    const color colormap(double value, Uint8 alpha = 100) const; // Returns a color based on the value
     void add_colormap_legend(const char txt1[] = "MAXIMUM", const char txt2[] = "", const char txt3[] = "", const char txt4[] = "MINIMUM"); // Adds a colormap legend
     void add_axis(int x_size, int y_size, int interval); // add an x and y axis
+    const color colormap(double value, Uint8 alpha = 100) const; // Returns a color based on the value
     const Vector to_pixel(const Vector& v) const; // Converts a position on the map to pixel coordinates
     int to_pixel(float f) const; // Converts a float to pixel length
     int to_pixel(int i) const; // Converts an integer to pixel length

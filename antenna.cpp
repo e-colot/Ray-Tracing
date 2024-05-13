@@ -77,17 +77,6 @@ double RealAntenna::get_max_attenuation() const
     return max_attenuation;
 }
 
-// Mutators
-
-void RealAntenna::set_min_attenuation(double a)
-{
-    min_attenuation = a;
-}
-void RealAntenna::set_max_attenuation(double a)
-{
-    max_attenuation = a;
-}
-
 // Methods
 
 void RealAntenna::virtualize(const Wall* w) {
@@ -127,10 +116,10 @@ void RealAntenna::calc_attenuation() {
     for (const Ray* r : rays) {
         double att = r->get_attenuation();
         if (get_max_attenuation() < att) {
-            set_max_attenuation(att);
+            max_attenuation = att;
         }
         else if (att > 0.0 && get_min_attenuation() > att) {
-            set_min_attenuation(att);
+            min_attenuation = att;
         }
     }
 }

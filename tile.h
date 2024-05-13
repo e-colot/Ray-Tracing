@@ -19,7 +19,6 @@ private:
 public:
     Tile(); // Default constructor
     Tile(const Vector& center_of_tile); // Constructor with center position
-    Tile(const Tile* origin); // Copy constructor from another Tile
 
     // Destructor
 public:

@@ -8,7 +8,6 @@ Tile::Tile() : pos(Vector()), antenna(nullptr) {}
 Tile::Tile(const Vector& center_of_zone) : pos(center_of_zone) {
     antenna = new RealAntenna(pos);
 }
-Tile::Tile(const Tile* origin) : Tile(origin->get_pos()) {}
 
 // Destructor
 Tile::~Tile() {

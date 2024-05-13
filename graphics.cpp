@@ -67,6 +67,11 @@ Graphics::~Graphics() {
 void Graphics::set_tile_size(float size) {
 	tile_size = size;
 }
+void Graphics::set_colormap_scale(double min, double max) {
+	// small changes to make sure we stay in the interval even with the lost of precision from double to float
+	min_value = static_cast<float>(min) - std::numeric_limits<float>::epsilon();
+	max_value = static_cast<float>(max) + std::numeric_limits<float>::epsilon();
+}
 
 // Methods
 
@@ -123,7 +128,14 @@ void Graphics::start() {
 		SDL_Delay(250);
 	}
 	//Free resources and close SDL
-	close();
+	// Destroy window	
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	window = NULL;
+	renderer = NULL;
+
+	// Quit SDL subsystems
+	SDL_Quit();
 }
 void Graphics::add_wall(const Wall* w) {
 	for (int i = 0; i < static_cast<int>(w->get_intervals().size()); i += 2) {
@@ -259,11 +271,6 @@ void Graphics::add_tiles(const tileVect& tiles, bool dBm) {
 		add_colormap_legend("40 GB/s", "30 GB/s", "10 GB/s", "0  GB/s");
 	}
 }
-void Graphics::set_colormap_scale(double min, double max) {
-	// small changes to make sure we stay in the interval even with the lost of precision from double to float
-	min_value = static_cast<float>(min) - std::numeric_limits<float>::epsilon();  
-	max_value = static_cast<float>(max) + std::numeric_limits<float>::epsilon();
-}
 void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const char txt3[], const char txt4[]) {
 	for (int i = 255; i >= 0; i--)
 	{
@@ -308,16 +315,6 @@ void Graphics::add_line(const Vector& start, const Vector& end, const color& col
 void Graphics::add_rect(const Vector& start, int length, int width, const color& col) {
 	colored_rect* rect = new colored_rect(start, length, width, col);
 	rectangles.push_back(rect);
-}
-void Graphics::close() {
-	// Destroy window	
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
-	window = NULL;
-	renderer = NULL;
-
-	// Quit SDL subsystems
-	SDL_Quit();
 }
 const color Graphics::colormap(double value, Uint8 alpha) const {
 	// color first determined in HSV for a better maping

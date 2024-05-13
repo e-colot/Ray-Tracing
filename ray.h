@@ -19,7 +19,7 @@ private:
     const Vector start; // Start point of the ray (pos of the emitter, which can be a virtual antenna)
     const Vector translation; // From tx to rx
     pathVect path; // Paths of the ray
-    double attenuation; // Attenuation of the ray
+    double attenuation; // = |T_1|^2 * |T_2|^2 * |T_3|^2 * ...
 
     // Constructors
 public:

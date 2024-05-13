@@ -48,7 +48,7 @@ class RealAntenna : public Antenna {
 private:
     antennaVect virtual_network; // Virtual network of antennas
     rayVect rays; // Rays emitted by the antenna
-    double emission_factor; // Emission factor of the antenna
+    double emission_factor; // proportionnal to power, see get_binary_rate()
     double min_attenuation; // Minimum attenuation of the antenna
     double max_attenuation; // Maximum attenuation of the antenna
 
@@ -67,11 +67,6 @@ public:
     const rayVect get_rays() const; // Returns the rays emitted by the antenna
     double get_min_attenuation() const; // Returns the minimum attenuation
     double get_max_attenuation() const; // Returns the maximum attenuation
-
-    // Mutators
-public:
-    void set_min_attenuation(double min_att); // Sets the minimum attenuation
-    void set_max_attenuation(double max_att); // Sets the maximum attenuation
 
     // Methods
 public:
