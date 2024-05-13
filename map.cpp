@@ -14,7 +14,7 @@ Map::Map(bool lift) : lift(lift) {
 	setup_walls();
 }
 Map::Map(Graphics* g, bool lift) : Map(lift) {
-	add_window(g);
+	display = g;
 }
 
 // Destructor
@@ -35,12 +35,6 @@ Map::~Map() {
 	for (Tile* t : tiles) {
 		delete t;
 	}
-}
-
-// Mutator
-
-void Map::add_window(Graphics* g) {
-	display = g;
 }
 
 // Methods
@@ -376,17 +370,6 @@ void Map::calculate_data_rate(const realantennaVect& tx_antenna) {
 		}
 		tiles[i]->add_rate(data);
 	}
-}
-Tile* Map::find_closest_tile(const Vector& pos) const {
-	Tile* closest_tile = nullptr;
-	float distance = 999999.9f;
-	for (Tile* t : tiles) {
-		if (distance >= (pos - t->get_pos()).squared_norm()) {
-			distance = (pos - t->get_pos()).squared_norm();
-			closest_tile = t;
-		}
-	}
-	return closest_tile;
 }
 void Map::setup_tiles(float tile_size, bool restrained) {
 	if (EXERCISE) {

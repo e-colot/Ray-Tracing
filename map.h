@@ -24,7 +24,7 @@ private:
     wallVect walls; // Walls on the map
     cornerVect corners; // Corners on the map
     tileVect tiles; // Tiles on the map
-    bool lift;
+    bool lift; // Is the lift there
 
     // Constructors
 public:
@@ -34,10 +34,6 @@ public:
     // Destructor
 public:
     ~Map(); // Destructor
-
-    // Mutator
-public:
-    void add_window(Graphics* window); // Adds a window
 
     // Methods
 public:
@@ -55,9 +51,8 @@ private:
     void create_rays(RealAntenna* tx, const RealAntenna* rx) const; // Creates rays on the map
     void calculate_data_rate(); // Calculates data rate with an router on each accessible_tile
     void calculate_data_rate(const realantennaVect& tx_antenna); // Calculates data rate for the given routers
-    Tile* find_closest_tile(const Vector& position) const; // Finds the closest tile to a given position
-    void setup_tiles(float tile_size, bool restrained); // Sets up tiles on the map, restrained don't add tiles in the walls
-    double calc_rate(RealAntenna* tx, const RealAntenna* rx) const; // Calculates the data rate between rx and tx
+    void setup_tiles(float tile_size, bool restrained); // Sets up tiles on the map. If restrained, don't add tiles in the walls and in the doors
+    double calc_rate(RealAntenna* tx, const RealAntenna* rx) const; // Calculates the data rate between tx and rx
     vectorVect best_position(int nbr_antennas) const; // returns the best positions for the given number of routers
     vectorVect brut_force(int number_of_antenna, float tile_size); // Search best tile to place the router(s) by trying every accessible tile
     void gradient_descent(vectorVect* pos, float tile_size, float precision);
