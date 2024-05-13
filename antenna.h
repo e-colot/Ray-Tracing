@@ -49,8 +49,6 @@ private:
     antennaVect virtual_network; // Virtual network of antennas
     rayVect rays; // Rays emitted by the antenna
     double emission_factor; // proportionnal to power, see get_binary_rate()
-    double min_attenuation; // Minimum attenuation of the antenna
-    double max_attenuation; // Maximum attenuation of the antenna
 
     // Constructors
 public:
@@ -73,7 +71,6 @@ public:
     void virtualize(const Wall* wall_to_bounce); // Creates a VirtualAntenna by mirroring this antenna through the wall
     double get_binary_rate() const; // Returns the binary rate of the antenna
     void reset(); // Resets the antenna to start calculating rays and the binary rate again
-    void calc_attenuation();
 
 private:
     void add_ray(const Ray* ray_to_add) override; // Adds a ray to the antenna's rays

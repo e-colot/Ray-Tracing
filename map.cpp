@@ -267,7 +267,6 @@ void Map::create_rays(RealAntenna* tx, const RealAntenna* rx) const {
 			tx->get_virtual_network()[i]->create_ray(rx->get_virtual_network()[j], walls);
 		}
 	}
-	tx->calc_attenuation();
 }
 // calculations
 void Map::calculate_data_rate() {

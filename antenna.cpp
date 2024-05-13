@@ -45,7 +45,7 @@ void Antenna::create_ray(const Antenna* rx, const wallVect& walls) {
 // Constructors
 
 RealAntenna::RealAntenna() : RealAntenna(Vector()) {}
-RealAntenna::RealAntenna(const Vector& position) : Antenna(position, this, nullptr), emission_factor(0.0f), min_attenuation(1.0f), max_attenuation(0.0f) {}
+RealAntenna::RealAntenna(const Vector& position) : Antenna(position, this, nullptr), emission_factor(0.0f) {}
 
 // Destructor
 
@@ -69,12 +69,24 @@ const rayVect RealAntenna::get_rays() const {
 
 double RealAntenna::get_min_attenuation() const
 {
-    return min_attenuation;
+    double res = 1e50;
+    for (const Ray* r : rays) {
+        if (r->get_attenuation() > 0.0 && r->get_attenuation() < res) {
+            res = r->get_attenuation();
+        }
+    }
+    return res;
 }
 
 double RealAntenna::get_max_attenuation() const
 {
-    return max_attenuation;
+    double res = -1e50;
+    for (const Ray* r : rays) {
+        if (r->get_attenuation() > 0.0 && r->get_attenuation() > res) {
+            res = r->get_attenuation();
+        }
+    }
+    return res;
 }
 
 // Methods
@@ -109,19 +121,6 @@ void RealAntenna::reset() {
     }
     rays.clear();
     emission_factor = 0.0f;
-    min_attenuation = 0.0f;
-    max_attenuation = 0.0f;
-}
-void RealAntenna::calc_attenuation() {
-    for (const Ray* r : rays) {
-        double att = r->get_attenuation();
-        if (get_max_attenuation() < att) {
-            max_attenuation = att;
-        }
-        else if (att > 0.0 && get_min_attenuation() > att) {
-            min_attenuation = att;
-        }
-    }
 }
 
 
