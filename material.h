@@ -6,7 +6,6 @@ class Material {
     // Attributes
 private:
     const float eps; // permittivity
-    const float sigma; // Conductivity
     const color col; // Color of the material
     const float thickness; // Thickness of the material
     const Complex propagation_cst; // Propagation constant (gamma_m in syllabus)
