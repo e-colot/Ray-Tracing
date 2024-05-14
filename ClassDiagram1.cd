@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="Antenna">
+    <Position X="7" Y="5.5" Width="2" />
+    <AssociationLine Name="wall" Type="Wall" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="7" Y="5.999" />
+        <Point X="6.396" Y="5.999" Type="JumpStart" />
+        <Point X="6.229" Y="5.999" Type="JumpEnd" />
+        <Point X="6.146" Y="5.999" Type="JumpStart" />
+        <Point X="5.979" Y="5.999" Type="JumpEnd" />
+        <Point X="5.771" Y="5.999" Type="JumpStart" />
+        <Point X="5.604" Y="5.999" Type="JumpEnd" />
+        <Point X="5.583" Y="5.999" Type="JumpStart" />
+        <Point X="5.417" Y="5.999" Type="JumpEnd" />
+        <Point X="4.5" Y="5.999" />
+        <Point X="4.5" Y="5.344" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.604" Y="0.162" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAEAgoAAAAAAAgAAAABEAAAAAMA=</HashCode>
+      <FileName>antenna.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="wall" />
+      <Field Name="pos" />
+      <Field Name="src" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="RealAntenna">
+    <Position X="5.25" Y="8.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAJgQAEAADEACAAAgIAAAAAAAAAAAAAAAAgAAAAAIA=</HashCode>
+      <FileName>antenna.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VirtualAntenna">
+    <Position X="7.75" Y="8.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAIAAAAIA=</HashCode>
+      <FileName>antenna.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Complex" Collapsed="true">
+    <Position X="10.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EGAAAAAQAACEEAAAAAIAAQAAAAAAAAAABAAgAAAAAAA=</HashCode>
+      <FileName>complex.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Graphics">
+    <Position X="9.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QoeAABAAgAAAAAAhAAQBAAwACQLgAAAIAIAAQAAIgAM=</HashCode>
+      <FileName>graphics.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Tile">
+    <Position X="3" Y="8" Width="1.5" />
+    <AssociationLine Name="pos" Type="Vector" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="4.5" Y="8.708" />
+        <Point X="5.188" Y="8.708" />
+        <Point X="5.188" Y="7.562" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.508" Y="0.152" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AQAAEAQAACAAAAACAAAACIAAAAAAAAAAAAAAACAAAUA=</HashCode>
+      <FileName>tile.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="pos" />
+      <Field Name="antenna" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Map">
+    <Position X="13" Y="0.5" Width="1.5" />
+    <AssociationLine Name="concrete" Type="Material" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="14.5" Y="1.915" />
+        <Point X="14.875" Y="1.915" />
+        <Point X="14.875" Y="8.125" />
+        <Point X="14.5" Y="8.125" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.412" Y="-0.227" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="exo_4_1" Type="Material" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="14.5" Y="3.393" />
+        <Point X="14.875" Y="3.393" />
+        <Point X="14.875" Y="9.188" />
+        <Point X="14.5" Y="9.188" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.443" Y="-0.167" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="gyproc" Type="Material" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="14.5" Y="4.132" />
+        <Point X="14.875" Y="4.132" />
+        <Point X="14.875" Y="7.25" />
+        <Point X="14.5" Y="7.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.405" Y="-0.167" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="glass" Type="Material" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="14.5" Y="5.609" />
+        <Point X="14.875" Y="5.609" />
+        <Point X="14.875" Y="7.688" />
+        <Point X="14.5" Y="7.688" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.458" Y="-0.197" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="metal" Type="Material" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="14.5" Y="4.871" />
+        <Point X="14.875" Y="4.871" />
+        <Point X="14.875" Y="8.625" />
+        <Point X="14.5" Y="8.625" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.427" Y="-0.159" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAgAGgSEgBAAAAAAQAAACACAAkEJCIAAAKAIAAIACAI=</HashCode>
+      <FileName>map.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="concrete" />
+      <Field Name="display" />
+      <Field Name="exo_4_1" />
+      <Field Name="gyproc" />
+      <Field Name="glass" />
+      <Field Name="metal" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Material">
+    <Position X="13" Y="7" Width="1.5" />
+    <AssociationLine Name="impedance" Type="Complex">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0" Y="-0.26" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="propagation_cst" Type="Complex" FixedFromPoint="true">
+      <Path>
+        <Point X="13" Y="7.562" />
+        <Point X="12" Y="7.562" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.212" Y="0.057" Height="0.182" Width="2.252" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="col" Type="color">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.238" Y="-0.189" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>gEAAAAEgAAAAIAQBAAAAAQAAAAAAAAAgAAIAIAAAAAA=</HashCode>
+      <FileName>material.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="col" />
+      <Field Name="impedance" />
+      <Field Name="propagation_cst" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Path">
+    <Position X="1.5" Y="5.25" Width="1.5" />
+    <AssociationLine Name="end" Type="Vector" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3" Y="7.75" />
+        <Point X="4.938" Y="7.75" />
+        <Point X="4.938" Y="7.562" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.934" Y="0.228" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="start" Type="Vector" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3" Y="7.688" />
+        <Point X="4.562" Y="7.688" />
+        <Point X="4.562" Y="7.562" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.491" Y="-0.111" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAgIACQAAAAAIgAgAAABAAAAAAAAQAFAAAAAAAAAA=</HashCode>
+      <FileName>path.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="end" />
+      <Field Name="start" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Ray">
+    <Position X="5.25" Y="1.5" Width="1.5" />
+    <AssociationLine Name="rx" Type="Antenna" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="6.062" Y="5.747" />
+        <Point X="6.062" Y="6.687" />
+        <Point X="7" Y="6.687" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.14" Y="-0.273" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="tx" Type="Antenna" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="6.312" Y="5.747" />
+        <Point X="6.312" Y="6.25" />
+        <Point X="7" Y="6.25" />
+      </Path>
+    </AssociationLine>
+    <AssociationLine Name="translation" Type="Vector">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.053" Y="0.511" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="start" Type="Vector">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.218" Y="0.721" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>BAEAgAAAIIIACBAiCAACAAAAgKAAIAABBQAAAAAAAAA=</HashCode>
+      <FileName>ray.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="rx" />
+      <Field Name="tx" />
+      <Field Name="translation" />
+      <Field Name="start" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Vector" Collapsed="true">
+    <Position X="4.25" Y="7" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAQAgAAAACAAQAAAABAAABABEBgBAAAIAA=</HashCode>
+      <FileName>vector.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Wall">
+    <Position X="3.25" Y="2.25" Width="1.5" />
+    <AssociationLine Name="dir" Type="Vector" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3.812" Y="5.344" />
+        <Point X="3.812" Y="5.719" />
+        <Point X="4.438" Y="5.719" />
+        <Point X="4.438" Y="7" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.027" Y="0.406" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="normal" Type="Vector" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3.625" Y="5.344" />
+        <Point X="3.625" Y="7.156" />
+        <Point X="4.25" Y="7.156" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.127" Y="0.178" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="pos" Type="Vector" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3.438" Y="5.344" />
+        <Point X="3.438" Y="7.375" />
+        <Point X="4.25" Y="7.375" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.248" Y="0.001" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAIAAAAAACAAIigAAAAAAUAAEAIAABAAEA=</HashCode>
+      <FileName>wall.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dir" />
+      <Field Name="normal" />
+      <Field Name="pos" />
+    </ShowAsAssociation>
+  </Class>
+  <Struct Name="color" Collapsed="true">
+    <Position X="10.5" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoAQABAAAAAAA=</HashCode>
+      <FileName>constants.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
