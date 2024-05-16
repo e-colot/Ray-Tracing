@@ -99,12 +99,7 @@ void RealAntenna::add_ray(const Ray* r) {
     emission_factor += r->get_attenuation();
 }
 double RealAntenna::get_binary_rate() const {
-    // 4.5 from exercises syllabus
-    // + 5.27 from syllabus
-    // + 5.49 from syllabus with theta = pi/2
-    // + 1.12 from syllabus
-    double received_power_mw;
-    received_power_mw = static_cast<double>(emission_factor * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
+    double received_power_mw = get_power();
     double received_power_dBm = 10 * log10(received_power_mw);
     if (received_power_dBm > -40.0f) {
         return 40e9;
@@ -114,6 +109,21 @@ double RealAntenna::get_binary_rate() const {
     }
     double binary_rate_dB = static_cast<double>(76.9897 + ((received_power_dBm + 90) / 50 * (106.0206 - 76.9897)));
     return (pow(10.0f, binary_rate_dB / 10));
+}
+double RealAntenna::get_power() const {
+    // 4.5 from exercises syllabus
+    // + 5.27 from syllabus
+    // + 5.49 from syllabus with theta = pi/2
+    // + 1.12 from syllabus
+    double received_power_mw = static_cast<double>(emission_factor * (30 * P_TX * 0.13 * C * C) / (PI * R_A * FREQUENCY * FREQUENCY));
+    // adding a max and a min to have a reasonable colormap
+    if (received_power_mw >= 1e-2) {
+        return 1e-2;
+    }
+    if (received_power_mw <= 1e-15) {
+        return 1e-15;
+    }
+    return received_power_mw;
 }
 void RealAntenna::reset() {
     for (const Ray* r : rays) {

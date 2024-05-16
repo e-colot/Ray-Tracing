@@ -11,11 +11,12 @@ int main(int argc, char* argv[]) {
     bool exercise = false;
     bool ray = false;
     bool dB = true;
-    bool optimize = true;
+    bool optimize = false;
     bool lift = false;
     int antenna_number = 2;
-    char precision_level = 1; // 0 = fast, 1 = intermediate, 2 = precise
+    char precision_level = 0; // 0 = fast, 1 = intermediate, 2 = precise
     float tile_size = 0.5f;
+    bool power = true;
 
     CHANGE_TYPE(exercise);
 
@@ -42,7 +43,12 @@ int main(int argc, char* argv[]) {
                 m->optimize_placement(antenna_number, 0.05f, precision_level, dB);
             }
             else {
-                m->show_data_rate(vectorVect{ Vector(13.0f, 4.05f), Vector(5.8f, 5.0f) }, dB, tile_size);
+                if (power) {
+                    m->show_power(vectorVect{ Vector(13.0f, 4.05f), Vector(5.8f, 5.0f) }, dB, tile_size);
+                }
+                else {
+                    m->show_data_rate(vectorVect{ Vector(13.0f, 4.05f), Vector(5.8f, 5.0f) }, dB, tile_size);
+                }
             }
         }
     }

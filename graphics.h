@@ -76,7 +76,7 @@ public:
     void add_corner(const corner* corner_to_show); // Adds a corner to the window
     void add_rays(const RealAntenna* transmitter, bool logarithmic); // Adds rays to the window
     void add_text(const char text[], const Vector& pos, const color& col); // Adds text to the window
-    void add_tiles(const tileVect& tiles, bool dBm = false); // Adds tiles to the window
+    void add_tiles(const tileVect& tiles, bool dBm, bool power = false); // Adds tiles to the window
 
 private:
     void add_line(const Vector& start, const Vector& end, const color& col); // Adds a line to the window

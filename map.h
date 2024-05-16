@@ -38,6 +38,7 @@ public:
 public:
     void show_rays(Vector tx_pos, Vector rx_pos, float tile_size, bool logarithmic); // Shows rays on the map
     void show_data_rate(const vectorVect& antenna_pos, bool dBm, float tilesize); // Shows data rate with multiple routers
+    void show_power(const vectorVect& antenna_pos, bool dBm, float tilesize); // Shows power with multiple routers
     void optimize_placement(int number_of_antenna, float precision, char precision_level, bool dBm); // Optimizes antenna placement
 
 private:
@@ -54,7 +55,9 @@ private:
     // calculations
     void calculate_data_rate(); // Calculates data rate with an router on each accessible_tile
     void calculate_data_rate(const realantennaVect& tx_antenna); // Calculates data rate for the given routers
+    void calculate_power(const realantennaVect& tx_antenna); // Calculates power for the given routers
     double calc_rate(RealAntenna* tx, const RealAntenna* rx) const; // Calculates the data rate between tx and rx
+    double calc_power(RealAntenna* tx, const RealAntenna* rx) const; // Calculates the power received by rx emitted by tx
     // optimization
     vectorVect brut_force(int number_of_antenna, float tile_size); // Search best tile to place the router(s) by trying every accessible tile
     void gradient_descent(vectorVect* pos, float tile_size, float precision);

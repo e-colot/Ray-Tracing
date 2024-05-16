@@ -70,6 +70,7 @@ public:
 public:
     void virtualize(const Wall* wall_to_bounce); // Creates a VirtualAntenna by mirroring this antenna through the wall
     double get_binary_rate() const; // Returns the binary rate of the antenna
+    double get_power() const; // Returns the power received at the antenna
     void reset(); // Resets the antenna to start calculating rays and the binary rate again
 
 private:

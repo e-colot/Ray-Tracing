@@ -39,7 +39,7 @@ Graphics::Graphics(const char name[]) : min_value(0.0f), max_value(1.0f), offset
 		if (TTF_Init() == -1) {
 			printf("TTF could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
 		}
-		font = TTF_OpenFont("D:\\Documents\\Codage\\C++\\NewProject\\Project1\\fonts\\Bebas-Neue-master\\fonts\\BebasNeue(2018)ByDhamraType\\ttf\\BebasNeue-Regular.ttf", 20);
+		font = TTF_OpenFont(".\\fonts\\lato\\Lato-Bold.ttf", 20);
 		if (font == NULL) {
 			printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
 		}
@@ -241,12 +241,22 @@ void Graphics::add_text(const char text[], const Vector& p, const color& c) {
 		}
 	}
 }
-void Graphics::add_tiles(const tileVect& tiles, bool dBm) {
+void Graphics::add_tiles(const tileVect& tiles, bool dBm, bool power) {
 	if (dBm) {
-		set_colormap_scale(62.47245f, 106.0206f);
+		if (power) {
+			set_colormap_scale(-150.0f, -20.0f);
+		}
+		else {
+			set_colormap_scale(62.47245f, 106.0206f);
+		}
 	}
 	else {
-		set_colormap_scale(0, 40e9f);
+		if (power) {
+			set_colormap_scale(1e-15, 1e-2);
+		}
+		else {
+			set_colormap_scale(0, 40e9f);
+		}
 	}
 	for (Tile* t : tiles) {
 		color c;
@@ -265,18 +275,28 @@ void Graphics::add_tiles(const tileVect& tiles, bool dBm) {
 		add_rect(to_pixel(t->get_pos() + Vector(0.0f, -tile_size / 2.0f)), to_pixel(tile_size), to_pixel(tile_size), c);
 	}
 	if (dBm) {
-		add_colormap_legend("40 GB/s", "1.4 GB/s", "50 MB/s", "0  MB/s");
+		if (power) {
+			add_colormap_legend("> -20 dBm", "-63.3 dBm", "-106.6 dBm", "< -150 dBm");
+		}
+		else {
+			add_colormap_legend("40 GB/s", "1.4 GB/s", "50 MB/s", "0  MB/s");
+		}
 	}
 	else {
-		add_colormap_legend("40 GB/s", "30 GB/s", "10 GB/s", "0  GB/s");
+		if (power) {
+			add_colormap_legend("> 10 mW", "6.6 mW", "3.3 mW", "< 1 fW");
+		}
+		else {
+			add_colormap_legend("40 GB/s", "30 GB/s", "10 GB/s", "0  GB/s");
+		}
 	}
 }
 void Graphics::add_colormap_legend(const char txt1[], const char txt2[], const char txt3[], const char txt4[]) {
 	for (int i = 255; i >= 0; i--)
 	{
 		color c = colormap(min_value + ((255.0f - i)/255.0f) * (max_value - min_value), static_cast<Uint8>(255));
-		add_line(Vector(SCREEN_WIDTH - 80, 100 + 2 * i), Vector(SCREEN_WIDTH - 40, 100 + 2 * i), c);
-		add_line(Vector(SCREEN_WIDTH - 80, 101 + 2 * i), Vector(SCREEN_WIDTH - 40, 101 + 2 * i), c);
+		add_line(Vector(SCREEN_WIDTH - 60, 100 + 2 * i), Vector(SCREEN_WIDTH - 20, 100 + 2 * i), c);
+		add_line(Vector(SCREEN_WIDTH - 60, 101 + 2 * i), Vector(SCREEN_WIDTH - 20, 101 + 2 * i), c);
 	}
 	add_text(txt4, Vector(SCREEN_WIDTH - 120, 610), color({ 255, 255, 255, 255 }));
 	add_text(txt3, Vector(SCREEN_WIDTH - 120, 440), color({ 255, 255, 255, 255 }));

@@ -81,6 +81,29 @@ void Map::show_data_rate(const vectorVect& antenna_pos, bool dBm, float tile_siz
 	show_map();
 	display->add_tiles(tiles, dBm);
 }
+void Map::show_power(const vectorVect& antenna_pos, bool dBm, float tile_size) {
+	if (EXERCISE) {
+		throw std::logic_error("Cannot show tiles outside of the appartment");
+	}
+	setup_tiles(tile_size, false);
+	if (display == nullptr) {
+		throw std::logic_error("No window given to show the data rate");
+	}
+	display->set_tile_size(tile_size);
+	realantennaVect antennas;
+	for (Vector pos : antenna_pos) {
+		RealAntenna* ant = new RealAntenna(pos);
+		virtualize_antenna(ant);
+		antennas.push_back(ant);
+	}
+	calculate_power(antennas);
+	for (RealAntenna* ant : antennas) {
+		delete ant;
+	}
+	antennas.clear();
+	show_map();
+	display->add_tiles(tiles, dBm, true); 
+}
 void Map::optimize_placement(int number_of_antenna, float precision, char precision_level, bool dBm) {
 	if (number_of_antenna <= 0 || number_of_antenna > 2) {
 		throw std::logic_error("Optimization with unvalid number of antenna");
@@ -315,6 +338,28 @@ void Map::calculate_data_rate(const realantennaVect& tx_antenna) {
 		tiles[i]->add_rate(data);
 	}
 }
+void Map::calculate_power(const realantennaVect& tx_antenna) {
+	floatVect data_rate_values;
+	RealAntenna* tx = nullptr;
+	RealAntenna* rx = nullptr;
+	for (int k = 0; k < static_cast<int>(tx_antenna.size()); k++) {
+		tx = tx_antenna[k];
+		for (int i = 0; i < static_cast<int>(tiles.size()); i++) {
+			rx = tiles[i]->get_antenna();
+			data_rate_values.push_back(static_cast<float>(calc_power(tx, rx))); // not a final result so losing some precision is acceptable
+		}
+		tx = nullptr;
+		rx = nullptr;
+	}
+	int size = static_cast<int>(tiles.size());
+	for (int i = 0; i < size; i++) {
+		float data = 0.0f;
+		for (int j = 0; j < static_cast<int>(tx_antenna.size()); j++) {
+			data = MAX(data, data_rate_values[i + j * size]);
+		}
+		tiles[i]->add_rate(data);
+	}
+}
 double Map::calc_rate(RealAntenna* tx, const RealAntenna* rx) const { // only called from calculate_data_rate
 	double output;
 	if (tx->get_pos() == rx->get_pos()) {
@@ -325,6 +370,12 @@ double Map::calc_rate(RealAntenna* tx, const RealAntenna* rx) const { // only ca
 		create_rays(tx, rx);
 		output = tx->get_binary_rate();
 	}
+	tx->reset();
+	return output;
+}
+double Map::calc_power(RealAntenna* tx, const RealAntenna* rx) const { // only called from calculate_data_rate
+	create_rays(tx, rx);
+	double output = tx->get_power();
 	tx->reset();
 	return output;
 }
