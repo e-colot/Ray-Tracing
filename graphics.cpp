@@ -315,18 +315,24 @@ void Graphics::add_axis(int x_size, int y_size, int interval) {
 	for (int x = 0; x <= x_size/interval; x++) {
 		add_rect(to_pixel(Vector(x * interval, 0)) + Vector(0, -space - big_side/2), big_side, small_side, white);
 		std::stringstream s;
-		s << x * interval << " m";
+		s << x * interval;
 		Vector pos = to_pixel(Vector(x * interval, 0)) + Vector(0, -space - txt_space_x - big_side / 2);
 		add_text(s.str().c_str(), pos, white);
 	}
+	int x = x_size / interval + 1;
+	Vector posx = to_pixel(Vector(x * interval, 0)) + Vector(0, -space - txt_space_x - big_side / 2);
+	add_text("[m]", posx, white);
 	add_rect(offset + Vector(-space - axis_width/2, to_pixel(-1)), to_pixel(y_size + 2), axis_width, white);
 	for (int y = 0; y <= y_size/interval; y++) {
 		add_rect(to_pixel(Vector(0, y * interval)) + Vector(-space - axis_width / 2, - small_side / 2), small_side, big_side, white);
 		std::stringstream s;
-		s << y * interval << " m";
+		s << y * interval;
 		Vector pos = to_pixel(Vector(0, y * interval)) + Vector(-space - big_side/2 - txt_space_y, 0);
 		add_text(s.str().c_str(), pos, white);
 	}
+	int y = y_size / interval + 1;
+	Vector posy = to_pixel(Vector(0, y * interval)) + Vector(-space - big_side / 2 - txt_space_y, 0);
+	add_text("[m]", posy, white);
 }
 void Graphics::add_line(const Vector& start, const Vector& end, const color& col) {
 	colored_line* line = new colored_line(start, end, col);

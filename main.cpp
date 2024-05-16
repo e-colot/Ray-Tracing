@@ -15,15 +15,15 @@ int main(int argc, char* argv[]) {
     bool lift = false;
     int antenna_number = 2;
     char precision_level = 0; // 0 = fast, 1 = intermediate, 2 = precise
-    float tile_size = 0.5f;
-    bool power = true;
+    float tile_size = 0.1f;
+    bool power = false;
 
     vectorVect antennas_positions;
     if (exercise) {
         antennas_positions = { Vector(32, 70), Vector(47, 15) };
     }
     else {
-        antennas_positions = { Vector(13.0f, 4.05f), Vector(5.8f, 5.0f) };
+        antennas_positions = { Vector(9.4f, 7.0f) };
     }
 
     CHANGE_TYPE(exercise);
