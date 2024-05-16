@@ -18,6 +18,14 @@ int main(int argc, char* argv[]) {
     float tile_size = 0.5f;
     bool power = true;
 
+    vectorVect antennas_positions;
+    if (exercise) {
+        antennas_positions = { Vector(32, 70), Vector(47, 15) };
+    }
+    else {
+        antennas_positions = { Vector(13.0f, 4.05f), Vector(5.8f, 5.0f) };
+    }
+
     CHANGE_TYPE(exercise);
 
     Graphics* g;
@@ -28,13 +36,13 @@ int main(int argc, char* argv[]) {
     if (EXERCISE) {
         g = new Graphics("Rays, in V^2");
         m = new Map(g);
-        m->show_rays(Vector(32, 70), Vector(47, 15), tile_size, dB);
+        m->show_rays(antennas_positions[0], antennas_positions[1], tile_size, dB);
     }
     else {
         if (ray) {
             g = new Graphics("Rays");
             m = new Map(g, lift);
-            m->show_rays(Vector(13.0f, 4.0f), Vector(14.0f, 7.0f), tile_size, dB);
+            m->show_rays(antennas_positions[0], antennas_positions[1], tile_size, dB);
         }
         else {
             g = new Graphics("Data rate");
@@ -44,10 +52,10 @@ int main(int argc, char* argv[]) {
             }
             else {
                 if (power) {
-                    m->show_power(vectorVect{ Vector(13.0f, 4.05f), Vector(5.8f, 5.0f) }, dB, tile_size);
+                    m->show_power(antennas_positions, dB, tile_size);
                 }
                 else {
-                    m->show_data_rate(vectorVect{ Vector(13.0f, 4.05f), Vector(5.8f, 5.0f) }, dB, tile_size);
+                    m->show_data_rate(antennas_positions, dB, tile_size); 
                 }
             }
         }
